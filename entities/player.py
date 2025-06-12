@@ -3,8 +3,9 @@ import pygame, math, random
 
 
 class Player:
-    def __init__(self, sound_manager):
+    def __init__(self, sound_manager, camera):
         self.sound_manager = sound_manager
+        self.camera = camera
         self.reset_stats()
         self.x = SCREEN_WIDTH // 2
         self.y = SCREEN_HEIGHT // 2
@@ -112,6 +113,7 @@ class Player:
         """Take damage"""
         self.hp = max(0, self.hp - amount)
         self.damage_flash_timer = 0.3
+        self.camera.add_shake(intensity=1, duration=1)
     
     def add_experience(self, exp):
         """Add experience points"""

@@ -6,7 +6,7 @@ from entities.enemies import *
 
 # systems
 from systems.wave_manager import *
-
+from systems.camera import *
 
 class GameState:
     def enter(self): pass
@@ -23,10 +23,16 @@ class GameplayState(GameState):
         self.wave_manager = None
     
     def enter(self):
-        self.player = Player(self.sound_manager)
+        # INITIALIZING CAMERA
+        self.camera = Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+        # INITIALIZING OBJECT
+        self.player = Player(self.sound_manager, self.camera)
         self.enemies = []
         self.wave_manager = WaveManager(self.sound_manager)
         self.wave_manager.start_wave(1)
+
+        
         
         # Stop menu music and start game music
         self.sound_manager.stop_background_music()
@@ -37,6 +43,9 @@ class GameplayState(GameState):
         self.handle_input()
         self.player.update(dt)
         self.update_enemies(dt)
+
+        # TEST PHASE - CAMERA
+        self.camera.update(dt, self.player.x, self.player.y)
         
         # Check wave completion
         if self.wave_manager.update(dt, self.enemies):
@@ -62,10 +71,19 @@ class GameplayState(GameState):
     def render(self, screen):
         screen.fill(BLACK)
         
+        # MAKING A TEST - CAMERA
+        self.player.x, self.player.y = self.camera.world_to_screen(self.player.x, self.player.y)
+
         # Render entities
         self.player.render(screen)
         for enemy in self.enemies:
-            enemy.render(screen)
+            enemy.x, enemy.y = self.camera.world_to_screen(enemy.x, enemy.y)
+
+            # Camera View - Performance Optimization
+            if (-50 <= enemy.x <= SCREEN_WIDTH + 50
+                and -50 <= enemy.y <= SCREEN_HEIGHT + 50):
+            
+                enemy.render(screen)
         
         # Render UI
         self.render_ui(screen)

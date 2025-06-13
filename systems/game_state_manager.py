@@ -1,4 +1,3 @@
-
 class GameStateManager:
     def __init__(self):
         self.current_state = None

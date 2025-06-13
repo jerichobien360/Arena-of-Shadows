@@ -18,8 +18,8 @@ class Camera:
     def update(self, dt, target_x, target_y):
         """Update camera position to follow target with smooth movement"""
         # Calculate target camera position (center target on screen)
-        self.target_x = target_x - self.screen_width // 2
-        self.target_y = target_y - self.screen_height // 2
+        self.target_x = target_x - (self.screen_width / 2) / self.zoom
+        self.target_y = target_y - (self.screen_height / 2) / self.zoom
         
         # Smooth camera movement
         self.x += (self.target_x - self.x) * self.smoothing
@@ -28,8 +28,8 @@ class Camera:
         # Update screen shake
         if self.shake_duration > 0:
             self.shake_duration -= dt
-            shake_x = random.uniform(-self.shake_intensity, self.shake_intensity)
-            shake_y = random.uniform(-self.shake_intensity, self.shake_intensity)
+            shake_x = random.uniform(-self.shake_intensity, self.shake_intensity) / self.zoom
+            shake_y = random.uniform(-self.shake_intensity, self.shake_intensity) / self.zoom
             self.x += shake_x
             self.y += shake_y
         
@@ -64,3 +64,9 @@ class Camera:
         right = (self.x + self.screen_width) / self.zoom
         bottom = (self.y + self.screen_height) / self.zoom
         return left, top, right, bottom
+
+    def get_center_position(self):
+        """Get the center position of the camera in world coordinates"""
+        center_x = self.x + (self.screen_width / 2) / self.zoom
+        center_y = self.y + (self.screen_height / 2) / self.zoom
+        return center_x, center_y

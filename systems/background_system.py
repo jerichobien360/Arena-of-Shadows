@@ -15,28 +15,28 @@ class BackgroundSystem:
         # Layer 1: Deep background (slowest)
         self.layers.append({
             'type': 'stars',
-            'parallax_factor': 0.1,
+            'parallax_factor': 10, #0.1
             'elements': self.generate_stars(100)
         })
         
         # Layer 2: Distant terrain
         self.layers.append({
             'type': 'distant_mountains',
-            'parallax_factor': 0.3,
+            'parallax_factor': 30, #0.3
             'elements': self.generate_mountains()
         })
         
         # Layer 3: Ground tiles
         self.layers.append({
             'type': 'ground',
-            'parallax_factor': 1.0,
+            'parallax_factor': 100.0, #1.0
             'elements': self.generate_ground_tiles()
         })
         
         # Layer 4: Foreground details
         self.layers.append({
             'type': 'details',
-            'parallax_factor': 1.0,
+            'parallax_factor': 100.0, #1.0
             'elements': self.generate_details()
         })
     
@@ -292,6 +292,10 @@ class BackgroundSystem:
                     ]
                     inner_color = tuple(min(255, c + 50) for c in glow_color)
                     pygame.draw.polygon(screen, inner_color, inner_points)
+                
+                else:
+                    # Simple dot for very small crystals
+                    pygame.draw.circle(screen, glow_color, (int(screen_x), int(screen_y)), size)
     
     def get_world_bounds(self):
         """Get the bounds of the world"""

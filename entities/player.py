@@ -3,17 +3,20 @@ import pygame, math, random
 
 
 class Player:
-    def __init__(self, sound_manager, camera):
+    def __init__(self, sound_manager, camera, start_x=0, start_y=0):
         self.sound_manager = sound_manager
         self.camera = camera
         self.reset_stats()
-        self.x = SCREEN_WIDTH // 2
-        self.y = SCREEN_HEIGHT // 2
+        self.x = start_x # location_x
+        self.y = start_y # location_y
         self.radius = 15
         self.rect = pygame.Rect(self.x - self.radius, self.y - self.radius, 
                                self.radius * 2, self.radius * 2)
         self.attack_cooldown = 0
         self.damage_flash_timer = 0
+
+        # WORLD BOUNDS - (will be set by GameplayState)
+        self.world_bounds = None
         
     def reset_stats(self):
         """Reset player stats"""
@@ -56,6 +59,16 @@ class Player:
                                     self.x + dx * self.speed * dt))
         self.y = max(self.radius, min(SCREEN_HEIGHT - self.radius, 
                                     self.y + dy * self.speed * dt))
+        
+        # Apply world boundaries if they exist
+        if self.world_bounds:
+            left, top, right, bottom = self.world_bounds
+            new_x = max(left + self.radius, min(right - self.radius, new_x))
+            new_y = max(top + self.radius, min(bottom - self.radius, new_y))
+
+            # Re-update position
+            self.x = new_x
+            self.y = new_y
     
     def update_timers(self, dt):
         """Update various timers"""
@@ -146,3 +159,9 @@ class Player:
         if self.attack_cooldown <= 0:
             pygame.draw.circle(screen, (0, 255, 0, 30), 
                              (int(self.x), int(self.y)), 60, 1)
+            
+    
+    # SET WORLD BOUNDARIES
+    def set_world_bounds(self, bounds):
+        """Set world boundaries (left, top, right, bottom)"""
+        self.world_bounds = bounds

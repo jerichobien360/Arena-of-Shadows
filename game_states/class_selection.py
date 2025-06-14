@@ -1,359 +1,259 @@
 from settings import *
 from entities.character_classes import CHARACTER_CLASSES
-from game_states.gameplay import *
 import pygame
+import math
+
 
 class ClassSelectionState:
-    """State for selecting character class at game start"""
+    """State for selecting character class before starting the game"""
+    
     def __init__(self, font, sound_manager):
         self.font = font
         self.sound_manager = sound_manager
-        self.selected_class = 'warrior'
-        self.class_list = list(CHARACTER_CLASSES.keys())
+        self.large_font = pygame.font.Font(None, 64)
+        self.medium_font = pygame.font.Font(None, 36)
+        self.small_font = pygame.font.Font(None, 24)
+        
+        # Available classes
+        self.classes = ['warrior', 'mage', 'fireshooter']
+        self.class_objects = [CHARACTER_CLASSES[cls] for cls in self.classes]
+        
+        # Selection state
         self.selected_index = 0
+        self.selected_class = None
+        self.animation_time = 0
+        self.preview_time = 0
         
-        # UI properties
-        self.title_font = pygame.font.Font(None, 48)
-        self.desc_font = pygame.font.Font(None, 24)
+        # Input handling
+        self.input_cooldown = 0
         
-        # Animation
-        self.selection_timer = 0
-        self.preview_rotation = 0
+        # Animation states
+        self.fade_alpha = 255
+        self.transitioning = False
+        self.transition_target = None
+        
+        # Create class preview surfaces
+        self.preview_surfaces = {}
+        self._create_preview_surfaces()
+        
+    def _create_preview_surfaces(self):
+        """Create preview surfaces for each character class"""
+        for class_name, class_obj in zip(self.classes, self.class_objects):
+            surface = pygame.Surface((200, 200), pygame.SRCALPHA)
+            
+            # Draw class representation
+            center = (100, 100)
+            
+            # Main character circle
+            pygame.draw.circle(surface, class_obj.color, center, 30)
+            pygame.draw.circle(surface, class_obj.secondary_color, center, 30, 3)
+            
+            # Class-specific visual elements
+            if class_name == 'warrior':
+                # Draw sword
+                sword_points = [
+                    (center[0] - 5, center[1] - 40),
+                    (center[0] + 5, center[1] - 40),
+                    (center[0] + 3, center[1] + 20),
+                    (center[0] - 3, center[1] + 20)
+                ]
+                pygame.draw.polygon(surface, (150, 150, 150), sword_points)
+                # Sword hilt
+                pygame.draw.rect(surface, (100, 50, 0), (center[0] - 8, center[1] + 20, 16, 6))
+                
+            elif class_name == 'mage':
+                # Draw staff
+                pygame.draw.line(surface, (100, 50, 0), 
+                               (center[0] + 20, center[1] - 30), 
+                               (center[0] + 20, center[1] + 30), 3)
+                # Staff orb
+                pygame.draw.circle(surface, (100, 100, 255), (center[0] + 20, center[1] - 35), 8)
+                pygame.draw.circle(surface, (200, 200, 255), (center[0] + 20, center[1] - 35), 5)
+                
+            elif class_name == 'fireshooter':
+                # Draw flame weapon
+                flame_points = [
+                    (center[0] + 25, center[1] - 10),
+                    (center[0] + 35, center[1] - 15),
+                    (center[0] + 40, center[1]),
+                    (center[0] + 35, center[1] + 15),
+                    (center[0] + 25, center[1] + 10)
+                ]
+                pygame.draw.polygon(surface, (255, 100, 0), flame_points)
+                pygame.draw.polygon(surface, (255, 200, 0), flame_points[1:-1])
+            
+            self.preview_surfaces[class_name] = surface
     
     def enter(self):
-        """Initialize class selection"""
-        self.sound_manager.play_sound('menu_select')
+        """Initialize state when entering"""
+        self.selected_index = 0
+        self.selected_class = None
+        self.animation_time = 0
+        self.fade_alpha = 255
+        self.transitioning = False
+        
+        # Play selection music if available
+        self.sound_manager.stop_background_music()
+        if self.sound_manager.load_background_music("assets/background_music/class_selection.mp3"):
+            self.sound_manager.play_background_music()
     
     def update(self, dt):
-        """Update class selection state"""
-        self.selection_timer += dt
-        self.preview_rotation += dt * 50  # Rotate preview
+        """Update selection state"""
+        self.animation_time += dt
+        self.preview_time += dt
         
-        keys = pygame.key.get_pressed()
+        # Handle input cooldown
+        if self.input_cooldown > 0:
+            self.input_cooldown -= dt
         
-        # Navigate classes
-        if self._is_key_just_pressed(pygame.K_LEFT) or self._is_key_just_pressed(pygame.K_a):
-            self.selected_index = (self.selected_index - 1) % len(self.class_list)
-            self.selected_class = self.class_list[self.selected_index]
-            self.sound_manager.play_sound('menu_move')
+        # Handle fade in
+        if not self.transitioning and self.fade_alpha > 0:
+            self.fade_alpha = max(0, self.fade_alpha - 300 * dt)
         
-        elif self._is_key_just_pressed(pygame.K_RIGHT) or self._is_key_just_pressed(pygame.K_d):
-            self.selected_index = (self.selected_index + 1) % len(self.class_list)
-            self.selected_class = self.class_list[self.selected_index]
-            self.sound_manager.play_sound('menu_move')
+        # Handle input
+        if self.input_cooldown <= 0 and not self.transitioning:
+            keys = pygame.key.get_pressed()
+            
+            # Navigation
+            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+                self.selected_index = (self.selected_index - 1) % len(self.classes)
+                self.input_cooldown = 0.2
+                self.sound_manager.play_sound('menu_move')
+                
+            elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+                self.selected_index = (self.selected_index + 1) % len(self.classes)
+                self.input_cooldown = 0.2
+                self.sound_manager.play_sound('menu_move')
+            
+            # Selection
+            elif keys[pygame.K_RETURN] or keys[pygame.K_SPACE]:
+                self.selected_class = self.classes[self.selected_index]
+                self._start_transition()
+                self.sound_manager.play_sound('menu_select')
+            
+            # Go back
+            elif keys[pygame.K_ESCAPE]:
+                self._start_transition("main_menu")
         
-        # Confirm selection
-        if self._is_key_just_pressed(pygame.K_RETURN) or self._is_key_just_pressed(pygame.K_SPACE):
-            self.sound_manager.play_sound('menu_confirm')
-            return "gameplay"
-        
-        # Go back to menu
-        if self._is_key_just_pressed(pygame.K_ESCAPE):
-            return "menu"
+        # Handle transition
+        if self.transitioning:
+            self.fade_alpha = min(255, self.fade_alpha + 400 * dt)
+            if self.fade_alpha >= 255:
+                return self.transition_target
         
         return None
     
+    def _start_transition(self, target=None):
+        """Start transition animation"""
+        self.transitioning = True
+        if target:
+            self.transition_target = target
+        else:
+            self.transition_target = "gameplay"
+    
     def render(self, screen):
-        """Render class selection screen"""
+        """Render class selection interface"""
         screen.fill((20, 20, 40))  # Dark blue background
         
-        # Title
-        title = self.title_font.render("Choose Your Class", True, WHITE)
-        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, 80))
-        screen.blit(title, title_rect)
+        # Render title
+        title_surface = self.large_font.render("Choose Your Class", True, WHITE)
+        title_rect = title_surface.get_rect(center=(SCREEN_WIDTH // 2, 80))
+        screen.blit(title_surface, title_rect)
         
-        # Class selection area
-        self._render_class_selection(screen)
+        # Calculate positions for class previews
+        class_width = 250
+        total_width = class_width * len(self.classes)
+        start_x = (SCREEN_WIDTH - total_width) // 2
         
-        # Instructions
-        instructions = [
-            "Use A/D or Arrow Keys to navigate",
-            "Press ENTER or SPACE to select",
-            "Press ESC to go back"
-        ]
-        
-        for i, instruction in enumerate(instructions):
-            text = self.font.render(instruction, True, GRAY)
-            text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 80 + i * 25))
-            screen.blit(text, text_rect)
-    
-    def _render_class_selection(self, screen):
-        """Render the class selection interface"""
-        center_x = SCREEN_WIDTH // 2
-        center_y = SCREEN_HEIGHT // 2
-        
-        # Render all classes
-        for i, class_name in enumerate(self.class_list):
-            char_class = CHARACTER_CLASSES[class_name]
-            offset_x = (i - self.selected_index) * 300
+        # Render each class option
+        for i, (class_name, class_obj) in enumerate(zip(self.classes, self.class_objects)):
+            x = start_x + i * class_width + class_width // 2
+            y = SCREEN_HEIGHT // 2
             
-            # Calculate position and scale based on selection
-            class_x = center_x + offset_x
-            class_y = center_y - 50
+            # Highlight selected class
+            is_selected = i == self.selected_index
             
-            is_selected = (i == self.selected_index)
-            scale = 1.5 if is_selected else 1.0
-            alpha = 255 if is_selected else 128
+            # Animated selection indicator
+            if is_selected:
+                pulse = 1.0 + 0.1 * math.sin(self.animation_time * 4)
+                glow_radius = int(80 * pulse)
+                
+                # Create glow effect
+                glow_surf = pygame.Surface((glow_radius * 2, glow_radius * 2), pygame.SRCALPHA)
+                pygame.draw.circle(glow_surf, (*class_obj.color, 30), 
+                                 (glow_radius, glow_radius), glow_radius)
+                screen.blit(glow_surf, (x - glow_radius, y - glow_radius))
+                
+                # Selection border
+                pygame.draw.circle(screen, class_obj.color, (x, y), 85, 4)
             
-            # Only render if on screen
-            if -100 < class_x < SCREEN_WIDTH + 100:
-                self._render_class_preview(screen, char_class, class_x, class_y, scale, alpha, is_selected)
-    
-    def _render_class_preview(self, screen, char_class, x, y, scale, alpha, is_selected):
-        """Render preview of a character class"""
-        # Create surface for alpha blending
-        preview_surface = pygame.Surface((200, 300), pygame.SRCALPHA)
+            # Background circle for class preview
+            bg_color = (60, 60, 80) if not is_selected else (80, 80, 100)
+            pygame.draw.circle(screen, bg_color, (x, y), 80)
+            pygame.draw.circle(screen, class_obj.secondary_color, (x, y), 80, 2)
+            
+            # Render class preview
+            preview_surf = self.preview_surfaces[class_name]
+            preview_rect = preview_surf.get_rect(center=(x, y))
+            screen.blit(preview_surf, preview_rect)
+            
+            # Class name
+            name_color = class_obj.color if is_selected else WHITE
+            name_surface = self.medium_font.render(class_obj.name.title(), True, name_color)
+            name_rect = name_surface.get_rect(center=(x, y + 120))
+            screen.blit(name_surface, name_rect)
         
-        # Class visual representation
-        radius = int(30 * scale)
-        pygame.draw.circle(preview_surface, char_class.color, (100, 100), radius)
+        # Render selected class details
+        if 0 <= self.selected_index < len(self.class_objects):
+            selected_class = self.class_objects[self.selected_index]
+            
+            # Description
+            desc_y = SCREEN_HEIGHT - 200
+            desc_surface = self.font.render(selected_class.description, True, WHITE)
+            desc_rect = desc_surface.get_rect(center=(SCREEN_WIDTH // 2, desc_y))
+            screen.blit(desc_surface, desc_rect)
+            
+            # Stats
+            stats_y = desc_y + 40
+            stats = [
+                f"HP: {selected_class.base_hp}",
+                f"Attack: {selected_class.base_attack_power}",
+                f"Speed: {selected_class.base_speed}",
+                f"Range: {selected_class.base_attack_range}"
+            ]
+            
+            stats_text = " | ".join(stats)
+            stats_surface = self.small_font.render(stats_text, True, (200, 200, 200))
+            stats_rect = stats_surface.get_rect(center=(SCREEN_WIDTH // 2, stats_y))
+            screen.blit(stats_surface, stats_rect)
+            
+            # Special ability
+            special_y = stats_y + 30
+            special_text = f"Special: {selected_class.special_ability_name}"
+            special_surface = self.small_font.render(special_text, True, selected_class.color)
+            special_rect = special_surface.get_rect(center=(SCREEN_WIDTH // 2, special_y))
+            screen.blit(special_surface, special_rect)
         
-        # Add selection glow
-        if is_selected:
-            glow_intensity = int(50 + 50 * abs(math.sin(self.selection_timer * 3)))
-            glow_color = (*char_class.secondary_color, glow_intensity)
-            pygame.draw.circle(preview_surface, glow_color, (100, 100), radius + 10, 3)
+        # Controls
+        controls_y = SCREEN_HEIGHT - 60
+        controls_surface = self.small_font.render(
+            "A/D or ←/→: Navigate | ENTER/SPACE: Select | ESC: Back", 
+            True, (150, 150, 150)
+        )
+        controls_rect = controls_surface.get_rect(center=(SCREEN_WIDTH // 2, controls_y))
+        screen.blit(controls_surface, controls_rect)
         
-        # Class name
-        name_text = self.font.render(char_class.name, True, WHITE)
-        name_rect = name_text.get_rect(center=(100, 150))
-        preview_surface.blit(name_text, name_rect)
-        
-        # Class stats preview
-        if is_selected:
-            self._render_class_stats(preview_surface, char_class, 100, 180)
-        
-        # Apply alpha and blit to main screen
-        preview_surface.set_alpha(alpha)
-        screen.blit(preview_surface, (x - 100, y - 100))
-    
-    def _render_class_stats(self, surface, char_class, center_x, start_y):
-        """Render class statistics"""
-        stats = [
-            f"HP: {int(100 * char_class.hp_modifier)}",
-            f"ATK: {int(25 * char_class.attack_modifier)}",
-            f"SPD: {int(200 * char_class.speed_modifier)}",
-            f"DEF: {int(10 * char_class.defense_modifier)}"
-        ]
-        
-        for i, stat in enumerate(stats):
-            stat_text = self.desc_font.render(stat, True, GRAY)
-            stat_rect = stat_text.get_rect(center=(center_x, start_y + i * 20))
-            surface.blit(stat_text, stat_rect)
-    
-    def _is_key_just_pressed(self, key):
-        """Simple key press detection (you might want to use InputHandler)"""
-        # This is a simplified version - in a real game you'd use proper input handling
-        return pygame.key.get_pressed()[key]
+        # Fade overlay
+        if self.fade_alpha > 0:
+            fade_surf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+            fade_surf.set_alpha(int(self.fade_alpha))
+            fade_surf.fill(BLACK)
+            screen.blit(fade_surf, (0, 0))
     
     def get_selected_class(self):
         """Get the currently selected class"""
         return self.selected_class
-
-# Enhanced GameplayState integration
-class EnhancedGameplayState(GameplayState):
-    """Enhanced gameplay state with better class integration"""
     
-    def __init__(self, font, sound_manager, selected_class='warrior'):
-        super().__init__(font, sound_manager)
-        self.selected_class = selected_class
-        self.class_ui_timer = 0
-        
-        # Class-specific UI elements
-        self.show_class_abilities = False
-        self.ability_cooldown_display = {}
-    
-    def _initialize_entities(self):
-        """Initialize game entities with selected class"""
-        # Set world bounds for player
-        world_bounds = (0, 0, WORLD_WIDTH, WORLD_HEIGHT)
-        
-        self.player = Player(
-            self.sound_manager, 
-            self.camera, 
-            character_class=self.selected_class,
-            start_x=WORLD_WIDTH // 2,
-            start_y=WORLD_HEIGHT // 2
-        )
-        
-        # Set world boundaries
-        self.player.set_world_bounds(world_bounds)
-        
-        self.enemies = []
-        self.wave_manager.start_wave(1)
-    
-    def _handle_input(self):
-        """Enhanced input handling with class abilities"""
-        keys = pygame.key.get_pressed()
-        
-        # Base input handling
-        next_state = super()._handle_input()
-        if next_state:
-            return next_state
-        
-        # Class-specific ability inputs
-        self._handle_class_abilities(keys)
-        
-        # Toggle class ability display
-        if self.input_handler.is_key_just_pressed(pygame.K_TAB):
-            self.show_class_abilities = not self.show_class_abilities
-        
-        return None
-    
-    def _handle_class_abilities(self, keys):
-        """Handle class-specific ability inputs"""
-        class_name = self.player.character_class.name.lower()
-        
-        if class_name == 'warrior':
-            self._handle_warrior_abilities(keys)
-        elif class_name == 'mage':
-            self._handle_mage_abilities(keys)
-        elif class_name == 'fireshooter':
-            self._handle_fireshooter_abilities(keys)
-    
-    def _handle_warrior_abilities(self, keys):
-        """Handle Warrior-specific abilities"""
-        warrior = self.player.character_class
-        
-        # Charge ability (Q key)
-        if keys[pygame.K_q] and warrior.charge_cooldown <= 0:
-            self._activate_warrior_charge()
-        
-        # Shield bash (E key)
-        if keys[pygame.K_e] and warrior.shield_bash_cooldown <= 0:
-            self._activate_shield_bash()
-    
-    def _handle_mage_abilities(self, keys):
-        """Handle Mage-specific abilities"""
-        mage = self.player.character_class
-        
-        # Fireball spell (Q key)
-        if keys[pygame.K_q] and mage.spell_cooldown <= 0 and mage.mana >= 30:
-            self._cast_fireball()
-        
-        # Mana shield (E key)
-        if keys[pygame.K_e] and mage.mana >= 20:
-            self._activate_mana_shield()
-    
-    def _handle_fireshooter_abilities(self, keys):
-        """Handle Fireshooter-specific abilities"""
-        fireshooter = self.player.character_class
-        
-        # Rapid fire mode (Q key)
-        if keys[pygame.K_q] and not fireshooter.rapid_fire_mode:
-            self._activate_rapid_fire()
-        
-        # Explosive shot (E key)
-        if keys[pygame.K_e] and fireshooter.explosion_cooldown <= 0:
-            self._fire_explosive_shot()
-    
-    def _activate_warrior_charge(self):
-        """Activate warrior charge ability"""
-        # Implementation for charge ability
-        warrior = self.player.character_class
-        warrior.charge_cooldown = 5.0  # 5 second cooldown
-        self.sound_manager.play_sound('warrior_charge')
-        
-        # Add charge effect (speed boost, damage immunity, etc.)
-        # This would need more implementation
-    
-    def _activate_shield_bash(self):
-        """Activate shield bash ability"""
-        warrior = self.player.character_class
-        warrior.shield_bash_cooldown = 3.0
-        self.sound_manager.play_sound('shield_bash')
-        
-        # Stun nearby enemies
-        for enemy in self.enemies:
-            distance = math.sqrt((enemy.x - self.player.x)**2 + (enemy.y - self.player.y)**2)
-            if distance <= 100:  # Shield bash range
-                enemy.stunned = True
-                enemy.stun_timer = 2.0
-    
-    def _cast_fireball(self):
-        """Cast mage fireball spell"""
-        mage = self.player.character_class
-        mage.spell_cooldown = 2.0
-        mage.mana -= 30
-        self.sound_manager.play_sound('fireball')
-        
-        # Create area of effect damage
-        # Implementation would create explosion at target location
-    
-    def _activate_mana_shield(self):
-        """Activate mage mana shield"""
-        mage = self.player.character_class
-        mage.mana -= 20
-        # Add temporary damage reduction
-        # This would need more implementation
-    
-    def _activate_rapid_fire(self):
-        """Activate fireshooter rapid fire mode"""
-        fireshooter = self.player.character_class
-        fireshooter.rapid_fire_mode = True
-        fireshooter.rapid_fire_timer = 5.0
-        self.sound_manager.play_sound('rapid_fire_activate')
-    
-    def _fire_explosive_shot(self):
-        """Fire explosive shot"""
-        fireshooter = self.player.character_class
-        fireshooter.explosion_cooldown = 4.0
-        self.sound_manager.play_sound('explosion')
-        
-        # Create explosive projectile
-        # Implementation would create area damage on impact
-    
-    def _render_ui(self):
-        """Enhanced UI rendering with class-specific elements"""
-        super()._render_ui()
-        
-        # Render class-specific UI
-        if self.show_class_abilities:
-            self._render_class_abilities_ui()
-    
-    def _render_class_abilities_ui(self):
-        """Render class abilities UI"""
-        # This would show ability cooldowns, mana for mage, etc.
+    def exit(self):
+        """Clean up when leaving state"""
         pass
-    
-    def _get_ui_elements(self):
-        """Enhanced UI elements including class info"""
-        base_elements = super()._get_ui_elements()
-        
-        # Add class-specific UI elements
-        class_name = self.player.character_class.name
-        base_elements.insert(1, f"Class: {class_name}")
-        
-        # Add class-specific stats
-        if class_name.lower() == 'mage':
-            mage = self.player.character_class
-            base_elements.append(f"Mana: {int(mage.mana)}/{mage.max_mana}")
-        
-        return base_elements
-
-# Usage in main.py integration
-def integrate_class_system_in_main():
-    """
-    Example of how to integrate this into your main game loop:
-    
-    # In your main.py or game manager:
-    
-    # Add class selection state
-    class_selection = ClassSelectionState(font, sound_manager)
-    game_state_manager.add_state("class_selection", class_selection)
-    
-    # Modified gameplay state creation
-    def create_gameplay_state(selected_class):
-        return EnhancedGameplayState(font, sound_manager, selected_class)
-    
-    # In your state transitions:
-    if current_state == "menu" and player_starts_game:
-        game_state_manager.change_state("class_selection")
-    
-    elif current_state == "class_selection" and class_selected:
-        selected_class = class_selection.get_selected_class()
-        gameplay_state = create_gameplay_state(selected_class)
-        game_state_manager.add_state("gameplay", gameplay_state)
-        game_state_manager.change_state("gameplay")
-    """
-    pass

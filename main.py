@@ -3,9 +3,9 @@ import sys
 from settings import *
 
 # System files - Core game management systems
-from systems.sound_manager import *
-from systems.wave_manager import *
-from systems.game_state_manager import *
+from systems.manager.sound_manager import *
+from systems.manager.wave_manager import *
+from systems.manager.game_state_manager import *
 
 # Entities - Game objects and characters
 from entities.player import *

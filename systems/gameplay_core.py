@@ -161,11 +161,12 @@ class GameplayCore:
                            min(bounds[3] - self.player.radius, self.player.y))
     
     def _update_combat_system(self, dt: float):
-        """Enhanced combat system with smart formations"""
+        """Enhanced combat system with fade-aware enemy management"""
         self.formations.update(dt, self.enemies, self.player)
         
-        # Update enemies with enhanced AI using list comprehension for filtering
-        self.enemies = [enemy for enemy in self.enemies if enemy.hp > 0]
+        # Remove enemies that have completed death fade
+        self.enemies = [enemy for enemy in self.enemies 
+                       if not enemy.should_be_removed()]
         
         for enemy in self.enemies:
             # Enhanced enemy AI with formation awareness
@@ -217,11 +218,10 @@ class GameplayCore:
             self._handle_ranged_ai(enemy, player_dist, unit_x, unit_y, move_speed)
     
     def _handle_melee_ai(self, enemy, player_dist: float, unit_x: float, unit_y: float, move_speed: float):
-        """Handle melee enemy AI"""
+        """Handle melee enemy AI - no attacks while dying"""
         if player_dist > enemy.attack_range:
             enemy.x += unit_x * move_speed
-            enemy.y += unit_y * move_speed
-        elif enemy.attack_cooldown <= 0:
+        elif enemy.attack_cooldown <= 0 and not getattr(enemy, 'is_dying', False):
             self._execute_enemy_attack(enemy)
     
     def _handle_ranged_ai(self, enemy, player_dist: float, unit_x: float, unit_y: float, move_speed: float):
@@ -243,7 +243,8 @@ class GameplayCore:
             enemy.x += -unit_y * move_speed * 0.5
             enemy.y += unit_x * move_speed * 0.5
         
-        if player_dist <= enemy.attack_range and enemy.attack_cooldown <= 0:
+        if (player_dist <= enemy.attack_range and enemy.attack_cooldown <= 0 
+        and not getattr(enemy, 'is_dying', False)):
             self._execute_enemy_attack(enemy)
     
     def _execute_direct_combat(self, enemy, dt: float):
@@ -265,10 +266,14 @@ class GameplayCore:
                 self._execute_enemy_attack(enemy)
     
     def _execute_enemy_attack(self, enemy):
-        """Execute enemy attack based on type"""
+        """Execute enemy attack only if enemy is not dying"""
+        # Prevent attacks during death fade
+        if getattr(enemy, 'is_dying', False):
+            return
+            
         if enemy.type in {"crawler", "brute"}:
             self.player.take_damage(enemy.attack_power, enemy=enemy)
-            enemy.attack_cooldown = 0.9  # Slightly faster attacks
+            enemy.attack_cooldown = 0.9
         else:
             enemy._initiate_ranged_attack(self.player)
     

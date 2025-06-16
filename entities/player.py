@@ -154,6 +154,9 @@ class Player:
         self.hp = max(0, self.hp - amount)
         self.damage_flash_timer = 0.3
         
+        # PLAY PLAYER DAMAGE SOUND EFFECT
+        self.sound_manager.play_sound('player_damage')
+        
         # Apply knockback if enemy is provided
         if enemy:
             self.apply_damage_knockback(enemy, amount)
@@ -211,21 +214,27 @@ class Player:
                 self.knockback_velocity_y *= scale
 
     def add_experience(self, exp):
-        """Add experience points"""
+        """Add experience points with immediate level up check"""
         self.experience += exp
 
     def check_level_up(self):
-        """Check for level up and apply bonuses"""
-        exp_needed = self.level * 100
-        if self.experience >= exp_needed:
+        """Check for level up and handle it immediately"""
+        leveled_up = False
+        
+        # Handle multiple level ups in one go if player gained a lot of exp
+        while self.experience >= self.level * 100:
+            exp_needed = self.level * 100
             self.level += 1
             self.experience -= exp_needed
             self.stat_points += 3
             self.max_hp += 15
-            self.hp = self.max_hp  # Full heal on level up
+            self.hp = self.max_hp
             self.attack_power += 3
-            # Increase knockback resistance slightly with each level
             self.knockback_resistance = min(0.9, self.knockback_resistance + 0.02)
+            leveled_up = True
+        
+        # Play sound only once, even if multiple levels were gained
+        if leveled_up:
             self.sound_manager.play_sound('level_up')
 
     def render(self, screen):

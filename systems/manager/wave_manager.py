@@ -70,8 +70,10 @@ class WaveManager:
                 self.spawn_timer = random.uniform(spawn_delay * 0.8, spawn_delay * 1.2)
    
     def check_wave_completion(self, active_enemies):
-        """Check if wave is complete"""
-        if not self.enemies_to_spawn and not active_enemies:
+        """Check if wave is complete - ignore dying enemies"""
+        living_enemies = [e for e in active_enemies if not getattr(e, 'is_dying', False)]
+        
+        if not self.enemies_to_spawn and not living_enemies:
             if not self.wave_complete:
                 self.wave_complete = True
                 self.sound_manager.play_sound('wave_complete')

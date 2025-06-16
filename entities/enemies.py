@@ -83,13 +83,17 @@ class SmartFormationAI:
         self._execute_combat(enemy, player, dt)
     
     def _execute_combat(self, enemy, player, dt):
-        """Ensure enemies attack even in formation"""
+        """Ensure enemies attack only when alive and not dying"""
+        # Skip combat if enemy is dying
+        if getattr(enemy, 'is_dying', False):
+            return
+            
         player_dist = math.hypot(player.x - enemy.x, player.y - enemy.y)
         
         if player_dist <= enemy.attack_range and enemy.attack_cooldown <= 0:
             if enemy.type in ["crawler", "brute"]:
                 player.take_damage(enemy.attack_power, enemy=enemy)
-                enemy.attack_cooldown = 1.0  # Slightly faster attacks
+                enemy.attack_cooldown = 1.0
             else:
                 enemy._initiate_ranged_attack(player)
     
@@ -141,21 +145,44 @@ class Enemy:
         self.preferred_distance = {"sniper": 250, "fireshooter": 120}.get(enemy_type, 0)
         self.rect = pygame.Rect(x - self.radius, y - self.radius, self.radius * 2, self.radius * 2)
    
+        # Fade transition properties
+        self.spawn_alpha = 0.0  # Start invisible
+        self.death_alpha = 1.0  # Start visible
+        self.is_spawning = True
+        self.is_dying = False
+        self.spawn_duration = 0.8  # Fade in over 0.8 seconds
+        self.death_duration = 0.6  # Fade out over 0.6 seconds
+
     def update(self, dt, player, formation_manager=None):
-        """Streamlined update with formation integration"""
-        self._update_physics(dt)
+        """Enhanced update with fade transitions"""
+        self._update_fade_states(dt)
         
-        # AI with formation priority
-        if formation_manager and self.formation.active:
-            formation_manager.update_enemy_behavior(self, dt, player)
-        else:
-            self._standard_ai(dt, player)
+        # Only update physics and AI if not in death fade
+        if not self.is_dying:
+            self._update_physics(dt)
             
-        self._update_attacks(dt, player)
+            # AI with formation priority
+            if formation_manager and self.formation.active:
+                formation_manager.update_enemy_behavior(self, dt, player)
+            else:
+                self._standard_ai(dt, player)
+                
+            self._update_attacks(dt, player)
+        
         self.attack_cooldown = max(0, self.attack_cooldown - dt)
         self.damage_flash_timer = max(0, self.damage_flash_timer - dt)
         self.rect.center = (self.x, self.y)
     
+    def _update_fade_states(self, dt):
+        """Update spawn and death fade effects"""
+        if self.is_spawning:
+            self.spawn_alpha = min(1.0, self.spawn_alpha + dt / self.spawn_duration)
+            if self.spawn_alpha >= 1.0:
+                self.is_spawning = False
+        
+        if self.is_dying:
+            self.death_alpha = max(0.0, self.death_alpha - dt / self.death_duration)
+
     def _update_physics(self, dt):
         """Physics update with boundary constraints"""
         if any(abs(v) > 5 for v in self.knockback_velocity):
@@ -166,19 +193,21 @@ class Enemy:
             self.knockback_velocity = [v * 0.85 for v in self.knockback_velocity]
         else:
             self.knockback_velocity = [0, 0]
-   
+
     def _standard_ai(self, dt, player):
-        """Improved AI behavior"""
+        """Improved AI behavior - no combat while dying"""
+        # Skip AI if dying
+        if getattr(self, 'is_dying', False):
+            return
+            
         dx, dy = player.x - self.x, player.y - self.y
         distance = math.hypot(dx, dy) or 1
         unit_x, unit_y = dx / distance, dy / distance
         
-        # Movement with knockback consideration
         knockback_reduction = max(0.3, 1.0 - math.hypot(*self.knockback_velocity) / 200)
         move_speed = self.speed * knockback_reduction * dt
         
         if self.type in ["crawler", "brute"]:
-            # Melee: charge and attack
             if distance > self.attack_range:
                 self.x += unit_x * move_speed
                 self.y += unit_y * move_speed
@@ -186,15 +215,13 @@ class Enemy:
                 player.take_damage(self.attack_power, enemy=self)
                 self.attack_cooldown = 1.0
         else:
-            # Ranged: maintain optimal distance
             if distance < self.preferred_distance * 0.7:
-                self.x -= unit_x * move_speed * 0.8  # Retreat
+                self.x -= unit_x * move_speed * 0.8
                 self.y -= unit_y * move_speed * 0.8
             elif distance > self.preferred_distance * 1.3:
-                self.x += unit_x * move_speed * 0.6  # Advance
+                self.x += unit_x * move_speed * 0.6
                 self.y += unit_y * move_speed * 0.6
             else:
-                # Strafe perpendicular
                 self.x += -unit_y * move_speed * 0.4
                 self.y += unit_x * move_speed * 0.4
             
@@ -262,59 +289,133 @@ class Enemy:
             self.knockback_velocity = [v * scale for v in self.knockback_velocity]
    
     def take_damage(self, amount):
-        """Take damage"""
+        """Enhanced damage with death fade trigger"""
         self.hp -= amount
         self.damage_flash_timer = 0.2
-        return self.hp <= 0
-   
+        
+        if self.hp <= 0 and not self.is_dying:
+            self.is_dying = True
+            return True  # Don't remove immediately, let fade complete
+        
+        return False
+
+    def should_be_removed(self):
+        """Check if enemy should be removed (after death fade)"""
+        return self.is_dying and self.death_alpha <= 0.0
+    
+    def get_current_alpha(self):
+        """Get current alpha based on fade states"""
+        if self.is_spawning:
+            return self.spawn_alpha
+        elif self.is_dying:
+            return self.death_alpha
+        return 1.0
+
     def render(self, screen, camera=None):
-        """Render enemy with minimal formation indicators"""
-        # Render attacks
-        for indicator in self.attack_indicators:
-            indicator.render(screen, camera)
-        for projectile in self.projectiles:
-            projectile.render(screen, camera)
+        """Enhanced render with fade transitions"""
+        # Calculate current alpha
+        current_alpha = self.get_current_alpha()
+        
+        # Skip rendering if completely transparent
+        if current_alpha <= 0.01:
+            return
+        
+        # Render attacks (they should appear normally)
+        if not self.is_dying:  # Don't show attacks while dying
+            for indicator in self.attack_indicators:
+                indicator.render(screen, camera)
+            for projectile in self.projectiles:
+                projectile.render(screen, camera)
         
         zoom = camera.zoom if camera else 1.0
         radius = int(self.radius * zoom)
         
-        # Damage flash
+        # Calculate color with damage flash
         color = self.color
         if self.damage_flash_timer > 0:
             flash = self.damage_flash_timer / 0.2
             color = tuple(min(255, c + int(150 * flash)) for c in color)
         
-        pygame.draw.circle(screen, color, (int(self.x), int(self.y)), radius)
+        # Apply alpha to color
+        alpha_color = (*color, int(255 * current_alpha))
         
-        # Subtle formation indicator (small dot instead of ring)
-        if self.formation.active:
-            pygame.draw.circle(screen, GREEN, (int(self.x), int(self.y)), 2)
+        # Create a surface for alpha blending
+        if current_alpha < 1.0:
+            temp_surface = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
+            pygame.draw.circle(temp_surface, alpha_color, (radius, radius), radius)
+            screen.blit(temp_surface, (int(self.x - radius), int(self.y - radius)))
+        else:
+            # Normal rendering for performance when fully opaque
+            pygame.draw.circle(screen, color, (int(self.x), int(self.y)), radius)
         
-        # Type markers
-        if self.type == "sniper":
-            line_len = int(4 * zoom)
-            pygame.draw.line(screen, WHITE, (self.x - line_len, self.y), 
-                           (self.x + line_len, self.y), 1)
-            pygame.draw.line(screen, WHITE, (self.x, self.y - line_len), 
-                           (self.x, self.y + line_len), 1)
-        elif self.type == "fireshooter":
-            inner_radius = max(1, int((self.radius - 3) * zoom))
-            pygame.draw.circle(screen, (255, 200, 0), (int(self.x), int(self.y)), inner_radius)
-       
-        # Health bar for damaged enemies
-        if self.hp < self.max_hp:
-            self._draw_health_bar(screen, camera)
+        # Formation indicator (with alpha)
+        if self.formation.active and not self.is_dying:
+            formation_alpha = int(255 * current_alpha * 0.8)  # Slightly dimmer
+            formation_color = (*GREEN, formation_alpha)
+            if current_alpha < 1.0:
+                temp_surface = pygame.Surface((4, 4), pygame.SRCALPHA)
+                pygame.draw.circle(temp_surface, formation_color, (2, 2), 2)
+                screen.blit(temp_surface, (int(self.x - 2), int(self.y - 2)))
+            else:
+                pygame.draw.circle(screen, GREEN, (int(self.x), int(self.y)), 2)
+        
+        # Type markers (with alpha)
+        if not self.is_dying:
+            if self.type == "sniper":
+                line_len = int(4 * zoom)
+                line_alpha = int(255 * current_alpha)
+                line_color = (*WHITE, line_alpha)
+                if current_alpha < 1.0:
+                    # Draw on temp surface for alpha
+                    temp_surface = pygame.Surface((line_len * 2, line_len * 2), pygame.SRCALPHA)
+                    pygame.draw.line(temp_surface, line_color, 
+                                   (0, line_len), (line_len * 2, line_len), 1)
+                    pygame.draw.line(temp_surface, line_color, 
+                                   (line_len, 0), (line_len, line_len * 2), 1)
+                    screen.blit(temp_surface, (int(self.x - line_len), int(self.y - line_len)))
+                else:
+                    pygame.draw.line(screen, WHITE, (self.x - line_len, self.y), 
+                                   (self.x + line_len, self.y), 1)
+                    pygame.draw.line(screen, WHITE, (self.x, self.y - line_len), 
+                                   (self.x, self.y + line_len), 1)
+            
+            elif self.type == "fireshooter":
+                inner_radius = max(1, int((self.radius - 3) * zoom))
+                inner_alpha = int(255 * current_alpha)
+                inner_color = (*FIRESHOOTER_INNER_COLOR, inner_alpha)  # Define this color
+                if current_alpha < 1.0:
+                    temp_surface = pygame.Surface((inner_radius * 2, inner_radius * 2), pygame.SRCALPHA)
+                    pygame.draw.circle(temp_surface, inner_color, (inner_radius, inner_radius), inner_radius)
+                    screen.blit(temp_surface, (int(self.x - inner_radius), int(self.y - inner_radius)))
+                else:
+                    pygame.draw.circle(screen, (255, 200, 0), (int(self.x), int(self.y)), inner_radius)
+        
+        # Health bar (with alpha)
+        if self.hp < self.max_hp and not self.is_dying:
+            self._draw_health_bar(screen, camera, current_alpha)
    
-    def _draw_health_bar(self, screen, camera=None):
-        """Health bar"""
+    def _draw_health_bar(self, screen, camera=None, alpha=1.0):
+        """Health bar with alpha support"""
         zoom = camera.zoom if camera else 1.0
         bar_width, bar_height = int(20 * zoom), int(3 * zoom)
         bar_x = self.x - bar_width // 2
         bar_y = self.y - (self.radius * zoom) - 6 * zoom
-       
-        pygame.draw.rect(screen, RED, (bar_x, bar_y, bar_width, bar_height))
-        health_width = (self.hp / self.max_hp) * bar_width
-        pygame.draw.rect(screen, GREEN, (bar_x, bar_y, health_width, bar_height))
+        
+        red_alpha = int(255 * alpha)
+        green_alpha = int(255 * alpha)
+        
+        if alpha < 1.0:
+            # Create temp surface for alpha blending
+            temp_surface = pygame.Surface((bar_width, bar_height), pygame.SRCALPHA)
+            pygame.draw.rect(temp_surface, (*RED, red_alpha), (0, 0, bar_width, bar_height))
+            health_width = (self.hp / self.max_hp) * bar_width
+            pygame.draw.rect(temp_surface, (*GREEN, green_alpha), (0, 0, health_width, bar_height))
+            screen.blit(temp_surface, (bar_x, bar_y))
+        else:
+            pygame.draw.rect(screen, RED, (bar_x, bar_y, bar_width, bar_height))
+            health_width = (self.hp / self.max_hp) * bar_width
+            pygame.draw.rect(screen, GREEN, (bar_x, bar_y, health_width, bar_height))
+
 
 class AttackIndicator:
     """Visual attack warning"""
@@ -370,6 +471,7 @@ class AttackIndicator:
             pygame.draw.circle(screen, color, (int(target_x), int(target_y)), radius, 2)
         except (ValueError, OverflowError):
             pass
+
 
 class Projectile:
     """Enemy projectile"""

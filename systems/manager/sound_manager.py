@@ -24,6 +24,7 @@ class SoundManager:
             'attack': 'assets/sounds/attack.wav',
             'enemy_hit': 'assets/sounds/enemy_hit.wav',
             'enemy_death': 'assets/sounds/enemy_death.wav',
+            'player_damage': 'assets/sounds/player_damage.wav',  # NEW: Player damage sound
             'level_up': 'assets/sounds/level_up.wav',
             'wave_complete': 'assets/sounds/wave_complete.wav'
         }
@@ -63,6 +64,7 @@ class SoundManager:
             'attack': (1000, 0.1, 'burst'),
             'enemy_hit': (600, 0.2, 'fade'),
             'enemy_death': (400, 0.4, 'descend'),
+            'player_damage': (300, 0.3, 'pain'),  # NEW: Player damage sound parameters
             'level_up': (800, 0.6, 'ascend'),
             'wave_complete': (1200, 0.8, 'victory')
         }
@@ -80,6 +82,8 @@ class SoundManager:
         self.create_tone('enemy_hit', 600, 0.2, 'fade')
         # Enemy death - descending tone
         self.create_tone('enemy_death', 400, 0.4, 'descend')
+        # Player damage - pain sound
+        self.create_tone('player_damage', 300, 0.3, 'pain')  # NEW: Player damage fallback
         # Level up - ascending chord
         self.create_tone('level_up', 800, 0.6, 'ascend')
         # Wave complete - victory chord
@@ -107,6 +111,17 @@ class SoundManager:
             elif style == 'ascend':
                 freq = base_freq * (1 + progress)
                 amplitude = 4096 * math.sin(math.pi * progress)
+            elif style == 'pain':  # NEW: Pain sound style for player damage
+                # Create a harsh, distorted sound with multiple frequencies
+                freq1 = base_freq
+                freq2 = base_freq * 0.7
+                freq3 = base_freq * 1.3
+                wave1 = math.sin(2 * math.pi * freq1 * t)
+                wave2 = math.sin(2 * math.pi * freq2 * t) * 0.6
+                wave3 = math.sin(2 * math.pi * freq3 * t) * 0.4
+                # Add some noise for harsh effect
+                noise = (math.sin(2 * math.pi * freq1 * t * 7) * 0.2)
+                amplitude = 3072 * (wave1 + wave2 + wave3 + noise) * (1 - progress) * math.sin(progress * math.pi * 3)
             elif style == 'victory':
                 freq1 = base_freq
                 freq2 = base_freq * 1.25
@@ -116,7 +131,7 @@ class SoundManager:
                 freq = base_freq
                 amplitude = 4096 * (1 - progress)
             
-            if style != 'victory':
+            if style not in ['victory', 'pain']:
                 wave = amplitude * math.sin(2 * math.pi * freq * t)
             else:
                 wave = amplitude

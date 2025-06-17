@@ -20,7 +20,7 @@ class ArenaOfShadows:
     """Main game class that handles initialization, game loop, and cleanup."""
     
     def __init__(self):
-        # Initialize Pygame subsystems
+        # Initialize Pygame
         pygame.init()
         pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
         

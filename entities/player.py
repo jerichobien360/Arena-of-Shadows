@@ -8,6 +8,7 @@ class Player:
     """
     Player class representing the main character in the game.
     Handles movement, combat, leveling, and rendering with smooth knockback effects.
+    Now includes temporary speed boost on level up.
     """
     
     def __init__(self, sound_manager, camera, start_x=0, start_y=0):
@@ -25,6 +26,13 @@ class Player:
         self.knockback_threshold = 8  # Minimum velocity before stopping
         self.knockback_resistance = 0.7  # Player resistance to knockback (0-1, lower = more resistance)
         
+        # Level up speed boost system
+        self.base_speed = 200  # Original speed
+        self.speed_boost_multiplier = 0  # Additional speed multiplier
+        self.speed_boost_decay_rate = 1.2  # How fast the speed boost decays per second
+        self.speed_boost_duration = 3.0  # Maximum duration of speed boost
+        self.level_up_speed_boost = 1.8  # Speed multiplier when leveling up (180% of base speed)
+        
         self.reset_stats()
         self.update_rect()
 
@@ -32,18 +40,41 @@ class Player:
         """Reset player stats to initial values"""
         self.hp = self.max_hp = 100
         self.attack_power = 25
-        self.speed = 200
+        self.speed = self.base_speed
         self.level = 1
         self.experience = self.stat_points = 0
+        # Reset speed boost
+        self.speed_boost_multiplier = 0
 
     def update(self, dt):
         """Update player state each frame"""
         self.update_knockback(dt)
+        self.update_speed_boost(dt)
         self.handle_movement(dt)
         self.attack_cooldown = max(0, self.attack_cooldown - dt)
         self.damage_flash_timer = max(0, self.damage_flash_timer - dt)
         self.check_level_up()
         self.update_rect()
+
+    def update_speed_boost(self, dt):
+        """Update the temporary speed boost effect"""
+        if self.speed_boost_multiplier > 0:
+            # Decay the speed boost
+            self.speed_boost_multiplier -= self.speed_boost_decay_rate * dt
+            self.speed_boost_multiplier = max(0, self.speed_boost_multiplier)
+            
+            # Calculate current speed with boost
+            self.speed = self.base_speed * (1 + self.speed_boost_multiplier)
+        else:
+            # Ensure speed is back to base when boost is gone
+            self.speed = self.base_speed
+
+    def apply_level_up_speed_boost(self):
+        """Apply temporary speed boost when leveling up"""
+        self.speed_boost_multiplier = self.level_up_speed_boost
+        
+        # Visual effect - slight camera shake for excitement
+        self.camera.add_shake(intensity=0.5, duration=0.8)
 
     def update_knockback(self, dt):
         """Update knockback physics"""
@@ -227,23 +258,50 @@ class Player:
             self.level += 1
             self.experience -= exp_needed
             self.stat_points += 3
-            self.max_hp += 15
+            self.max_hp += round(ADD_MAX_HP * 1.05)
             self.hp = self.max_hp
-            self.attack_power += 3
+            self.attack_power += ADD_ATTACK_POWER
+            self.base_speed += self.base_speed * 0.12
             self.knockback_resistance = min(0.9, self.knockback_resistance + 0.02)
             leveled_up = True
         
-        # Play sound only once, even if multiple levels were gained
+        # Play sound and apply speed boost only once, even if multiple levels were gained
         if leveled_up:
             self.sound_manager.play_sound('level_up')
+            self.apply_level_up_speed_boost()
+
+    def get_speed_boost_percentage(self):
+        """Get current speed boost as a percentage for UI display"""
+        return int(self.speed_boost_multiplier * 100)
 
     def render(self, screen):
-        """Render player with damage flash effect and knockback visual effects"""
+        """Render player with damage flash effect, knockback visual effects, and speed boost indicator"""
         # Calculate color with damage flash
         color = GREEN
         if self.damage_flash_timer > 0:
             flash = int(255 * self.damage_flash_timer / 0.3)
             color = (min(255, GREEN[0] + flash), GREEN[1], GREEN[2])
+        
+        # Speed boost visual effect - add blue tint and glow
+        if self.speed_boost_multiplier > 0.2:  # Only show when boost is significant
+            boost_intensity = min(1.0, self.speed_boost_multiplier / self.level_up_speed_boost)
+            
+            # Add blue tint to player color
+            blue_tint = int(100 * boost_intensity)
+            color = (color[0], color[1], min(255, color[2] + blue_tint))
+            
+            # Draw speed boost glow effect
+            glow_radius = self.radius + int(8 * boost_intensity)
+            glow_alpha = int(60 * boost_intensity)
+            
+            try:
+                # Create glow surface
+                glow_surface = pygame.Surface((glow_radius * 2, glow_radius * 2), pygame.SRCALPHA)
+                pygame.draw.circle(glow_surface, (100, 150, 255, glow_alpha), 
+                                 (glow_radius, glow_radius), glow_radius)
+                screen.blit(glow_surface, (self.x - glow_radius, self.y - glow_radius))
+            except:
+                pass  # Skip glow effect if not supported
         
         # Knockback visual effect - motion trail
         knockback_magnitude = math.sqrt(self.knockback_velocity_x**2 + self.knockback_velocity_y**2)

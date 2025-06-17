@@ -6,7 +6,7 @@ from typing import List, Tuple, Optional, Dict, Any
 
 # Game entities
 from entities.player import *
-from entities.enemies import *
+from entities.enemy.enemy_base import *
 
 # Core systems
 from systems.manager.wave_manager import *

@@ -1,0 +1,31 @@
+# Constants
+SCREEN_WIDTH = 700
+SCREEN_HEIGHT = 525
+FPS = 60
+
+# Colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+GRAY = (128, 128, 128)
+DARK_GRAY = (64, 64, 64)
+YELLOW = (255, 255, 0)
+
+# CAMERA
+CAMERA_SMOOTHING = 1 # Default: 0.10
+MAX_ZOOM = 500
+MIN_ZOOM = 0
+
+# WORLD SETTINGS
+WORLD_WIDTH = 3000
+WORLD_HEIGHT = 3000
+
+
+FIRESHOOTER_INNER_COLOR = (255, 200, 0)
+
+
+# ASSET HANDLER
+GAME_ICON = "assets\\icon.png"
+CUSTOM_FONT = "assets\\font\\PixelifySans-Medium.ttf"

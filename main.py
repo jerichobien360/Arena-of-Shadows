@@ -8,7 +8,7 @@ from systems.manager.wave_manager import *
 from systems.manager.game_state_manager import *
 from systems.manager.asset_manager import *
 
-# Entities - Game objects and characters
+# Entities - Game objects and characters were used in a game
 from entities.player import *
 
 # Game states - Different screens/modes of the game
@@ -18,7 +18,7 @@ from game_states.game_over import *
 
 
 class ArenaOfShadows:
-    """Main game class that handles initialization, game loop, and cleanup."""
+    """Game Initialization"""
     
     def __init__(self):
         # Initialize Pygame subsystems
@@ -29,9 +29,10 @@ class ArenaOfShadows:
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Arena of Shadows")
         
+        # Importing the game necessities assets for the main game
         image_load(GAME_ICON)
         self.clock = pygame.time.Clock()
-        self.font = pygame.font.Font(CUSTOM_FONT, 18)
+        self.font = create_font(CUSTOM_FONT, 18)
         
         # Initialize game managers
         self.sound_manager = SoundManager()
@@ -42,27 +43,32 @@ class ArenaOfShadows:
         self.state_manager.change_state("main_menu")
     
     def _setup_states(self):
-        """Initialize all game states with required dependencies."""
+        """Initialize all game states with required dependencies. This will be used for
+        managing for the flow of overall game application."""
+        # Game States will be used for
         states = {
             "main_menu": MainMenuState(self.font, self.sound_manager),
             "gameplay": GameplayState(self.font, self.sound_manager),
             "game_over": GameOverState(self.font, self.sound_manager)
         }
         
+        # Adding the state based on the _setup_states
         for name, state in states.items():
             self.state_manager.add_state(name, state)
     
     def _handle_events(self):
-        """Process pygame events and handle quit conditions."""
+        """Process pygame events and handle quit conditions for testing phase purposes"""
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or (
-                event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
-            ):
+            if event.type == pygame.QUIT:
                 return False
+            if (event.type == pygame.KEYDOWN) and (event.key == pygame.K_ESCAPE):
+                return False
+        
         return True
     
     def run(self):
-        """Main game loop - handles events, updates, and rendering."""
+        """Main game loop - handles events, updates, and rendering. This is the starting point
+        where all the game event occurs"""
         running = True
         
         while running:

@@ -4,6 +4,9 @@ from dataclasses import dataclass
 from typing import List, Dict, Tuple
 from enum import Enum
 
+from systems.game_feature.particle_system import *
+
+
 class FormationType(Enum):
     SURROUND = "surround"
     PINCER = "pincer" 
@@ -153,6 +156,10 @@ class Enemy:
         self.spawn_duration = 0.8  # Fade in over 0.8 seconds
         self.death_duration = 0.6  # Fade out over 0.6 seconds
 
+        # Particle System
+        self.particle_system = ParticleSystem()
+        self.particle_system.set_world_bounds((0, 0, WORLD_WIDTH, WORLD_HEIGHT))
+
     def update(self, dt, player, formation_manager=None):
         """Enhanced update with fade transitions"""
         self._update_fade_states(dt)
@@ -261,6 +268,7 @@ class Enemy:
             projectile.update(dt)
             if projectile.check_collision(player):
                 player.take_damage(projectile.damage, enemy=self)
+                self.particle_system.create_attack_effect(projectile.x, projectile.y, "projectile") # Particle effect
                 self.projectiles.remove(projectile)
             elif projectile.is_off_world():
                 self.projectiles.remove(projectile)
@@ -292,6 +300,8 @@ class Enemy:
         """Enhanced damage with death fade trigger"""
         self.hp -= amount
         self.damage_flash_timer = 0.2
+
+        self.particle_system.create_damage_effect(self.x, self.y, amount, enemy_type=self.type)
         
         if self.hp <= 0 and not self.is_dying:
             self.is_dying = True

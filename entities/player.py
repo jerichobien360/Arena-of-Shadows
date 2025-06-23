@@ -4,6 +4,8 @@ import math
 import random
 from typing import Optional, Tuple, List
 
+from systems.game_feature.particle_system import *
+
 
 class Player:
     """Player class with movement, combat, leveling, and smooth knockback effects."""
@@ -24,7 +26,13 @@ class Player:
         self.knockback_decay = 0.88
         self.knockback_threshold = 8
         self.knockback_resistance = 0.7
+
+        # Game Feature
+        self.particle_system = ParticleSystem()
+        self.particle_system.set_world_bounds((0, 0, WORLD_WIDTH, WORLD_HEIGHT))
         
+
+        # Reset/Update
         self._reset_stats()
         self._update_rect()
 
@@ -47,6 +55,7 @@ class Player:
         
         self._check_level_up()
         self._update_rect()
+        self.particle_system.update(dt)
 
     def _update_knockback(self, dt: float) -> None:
         """Update knockback physics."""
@@ -124,6 +133,8 @@ class Player:
             distance = math.hypot(enemy.x - self.x, enemy.y - self.y)
             if distance <= 60:  # Attack range
                 damage = self.attack_power + random.randint(-3, 3)
+
+                self.particle_system.create_attack_effect(enemy.x, enemy.y, "melee") # Particle effect
                 
                 if enemy.take_damage(damage):  # Enemy died
                     self.sound_manager.play_sound('enemy_death')
@@ -131,6 +142,8 @@ class Player:
                 else:  # Enemy survived
                     self.sound_manager.play_sound('enemy_hit')
                     self._apply_enemy_knockback(enemy, distance, damage)
+                    self.particle_system.create_damage_effect(enemy.x, enemy.y, damage, 
+                                                        enemy_type=enemy.type)
                 
                 hit_count += 1
         
@@ -159,6 +172,8 @@ class Player:
         self.damage_flash_timer = 0.3
         
         self.sound_manager.play_sound('player_damage')
+
+        self.particle_system.create_damage_effect(self.x, self.y, amount, is_player=True)
         
         if enemy:
             self._apply_damage_knockback(enemy, amount)
@@ -166,6 +181,9 @@ class Player:
         # Camera shake based on damage and enemy
         shake_intensity = self._calculate_shake_intensity(amount, enemy)
         self.camera.add_shake(intensity=shake_intensity, duration=1)
+
+        if self.hp <= 0:
+            self.particle_system.create_death_effect(self.x, self.y, "player", is_player=True)
 
     def _calculate_shake_intensity(self, damage: int, enemy) -> float:
         """Calculate camera shake intensity."""
@@ -252,6 +270,9 @@ class Player:
         if self.attack_cooldown <= 0:
             pygame.draw.circle(screen, (0, 255, 0, 30), 
                              (int(self.x), int(self.y)), 60, 1)
+        
+        # Update the particle rendering (universal update)
+        self.particle_system.render(screen, self.camera)
 
     def _render_motion_trail(self, screen: pygame.Surface, color: Tuple[int, int, int]) -> None:
         """Render motion trail effect during knockback."""

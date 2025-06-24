@@ -79,19 +79,16 @@ git clone https://github.com/jerichobien360/Arena-of-Shadows.git
 # 2. Navigate to project directory
 cd Arena-of-Shadows
 
-# 3. (Optional) Create a virtual environment
-python -m venv venv
-
-# 4. Activate the virtual environment
+# 3. Activate the virtual environment
 # CMD:
 venv\Scripts\activate
 # PowerShell:
 venv\Scripts\Activate.ps1
 
-# 5. Install required dependencies
+# 4. Install required dependencies
 pip install pygame numpy numba
 
-# 6. Run the game
+# 5. Run the game
 python main.py
 ```
 
@@ -103,16 +100,13 @@ git clone https://github.com/jerichobien360/Arena-of-Shadows.git
 # 2. Navigate to project directory
 cd Arena-of-Shadows
 
-# 3. (Optional) Create a virtual environment
-python3 -m venv venv
-
-# 4. Activate the virtual environment
+# 3. Activate the virtual environment
 source venv/bin/activate
 
-# 5. Install required dependencies
+# 4. Install required dependencies
 pip install pygame numpy numba
 
-# 6. Run the game
+# 5. Run the game
 python3 main.py
 ```
 

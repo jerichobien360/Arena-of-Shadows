@@ -34,9 +34,9 @@ class ArenaOfShadows:
         """Initialize pygame subsystems."""
         pygame.init()
         pygame.mixer.init(
-            frequency=22050, 
-            size=-16, 
-            channels=2, 
+            frequency=22050,
+            size=-16,
+            channels=2,
             buffer=512
         )
     
@@ -44,7 +44,14 @@ class ArenaOfShadows:
         """Setup display and core visual components."""
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Arena of Shadows")
-        image_load(GAME_ICON)
+        
+        # Load game icon if available
+        try:
+            icon = image_load(GAME_ICON)
+            pygame.display.set_icon(icon)
+        except:
+            pass  # Skip if icon loading fails
+        
         self.clock = pygame.time.Clock()
         self.font = create_font(CUSTOM_FONT, 18)
     
@@ -55,22 +62,26 @@ class ArenaOfShadows:
     
     def _setup_states(self):
         """Initialize all game states with required dependencies."""
-        states = {
-            "main_menu": MainMenuState(self.font, self.sound_manager),
-            "gameplay": GameplayState(self.font, self.sound_manager),
-            "game_over": GameOverState(self.font, self.sound_manager)
-        }
+        # Create all game states
+        main_menu = MainMenuState(self.font, self.sound_manager)
+        gameplay = GameplayState(self.font, self.sound_manager)
+        game_over = GameOverState(self.font, self.sound_manager)
         
-        for name, state in states.items():
-            self.state_manager.add_state(name, state)
+        # Add states to manager
+        self.state_manager.add_state("main_menu", main_menu)
+        self.state_manager.add_state("gameplay", gameplay)
+        self.state_manager.add_state("game_over", game_over)
     
     def _handle_events(self):
         """Process pygame events and handle quit conditions."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
+            
+            # Allow ESC key to quit
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 return False
+        
         return True
     
     def run(self):
@@ -78,21 +89,40 @@ class ArenaOfShadows:
         running = True
         
         while running:
-            # Frame-independent movement timing
+            # Calculate delta time for frame-independent movement
             dt = self.clock.tick(FPS) / 1000.0
             
-            # Process events
+            # Process input events
             running = self._handle_events()
             
-            # Update and render current game state
+            # Update current game state
             self.state_manager.update(dt)
+            
+            # Render current game state
             self.state_manager.render(self.screen)
+            
+            # Update display
             pygame.display.flip()
         
         # Clean shutdown
+        self._cleanup()
+    
+    def _cleanup(self):
+        """Clean up resources and exit gracefully."""
         pygame.quit()
         sys.exit()
 
 
+def main():
+    """Entry point for the game."""
+    try:
+        game = ArenaOfShadows()
+        game.run()
+    except Exception as e:
+        print(f"Game error: {e}")
+        pygame.quit()
+        sys.exit(1)
+
+
 if __name__ == "__main__":
-    ArenaOfShadows().run()
+    main()

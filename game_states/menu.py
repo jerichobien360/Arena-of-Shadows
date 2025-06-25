@@ -8,38 +8,8 @@ from settings import *
 from game_states.gameplay import GameState
 from ui.effects.particles import ParticleSystem
 from ui.screens.main_menu_screen import MainMenuRenderer
-
-
-@dataclass
-class AnimationState:
-    """Centralized animation state management."""
-    fade_alpha: float = 255.0
-    fade_speed: float = 200.0
-    fade_direction: int = 1
-    transitioning: bool = False
-    target: Optional[str] = None
-    title_pulse: float = 0.0
-    text_appear: float = 0.0
-    lighting: float = 0.0
-    
-    def reset(self) -> None:
-        """Reset all animation values to initial state."""
-        self.fade_alpha = 255.0
-        self.fade_direction = 1
-        self.transitioning = False
-        self.target = None
-        self.title_pulse = 0.0
-        self.text_appear = 0.0
-        self.lighting = 0.0
-
-
-@dataclass
-class LightingConfig:
-    """Lighting system configuration."""
-    ambient: float = 0.4
-    variation_speed: float = 0.8
-    variation_amp: float = 0.05
-    background_dim: float = 0.25
+from ui.effects.animations import *
+from ui.effects.lighitng import *
 
 
 class MainMenuState(GameState):

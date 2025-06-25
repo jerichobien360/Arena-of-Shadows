@@ -8,8 +8,8 @@ from settings import *
 from game_states.gameplay import GameState
 from ui.effects.particles import ParticleSystem
 from ui.screens.main_menu_screen import MainMenuRenderer
-from ui.effects.animations import *
-from ui.effects.lighitng import *
+from ui.effects.animations import AnimationState
+from ui.effects.lighting import LightingConfig
 
 
 class MainMenuState(GameState):
@@ -20,7 +20,7 @@ class MainMenuState(GameState):
         self.sound_manager = sound_manager
         
         # Initialize state and systems
-        self.anim_state = AnimationState()
+        self.animate_state = AnimationState()
         self.lighting_config = LightingConfig()
         self.particle_system = ParticleSystem()
         self.renderer = MainMenuRenderer(font, self.lighting_config)
@@ -28,29 +28,33 @@ class MainMenuState(GameState):
         
     def enter(self) -> None:
         """Initialize menu state and start background music."""
-        self.anim_state.reset()
+        self.animate_state.reset()
         self.input_enabled = False
         self._start_background_music()
     
     def start_transition(self, target_state: str) -> None:
         """Initiate fade transition to target state."""
-        if self.anim_state.transitioning:
+        if self.animate_state.transitioning:
             return
             
-        self.anim_state.transitioning = True
-        self.anim_state.target = target_state
-        self.anim_state.fade_direction = -1
+        self.animate_state.transitioning = True
+        self.animate_state.target = target_state
+        self.animate_state.fade_direction = -1
         self.input_enabled = False
     
     def update(self, dt: float) -> Optional[str]:
         """Main update loop - handles animations, particles, and input."""
+        # Update animations and particles
         self._update_animations(dt)
         self.particle_system.update(dt)
         
-        # Check for state transitions
-        if next_state := self._update_fade_transition(dt):
-            return next_state
+        # Handle fade transitions
+        if self.animate_state.transitioning:
+            return self._handle_fade_out(dt)
+        else:
+            self._handle_fade_in(dt)
             
+        # Process input when ready
         return self._handle_input()
     
     def render(self, screen) -> None:
@@ -58,8 +62,8 @@ class MainMenuState(GameState):
         self.renderer.render(
             screen=screen,
             particles=self.particle_system.get_particles(),
-            anim_state=self.anim_state,
-            lighting_time=self.anim_state.lighting
+            animate_state=self.animate_state,
+            lighting_time=self.animate_state.lighting
         )
     
     def cleanup(self) -> None:
@@ -75,36 +79,29 @@ class MainMenuState(GameState):
     
     def _update_animations(self, dt: float) -> None:
         """Update all animation timers."""
-        self.anim_state.title_pulse += dt
-        self.anim_state.text_appear += dt
-        self.anim_state.lighting += dt
-    
-    def _update_fade_transition(self, dt: float) -> Optional[str]:
-        """Handle fade transitions with quadratic easing."""
-        if not self.anim_state.transitioning:
-            return self._handle_fade_in(dt)
-        
-        return self._handle_fade_out(dt)
+        self.animate_state.title_pulse += dt
+        self.animate_state.text_appear += dt
+        self.animate_state.lighting += dt
     
     def _handle_fade_in(self, dt: float) -> None:
         """Handle initial fade-in when menu starts."""
-        if self.anim_state.fade_direction != 1:
-            return
-            
-        self.anim_state.fade_alpha -= self.anim_state.fade_speed * dt
-        if self.anim_state.fade_alpha <= 0:
-            self.anim_state.fade_alpha = 0
-            self.anim_state.fade_direction = 0
-            self.input_enabled = True
+        if self.animate_state.fade_direction == 1:
+            self.animate_state.fade_alpha -= self.animate_state.fade_speed * dt
+            if self.animate_state.fade_alpha <= 0:
+                self.animate_state.fade_alpha = 0
+                self.animate_state.fade_direction = 0
+                self.input_enabled = True
     
     def _handle_fade_out(self, dt: float) -> Optional[str]:
         """Handle fade-out transition to next state."""
-        fade_progress = 1.0 - (self.anim_state.fade_alpha / 255.0)
-        self.anim_state.fade_alpha = 255 * (1.0 - fade_progress * fade_progress)
-        self.anim_state.fade_alpha -= self.anim_state.fade_speed * dt
+        # Apply quadratic easing for smooth transition
+        fade_progress = 1.0 - (self.animate_state.fade_alpha / 255.0)
+        self.animate_state.fade_alpha = 255 * (1.0 - fade_progress * fade_progress)
+        self.animate_state.fade_alpha -= self.animate_state.fade_speed * dt
         
-        if self.anim_state.fade_alpha <= 0:
-            return self.anim_state.target
+        # Check if transition is complete
+        if self.animate_state.fade_alpha <= 0:
+            return self.animate_state.target
         return None
     
     def _handle_input(self) -> Optional[str]:

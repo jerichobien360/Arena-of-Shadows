@@ -52,10 +52,12 @@ class GameplayState(GameState):
         """Render current game state."""
         self.renderer.render(screen, self.core.game_data)
     
+    #TODO: Implement the Pause-Layout
     def pause(self) -> None:
         """Pause the game."""
         self.core.pause()
     
+    #TODO: Implement the Pause-Layout
     def unpause(self) -> None:
         """Resume the game."""
         self.core.unpause()
@@ -66,6 +68,7 @@ class GameplayState(GameState):
             self.core.cleanup()
             self._initialized = False
     
+    #TODO: Implement the Pause-Layout
     @property
     def is_paused(self) -> bool:
         """Check if game is currently paused."""

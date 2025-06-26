@@ -1,3 +1,5 @@
+"""This is where everything in the game components handles there from the main loop"""
+
 class GameStateManager:
     def __init__(self):
         self.current_state = None

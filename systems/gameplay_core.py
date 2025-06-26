@@ -32,13 +32,13 @@ class GameplayCore:
         self.input_handler = InputHandler()
         
         # Game state
-        self.is_paused = False
+        self.is_paused = False #TODO: Implement the Pause-Layout
         self.game_time = 0.0
     
     def initialize(self) -> None:
         """Initialize all gameplay systems and entities."""
         self.game_time = 0.0
-        self.is_paused = False
+        self.is_paused = False #TODO: Implement the Pause-Layout
         
         # Initialize systems
         self.camera = Camera(SCREEN_WIDTH, SCREEN_HEIGHT)

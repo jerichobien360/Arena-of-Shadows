@@ -18,3 +18,9 @@ class Pause:
     
     def __del__(self):
         pass
+
+    def render(self):
+        pass
+
+    def update(self):
+        pass

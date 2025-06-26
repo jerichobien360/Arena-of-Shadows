@@ -1,0 +1,29 @@
+Bug to Fix:
+1. Combat System: The enemy were glitching when they make a formation, other code classes were possibly not used there correctly.
+2. Canera System: When perfirming to zoom in/out, the other objects were not affected (attack range of player), and when it reverts back, they are not the same as the original one.
+
+
+For Improvement:
+1. Background System: The background itself were not great, so it should refine it and make it more lively atmosphere.
+2. Collision System: Since it is for prototyping, it shall be used a masking collision to get accurately when the objects collide.
+3. Game Difficulty: Since the enemies were too OP (especially to the sniper and fireshooter), implementing of dash skills and inventory system
+
+
+Additional Features to be Added:
+1. Looting System
+2. Inventory System
+3. Map Editor (Including on the Mobs, Obstacles, Loots, Events, Sounds, Text Scripts)
+4. Animation System (since it is getting hassles to work with a large code)
+5. Minimap
+6. Save/Load System
+7. Stats (as for the result of the game and achievements in general)
+8. Game Settings (Configuration on the screen size, audio, etc.)
+
+
+Possible to Add in the Future:
+1. Loading Screen (Since Pygame is slow and thus this will be used for multi-purposes)1
+
+
+
+Final Thought:
+Since this game meant to have fun, and this is on what game created for.

@@ -47,7 +47,7 @@ class ArenaOfShadows:
         
         # Load game icon if available
         try:
-            icon = image_load(GAME_ICON)
+            icon = image_icon_load(GAME_ICON)
             pygame.display.set_icon(icon)
         except:
             pass  # Skip if icon loading fails

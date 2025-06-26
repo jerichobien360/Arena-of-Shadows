@@ -41,36 +41,7 @@ class MainMenuState(GameState):
         self.animate_state.target = target_state
         self.animate_state.fade_direction = -1
         self.input_enabled = False
-    
-    def update(self, dt: float) -> Optional[str]:
-        """Main update loop - handles animations, particles, and input."""
-        # Update animations and particles
-        self._update_animations(dt)
-        self.particle_system.update(dt)
-        
-        # Handle fade transitions
-        if self.animate_state.transitioning:
-            return self._handle_fade_out(dt)
-        else:
-            self._handle_fade_in(dt)
-            
-        # Process input when ready
-        return self._handle_input()
-    
-    def render(self, screen) -> None:
-        """Render the main menu using the dedicated renderer."""
-        self.renderer.render(
-            screen=screen,
-            particles=self.particle_system.get_particles(),
-            animate_state=self.animate_state,
-            lighting_time=self.animate_state.lighting
-        )
-    
-    def cleanup(self) -> None:
-        """Clean up resources when leaving state."""
-        self.sound_manager.stop_background_music()
-        self.particle_system.clear()
-    
+
     def _start_background_music(self) -> None:
         """Load and start background music with error handling."""
         music_path = "assets/background_music/main_menu.mp3"
@@ -113,3 +84,32 @@ class MainMenuState(GameState):
             self.start_transition("gameplay")
         
         return None
+
+    def cleanup(self) -> None:
+        """Clean up resources when leaving state."""
+        self.sound_manager.stop_background_music()
+        self.particle_system.clear()
+
+    def update(self, dt: float) -> Optional[str]:
+        """Main update loop - handles animations, particles, and input."""
+        # Update animations and particles
+        self._update_animations(dt)
+        self.particle_system.update(dt)
+        
+        # Handle fade transitions
+        if self.animate_state.transitioning:
+            return self._handle_fade_out(dt)
+        else:
+            self._handle_fade_in(dt)
+            
+        # Process input when ready
+        return self._handle_input()
+
+    def render(self, screen) -> None:
+        """Render the main menu using the dedicated renderer."""
+        self.renderer.render(
+            screen=screen,
+            particles=self.particle_system.get_particles(),
+            animate_state=self.animate_state,
+            lighting_time=self.animate_state.lighting
+        )

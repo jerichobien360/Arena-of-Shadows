@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 
 # Constants
 SCREEN_WIDTH = 700
@@ -56,3 +57,17 @@ class UIConfig:
     low_health_threshold: float = 0.3
     effect_alpha: int = 64
     level_up_duration: int = 2000
+
+class ParticleType(Enum):
+    """Different types of particles for various effects"""
+    BLOOD = 0
+    SPARKS = 1
+    EXPLOSION = 2
+    MAGIC = 3
+    SMOKE = 4
+    DEBRIS = 5
+    ENERGY = 6
+    HEALING = 7
+    SMOOTH_FADE = 8
+    SMOOTH_SCALE = 9
+    SMOOTH_FLOAT = 10

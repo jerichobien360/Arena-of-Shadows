@@ -5,21 +5,9 @@ import numpy as np
 from typing import Tuple, Optional, Callable, List
 from enum import Enum
 from functools import lru_cache
+from settings import *
 
 
-class ParticleType(Enum):
-    """Different types of particles for various effects"""
-    BLOOD = 0
-    SPARKS = 1
-    EXPLOSION = 2
-    MAGIC = 3
-    SMOKE = 4
-    DEBRIS = 5
-    ENERGY = 6
-    HEALING = 7
-    SMOOTH_FADE = 8
-    SMOOTH_SCALE = 9
-    SMOOTH_FLOAT = 10
 
 
 class EaseType(Enum):

@@ -3,6 +3,7 @@
 import pygame
 import sys
 from settings import *
+from game_function import *
 
 # System files - Core game management systems
 from systems.manager.sound_manager import *
@@ -42,21 +43,18 @@ class ArenaOfShadows:
     
     def _setup_display(self):
         """Setup display and core visual components."""
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        pygame.display.set_caption("Arena of Shadows")
+        # Load Windows
+        self.screen = SCREEN()
+        TITLE_CAPTION()
+        ICON_IMPORT()
         
-        # Load game icon if available
-        try:
-            icon = image_icon_load(GAME_ICON)
-            pygame.display.set_icon(icon)
-        except:
-            pass  # Skip if icon loading fails
-        
-        self.clock = pygame.time.Clock()
-        self.font = create_font(CUSTOM_FONT, 18)
+        # Other Essentials
+        self.clock = CLOCK()
+        self.font = FONT()
     
     def _init_managers(self):
         """Initialize game managers."""
+        # Main Game Composition
         self.sound_manager = SoundManager()
         self.state_manager = GameStateManager()
     
@@ -75,11 +73,9 @@ class ArenaOfShadows:
     def _handle_events(self):
         """Process pygame events and handle quit conditions."""
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return False
-            
-            # Allow ESC key to quit
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            if GAME_INPUT_HANDLER(event):
+                continue
+            else:
                 return False
         
         return True

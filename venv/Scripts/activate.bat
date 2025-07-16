@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\Jericho\Documents\GitHub\python-portfolio\Arena-of-Shadows\venv
+set VIRTUAL_ENV=D:\Documents\python_projects\Collaborated_Projects\(collab_proj_2)AOS\Arena-of-Shadows\venv
 
 if not defined PROMPT set PROMPT=$P$G
 

@@ -1,0 +1,62 @@
+-------LOADING SAVE STATES-------
+
+(1) in the menu have the user decide wheter to start a new game or load a save state
+IF the user wishes to load state make the user pick which save state to load IF there is one
+use the function LoadSaveState().fetch_all_save_state() to load/show all save states
+
+(2) once the user selected a save state get the save_data_id
+
+(3) load the character stats and/or character inventory by doing
+LoadSaveState().fetch_character_stats(save_data_id)
+LoadSaveState().fetch_character_inventory(save_data_id)
+
+
+-------ADDING SAVE STATE-------
+
+(1) add a pause button and then add an option to add a save state, in there make the user name the
+save state OR you could name it automatically based on datetime(converted into str) its up to u
+
+use the function
+AddSaveState().add_save_state(
+                            save_title,
+
+                            #character stats
+                            character_class, 
+                            character_exp, 
+                            character_level, 
+                            character_wave,
+
+                            #inventory items
+                            character_weapons,
+                            character_armors, 
+                            character_accessories, 
+                            character_consumables 
+                            )
+
+
+
+-------UPDATING SAVE STATE-------
+
+(1) add a pause button and then add an option to add a save state OR update an existing save state,
+then use the function:
+LoadSaveState().fetch_all_save_state()
+to get the save_id of the save state you want to be updated
+
+(2) using the save_id update/make changes to the appropriate save states by using the functions:
+UpdateSaveData().update_character_stats(
+                                        save_data_id, 
+                                        character_class, 
+                                        character_exp, 
+                                        character_level, 
+                                        character_wave
+                                        )
+AND (must be ran together)
+
+UpdateSaveData().update_character_inventory(
+                                            save_data_id,
+                                            character_weapons,
+                                            character_armors, 
+                                            character_accessories, 
+                                            character_consumables 
+                                            )
+

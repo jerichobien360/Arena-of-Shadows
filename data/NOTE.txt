@@ -1,0 +1,45 @@
+# Description #
+- for data handling I opted in using .db file which usses SQLite as it is better suited 
+in doing CRUD than JSON file, this implies that u need to review how to do SQL commands
+
+
+# added requirements #
+--in python dependencies--
+- sqlite3
+
+--in softwares--
+- to add db table and examine the contents of the .db file for development 
+it is suggested to install sqlite3 in your system
+
+
+# database schema #
+--for save state--
+CREATE TABLE save_data (
+    save_data_id INT PRIMARY KEY,
+    save_data_title VARCHAR(50) NOT NULL
+)  
+
+-- for character statistics --
+CREATE TABLE character_stats (
+    save_data_id INT,
+    character_class VARCHAR(50), --pass NONE or "" if class selection not implemented yet
+    character_exp INT,
+    character_level INT,
+    character_wave INT, --this is to indentify the wave count the user reached before saving
+    FOREIGN KEY (save_data_id) REFERENCES save_data(save_data_id)
+);
+
+-- for character inventory -- 
+CREATE TABLE character_inventory (
+    save_data_id INT,
+    character_weapons TEXT,
+    character_armors TEXT,
+    character_accessories TEXT,
+    character_consumables TEXT,
+    FOREIGN KEY (save_data_id) REFERENCES save_data(save_data_id)
+);
+
+
+# TO DO #
+- connect the data handler modules to the main app
+

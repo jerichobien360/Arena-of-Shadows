@@ -1,3 +1,4 @@
+import pygame
 from dataclasses import dataclass
 from enum import Enum
 
@@ -72,3 +73,12 @@ class ParticleType(Enum):
     SMOOTH_FADE = 8
     SMOOTH_SCALE = 9
     SMOOTH_FLOAT = 10
+
+
+# Input Handler
+MOVE_LEFT = pygame.K_LEFT
+MOVE_RIGHT = pygame.K_RIGHT
+MOVE_DOWN = pygame.K_DOWN
+MOVE_UP = pygame.K_UP
+JUMP = pygame.K_SPACE
+ESCAPE = pygame.K_ESCAPE

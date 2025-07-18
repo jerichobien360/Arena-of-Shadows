@@ -47,8 +47,8 @@ Fight against waves of shadow creatures in intense top-down combat. Master your 
 - [x] Smart Mob AI
 - [x] Combat Mechanics
 - [x] Game Over Interface
+- [X] Save/Load System
 - [ ] Level Stages
-- [ ] Save/Load System
 - [ ] Boss Battles
 - [ ] Character Classes
 - [ ] Level Editor

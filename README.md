@@ -136,3 +136,5 @@ Feel free to reach out with any questions or suggestions about the game!
 
 ---
 ⭐ **Star this repo if you're interested in following the development!** ⭐
+
+© 2025 Jericho Bien. Licensed under the MIT License.

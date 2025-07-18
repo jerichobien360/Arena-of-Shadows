@@ -1,80 +1,90 @@
 import os
 import sqlite3
+from settings import *
 
 
-'''for fetching save states'''
-class LoadSaveState:
+class DataManagement:
     def __init__(self):
-        self.database_file = 'data/AOS_player_data.db'
+        self.db_file = DATABASE_FILE
 
-        #check if db exists
-        if not os.path.exists(self.database_file):
-            print(f"Database file not found: {self.database_file}")
-            return
+        # Check if database file exists
+        if not os.path.exists(self.db_file):
+            print(f"Database file not found: {self.db_file}")
         else:
             try:
                 # Establish a connection to the database
-                self.conn = sqlite3.connect(self.database_file)
-                self.cursor = self.conn.cursor()
-                print(f"connected to Database")
+                self.db_connection = sqlite3.connect(self.db_file)
+                self.cursor =   self.db_connection.cursor()
+                print("Database connected successfully!")
 
             except sqlite3.OperationalError as e:
                 print(f"Error connecting to the database: {e}")
+    
+    def close(self):
+        if self.db_connection:
+            self.db_connection.close()
+    
+    def __del__(self):
+        self.close()
+
+
+'''for fetching save states'''
+class LoadSaveState(DataManagement):
+    def __init__(self):
+        super().__init__()
     
     def fetch_all_save_state(self):
         try:
             self.cursor.execute(f"SELECT * FROM save_data")
             result = self.cursor.fetchall()
             if result:
-                return result #in the form [[save_data_1], [save_data_2], ...]
+                return result # Saved data: [[data_1], [data_2], ...]
             else:
                 return None
         except sqlite3.OperationalError as e:
             print(f"Database error: {e}")
+            return
 
     def fetch_character_stats(self, save_data_id:int):
         try:
             self.cursor.execute(f"SELECT * FROM character_stats WHERE  save_data_id = ?", (save_data_id,))
             result = self.cursor.fetchall()
             if result:
-                return result #in the form [[save_data_1], [save_data_2], ...]
+                return result # Retrieved character stats data: [[data_1], [data_2], ...]
             else:
                 return None
         except sqlite3.OperationalError as e:
             print(f"Database error: {e}")
+            return
 
     def fetch_character_inventory(self, save_data_id:int):
         try:
             self.cursor.execute(f"SELECT * FROM character_inventory WHERE  save_data_id = ?", (save_data_id,))
             result = self.cursor.fetchall()
             if result:
-                return result #in the form [[save_data_1], [save_data_2], ...]
+                return result #Retrieved character inventory data: [[save_data_1], [save_data_2], ...]
             else:
                 return None
         except sqlite3.OperationalError as e:
             print(f"Database error: {e}")
+            return
 
 
 '''adding new save state'''
-class AddSaveState:
+class AddSaveState(DataManagement):
     def __init__(self):
-        self.database_file = 'data/AOS_player_data.db'
-
-        #check if db exists
-        if not os.path.exists(self.database_file):
-            print(f"Database file not found: {self.database_file}")
-            return
-        else:
-            try:
-                # Establish a connection to the database
-                self.conn = sqlite3.connect(self.database_file)
-                self.cursor = self.conn.cursor()
-                print(f"connected to Database")
-
-            except sqlite3.OperationalError as e:
-                print(f"Error connecting to the database: {e}")
+        super().__init__()
     
-    def add_save_state(self, save_title:str, character_class:str, character_exp:int, character_level:int, character_wave:int, character_weapons:str, character_armors:str, character_accessories:str, character_consumables:str):
+    def add_save_state(self, 
+                       save_title:str, 
+                       character_class:str, 
+                       character_exp:int, 
+                       character_level:int, 
+                       character_wave:int, 
+                       character_weapons:str, 
+                       character_armors:str, 
+                       character_accessories:str, 
+                       character_consumables:str) -> bool:
         try:
             # Insert into parent table (save_data)
             query_save_data = "INSERT INTO save_data (save_data_title) VALUES (?);"
@@ -100,55 +110,41 @@ class AddSaveState:
                                                 character_armors, character_accessories,
                                                 character_consumables))
             
-            self.conn.commit()
+            self.db_connection.commit()
             return True
         
         except sqlite3.Error as e:  
             print(f"Database error: {e}")
-            self.conn.rollback() 
+            self.db_connection.rollback() 
             return False
-        
-        finally:
-            if self.conn:
-                self.conn.close()
 
 
 '''for updating/changing save data'''
-class UpdateSaveData:
+class UpdateSaveData(DataManagement):
     def __init__(self):
-        self.database_file = 'data/AOS_player_data.db'
-
-        #check if db exists
-        if not os.path.exists(self.database_file):
-            print(f"Database file not found: {self.database_file}")
-            return
-        else:
-            try:
-                # Establish a connection to the database
-                self.conn = sqlite3.connect(self.database_file)
-                self.cursor = self.conn.cursor()
-                print(f"connected to Database")
-
-            except sqlite3.OperationalError as e:
-                print(f"Error connecting to the database: {e}")
+        super().__init__()
     
-    '''use this if you want to add an option to rename a save state'''
-    def update_save_state(self,save_data_id:int, new_save_title:str):
+    """Optional: Rename a game saved state"""
+    def update_save_state(self,save_data_id:int, new_save_title:str) -> bool:
         try:
             sql = """UPDATE save_data 
-                    SET save_data_title = ?, 
+                    SET save_data_title = ?
                     WHERE save_data_id = ?"""
-            self.cursor.execute(sql, (save_data_id, new_save_title))
-            self.conn.commit()
+            self.cursor.execute(sql, (new_save_title, save_data_id))
+            self.db_connection.commit()
             return True
         except sqlite3.Error as e: 
             print(f"Database error: {e}")
-            self.conn.rollback() 
-        finally:
-            if self.conn:
-                self.conn.close()
+            self.db_connection.rollback()
+            return False
+                
 
-    def update_character_stats(self, save_data_id:int, character_class:str, character_exp:int, character_level:int, character_wave:int):
+    def update_character_stats(self, 
+                               save_data_id:int,
+                               character_class:str, 
+                               character_exp:int, 
+                               character_level:int, 
+                               character_wave:int) -> bool:
         try:
             sql = """UPDATE character_stats 
                     SET character_class = ?, 
@@ -157,16 +153,19 @@ class UpdateSaveData:
                         character_wave = ? 
                     WHERE save_data_id = ?"""
             self.cursor.execute(sql, (character_class, character_exp, character_level, character_wave, save_data_id))
-            self.conn.commit()
+            self.db_connection.commit()
             return True
         except sqlite3.Error as e: 
             print(f"Database error: {e}")
-            self.conn.rollback() 
-        finally:
-            if self.conn:
-                self.conn.close()
+            self.db_connection.rollback()
+            return False
 
-    def update_character_inventory(self, save_data_id:int, character_weapons:str, character_armors:str, character_accessories:str, character_consumables:str):
+    def update_character_inventory(self, 
+                                   save_data_id:int, 
+                                   character_weapons:str, 
+                                   character_armors:str, 
+                                   character_accessories:str, 
+                                   character_consumables:str) -> bool:
         try:
             sql = """UPDATE character_inventory 
                     SET character_weapons = ?, 
@@ -175,12 +174,10 @@ class UpdateSaveData:
                         character_consumables = ? 
                     WHERE save_data_id = ?"""
             self.cursor.execute(sql, (character_weapons, character_armors, character_accessories, character_consumables, save_data_id))
-            self.conn.commit()
+            self.db_connection.commit()
             return True
         except sqlite3.Error as e: 
             print(f"Database error: {e}")
-            self.conn.rollback() 
-        finally:
-            if self.conn:
-                self.conn.close()
+            self.db_connection.rollback() 
+            return False
 

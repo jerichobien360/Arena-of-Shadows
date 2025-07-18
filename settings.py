@@ -36,7 +36,8 @@ FIRESHOOTER_INNER_COLOR = (255, 200, 0)
 GAME_ICON = "assets\\icon.png"
 CUSTOM_FONT = "assets\\font\\PixelifySans-Medium.ttf"
 
-
+#database file path
+DATABASE_FILE = "data\\AOS_player_data.db"
 
 # Gamerplay Renderer Configuration
 @dataclass

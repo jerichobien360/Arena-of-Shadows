@@ -136,3 +136,6 @@ Feel free to reach out with any questions or suggestions about the game!
 
 ---
 ⭐ **Star this repo if you're interested in following the development!** ⭐
+
+
+![GitHub Metrics](https://github.com/jerichobien360/Arena-of-Shadows/blob/main/github-metrics.svg)

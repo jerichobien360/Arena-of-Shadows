@@ -1,0 +1,7 @@
+----------USE CASES----------
+use the executable_file_redirector IF you want to bundle the app into .exe
+
+
+----------HOW TO USE----------
+file_path = "assets\background\background_1.jpg"
+exe_compatible_path = Convert().get_resource_path(file_path)

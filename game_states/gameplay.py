@@ -38,20 +38,20 @@ class GameplayState(GameState):
         self.renderer = GameplayRenderer(font)
         self._initialized = False
     
+    # -------------------INITIALIZE & CLEANUP-----------------------------
     def enter(self) -> None:
         """Initialize gameplay when entering state."""
         if not self._initialized:
             self.core.initialize()
             self._initialized = True
     
-    def update(self, dt: float) -> Optional[str]:
-        """Update game logic and return next state if needed."""
-        return self.core.update(dt)
-    
-    def render(self, screen: pygame.Surface) -> None:
-        """Render current game state."""
-        self.renderer.render(screen, self.core.game_data)
-    
+    def exit(self) -> None:
+        """Clean up resources when exiting state."""
+        if self._initialized:
+            self.core.cleanup()
+            self._initialized = False
+
+    # -------------------CLASS METHOD-------------------------------------
     #TODO: Implement the Pause-Layout
     def pause(self) -> None:
         """Pause the game."""
@@ -62,12 +62,7 @@ class GameplayState(GameState):
         """Resume the game."""
         self.core.unpause()
     
-    def exit(self) -> None:
-        """Clean up resources when exiting state."""
-        if self._initialized:
-            self.core.cleanup()
-            self._initialized = False
-    
+    # -------------------CLASS PROPERTIES---------------------------------
     #TODO: Implement the Pause-Layout
     @property
     def is_paused(self) -> bool:
@@ -78,3 +73,12 @@ class GameplayState(GameState):
     def game_data(self) -> dict:
         """Access to current game data for debugging/testing."""
         return self.core.game_data
+
+    # -------------------GAME STATE HANDLE-----------------------------
+    def update(self, dt: float) -> Optional[str]:
+        """Update game logic and return next state if needed."""
+        return self.core.update(dt)
+    
+    def render(self, screen: pygame.Surface) -> None:
+        """Render current game state."""
+        self.renderer.render(screen, self.core.game_data)

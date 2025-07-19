@@ -13,17 +13,31 @@ class GameOverState(GameState):
         self.visuals = GameOverVisuals(font)
         self._reset_state()
     
-    def _reset_state(self):
-        """Reset all timing and state variables"""
-        self.timer = 0.0
-        self.can_exit = False
-        
+    # -------------------INITIALIZE & CLEANUP-----------------------------
     def enter(self):
         """Initialize state when entering game over"""
         self.sound_manager.stop_background_music()
         self._reset_state()
         self.visuals.reset()
     
+    def exit(self): # TODO: Create an exit function from line of code 49-50
+        pass
+
+    # -------------------CLASS METHOD-------------------------------------
+    # EMPTY
+
+    # -------------------CLASS PROPERTIES---------------------------------
+    def _reset_state(self):
+        """Reset all timing and state variables"""
+        self.timer = 0.0
+        self.can_exit = False
+        
+    def _check_input(self):
+        """Check for restart input"""
+        keys = pygame.key.get_pressed()
+        return keys[pygame.K_RETURN] or keys[pygame.K_SPACE]
+    
+    # -------------------GAME STATE HANDLE-----------------------------
     def update(self, dt):
         """Update timing and handle input"""
         self.timer += dt
@@ -40,12 +54,7 @@ class GameOverState(GameState):
             return "main_menu"
         
         return None
-    
-    def _check_input(self):
-        """Check for restart input"""
-        keys = pygame.key.get_pressed()
-        return keys[pygame.K_RETURN] or keys[pygame.K_SPACE]
-    
+
     def render(self, screen):
         """Delegate rendering to visuals component"""
         self.visuals.render(screen)

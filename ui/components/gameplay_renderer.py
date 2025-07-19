@@ -17,6 +17,7 @@ class ScreenEffects:
         self.level_up_timer = 0
         self.last_player_level = 1
     
+    # -------------------CLASS METHOD-------------------------------------
     def check_level_up(self, player, current_time_ms: int) -> None:
         """Check for level-up and trigger effect."""
         if player.level > self.last_player_level:
@@ -30,6 +31,7 @@ class ScreenEffects:
         elif self._should_show_low_health(player):
             self._render_low_health_effect(screen, current_time_ms)
     
+    # -------------------CLASS PROPERTIES---------------------------------
     def _is_level_up_active(self, current_time_ms: int) -> bool:
         """Check if level-up effect is active."""
         return (self.level_up_timer > 0 and 
@@ -73,6 +75,7 @@ class UIRenderer:
         self.font = font
         self.config = config
     
+    # -------------------CLASS METHOD-------------------------------------
     def render_panel(self, screen: pygame.Surface, x: int, y: int, width: int, height: int) -> None:
         """Render semi-transparent UI panel."""
         panel = pygame.Surface((width, height), pygame.SRCALPHA)
@@ -142,6 +145,7 @@ class UIRenderer:
         # Labels and values
         self._render_bar_labels(screen, x, y, label, animated_bar, progress)
     
+    # -------------------CLASS PROPERTIES---------------------------------
     def _get_animated_color(self, base_color: Tuple[int, int, int], 
                           glow_color: Tuple[int, int, int], is_animating: bool) -> Tuple[int, int, int]:
         """Get color with animation glow if needed."""
@@ -219,6 +223,7 @@ class GameplayRenderer:
         self.exp_bar = AnimatedProgressBar()
         self._initialized = False
     
+    # -------------------CLASS METHOD-------------------------------------
     def render(self, screen: pygame.Surface, game_data: Dict[str, Any]) -> None:
         """Main render method."""
         screen.fill(BLACK)
@@ -244,6 +249,8 @@ class GameplayRenderer:
         if game_data['is_paused']:
             self._render_pause_overlay(screen)
     
+    # -------------------CLASS PROPERTIES---------------------------------
+    # HUD 1 - HP & EXP =========================================
     def _initialize_progress_bars(self, player, current_time_ms: int) -> None:
         """Initialize progress bars with current values."""
         self.hp_bar.update(player.hp, player.max_hp, current_time_ms)
@@ -254,23 +261,6 @@ class GameplayRenderer:
         """Update animated progress bars."""
         self.hp_bar.update(player.hp, player.max_hp, current_time_ms)
         self.exp_bar.update(player.experience, self._get_exp_for_next_level(player.level), current_time_ms)
-    
-    def _render_world_and_entities(self, screen: pygame.Surface, game_data: Dict[str, Any]) -> None:
-        """Render world background and all entities."""
-        camera = game_data['camera']
-        current_time = pygame.time.get_ticks() / 1000.0
-        
-        # World
-        game_data['background'].render(screen, camera, current_time)
-        
-        # Player
-        self._render_entity(screen, game_data['player'], camera)
-        
-        # Enemies with culling
-        for enemy in game_data['enemies']:
-            screen_pos = camera.world_to_screen(enemy.x, enemy.y)
-            if self._is_in_view(screen_pos):
-                self._render_entity_at(screen, enemy, screen_pos, camera)
     
     def _render_ui(self, screen: pygame.Surface, game_data: Dict[str, Any], current_time_ms: int) -> None:
         """Render game UI elements."""
@@ -314,6 +304,28 @@ class GameplayRenderer:
             screen, bar_x, exp_y, self.exp_bar, "EXP",
             ((50, 100, 220), (100, 150, 255)), current_time_ms
         )
+
+    def _get_exp_for_next_level(self, level: int) -> int:
+        """Get experience needed for next level."""
+        return level * 100
+
+    # CAMERA SYSTEM ============================================
+    def _render_world_and_entities(self, screen: pygame.Surface, game_data: Dict[str, Any]) -> None:
+        """Render world background and all entities."""
+        camera = game_data['camera']
+        current_time = pygame.time.get_ticks() / 1000.0
+        
+        # World
+        game_data['background'].render(screen, camera, current_time)
+        
+        # Player
+        self._render_entity(screen, game_data['player'], camera)
+        
+        # Enemies with culling
+        for enemy in game_data['enemies']:
+            screen_pos = camera.world_to_screen(enemy.x, enemy.y)
+            if self._is_in_view(screen_pos):
+                self._render_entity_at(screen, enemy, screen_pos, camera)
     
     def _is_in_view(self, pos: Tuple[float, float]) -> bool:
         """Check if position is visible on screen."""
@@ -354,10 +366,7 @@ class GameplayRenderer:
             else:
                 entity.render(screen)
     
-    def _get_exp_for_next_level(self, level: int) -> int:
-        """Get experience needed for next level."""
-        return level * 100
-    
+    # GAME PAUSE ===============================================
     def _render_pause_overlay(self, screen: pygame.Surface) -> None:
         """Render pause screen overlay."""
         # Semi-transparent overlay

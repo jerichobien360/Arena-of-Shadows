@@ -35,6 +35,7 @@ class GameplayCore:
         self.is_paused = False #TODO: Implement the Pause-Layout
         self.game_time = 0.0
     
+    # -------------------INITIALIZE & CLEANUP-----------------------------
     def initialize(self) -> None:
         """Initialize all gameplay systems and entities."""
         self.game_time = 0.0
@@ -54,26 +55,11 @@ class GameplayCore:
         self.wave_manager.start_wave(1)
         self._setup_audio()
     
-    def update(self, dt: float) -> Optional[str]:
-        """Main update loop returning next state or None."""
-        if self.is_paused:
-            return None
-            
-        self.game_time += dt
-        self.input_handler.update()
-        
-        # Process input first
-        if next_state := self._handle_input():
-            return next_state
-        
-        # Update game systems
-        self._update_player(dt)
-        self._update_combat(dt)
-        self._update_systems(dt)
-        
-        # Check game over condition
-        return "game_over" if self.player.hp <= 0 else None
-    
+    def cleanup(self) -> None: # TODO: Add an exit from the line of 279 & 288
+        """Clean up resources when exiting gameplay."""
+        self.sound_manager.stop_background_music()
+
+    # -------------------CLASS METHOD-------------------------------------
     def pause(self) -> None:
         """Pause the game."""
         self.is_paused = True
@@ -82,10 +68,7 @@ class GameplayCore:
         """Resume the game."""
         self.is_paused = False
     
-    def cleanup(self) -> None:
-        """Clean up resources when exiting gameplay."""
-        self.sound_manager.stop_background_music()
-    
+    # -------------------CLASS METHOD-------------------------------------
     @property
     def game_data(self) -> Dict[str, Any]:
         """Return all data needed for rendering."""
@@ -125,6 +108,11 @@ class GameplayCore:
             self.camera.set_zoom(new_zoom)
         
         return None
+
+    # -------------------Player Properties-----------------------------
+    def _get_player_distance(self, enemy) -> float:
+        """Calculate distance from enemy to player."""
+        return math.hypot(self.player.x - enemy.x, self.player.y - enemy.y)
     
     def _update_player(self, dt: float) -> None:
         """Update player with world boundary constraints."""
@@ -136,7 +124,65 @@ class GameplayCore:
                            min(bounds[2] - self.player.radius, self.player.x))
         self.player.y = max(bounds[1] + self.player.radius, 
                            min(bounds[3] - self.player.radius, self.player.y))
+
+    # -------------------Enemy Properties------------------------------
+    def _handle_melee_enemy(self, enemy, distance: float, unit_vector: Tuple[float, float], speed: float) -> None:
+        """Handle melee enemy behavior."""
+        if distance > enemy.attack_range:
+            enemy.x += unit_vector[0] * speed
+            enemy.y += unit_vector[1] * speed
+        elif enemy.attack_cooldown <= 0 and not getattr(enemy, 'is_dying', False):
+            self._execute_enemy_attack(enemy)
     
+    def _handle_ranged_enemy(self, enemy, distance: float, unit_vector: Tuple[float, float], speed: float) -> None:
+        """Handle ranged enemy behavior with tactical positioning."""
+        # Define preferred combat distances
+        preferred_distances = {"sniper": 220, "fireshooter": 100}
+        preferred_distance = preferred_distances.get(enemy.type, 150)
+        
+        # Tactical movement based on distance
+        if distance < preferred_distance * 0.8:
+            # Retreat
+            enemy.x -= unit_vector[0] * speed * 0.9
+            enemy.y -= unit_vector[1] * speed * 0.9
+        elif distance > preferred_distance * 1.3:
+            # Advance
+            enemy.x += unit_vector[0] * speed * 0.6
+            enemy.y += unit_vector[1] * speed * 0.6
+        else:
+            # Strafe movement
+            enemy.x += -unit_vector[1] * speed * 0.5
+            enemy.y += unit_vector[0] * speed * 0.5
+        
+        # Attack if in range
+        if (distance <= enemy.attack_range and enemy.attack_cooldown <= 0 
+            and not getattr(enemy, 'is_dying', False)):
+            self._execute_enemy_attack(enemy)
+
+    def _get_unit_vector_to_player(self, enemy, distance: Optional[float] = None) -> Tuple[float, float]:
+        """Get unit vector from enemy to player."""
+        if distance is None:
+            distance = self._get_player_distance(enemy)
+        
+        if distance > 0:
+            dx = self.player.x - enemy.x
+            dy = self.player.y - enemy.y
+            return dx / distance, dy / distance
+        
+        return 0.0, 0.0
+
+    def _execute_enemy_attack(self, enemy) -> None:
+        """Execute enemy attack if not dying."""
+        if getattr(enemy, 'is_dying', False):
+            return
+        
+        if enemy.type in {"crawler", "brute"}:
+            self.player.take_damage(enemy.attack_power, enemy=enemy)
+            enemy.attack_cooldown = 0.9
+        else:
+            enemy._initiate_ranged_attack(self.player)
+    
+    # -------------------Combat Formation Properties-------------------      
     def _update_combat(self, dt: float) -> None:
         """Update combat system with formation management."""
         self.formation_system.update(dt, self.enemies, self.player)
@@ -177,40 +223,7 @@ class GameplayCore:
             self._handle_melee_enemy(enemy, player_distance, unit_vector, move_speed)
         else:
             self._handle_ranged_enemy(enemy, player_distance, unit_vector, move_speed)
-    
-    def _handle_melee_enemy(self, enemy, distance: float, unit_vector: Tuple[float, float], speed: float) -> None:
-        """Handle melee enemy behavior."""
-        if distance > enemy.attack_range:
-            enemy.x += unit_vector[0] * speed
-            enemy.y += unit_vector[1] * speed
-        elif enemy.attack_cooldown <= 0 and not getattr(enemy, 'is_dying', False):
-            self._execute_enemy_attack(enemy)
-    
-    def _handle_ranged_enemy(self, enemy, distance: float, unit_vector: Tuple[float, float], speed: float) -> None:
-        """Handle ranged enemy behavior with tactical positioning."""
-        # Define preferred combat distances
-        preferred_distances = {"sniper": 220, "fireshooter": 100}
-        preferred_distance = preferred_distances.get(enemy.type, 150)
-        
-        # Tactical movement based on distance
-        if distance < preferred_distance * 0.8:
-            # Retreat
-            enemy.x -= unit_vector[0] * speed * 0.9
-            enemy.y -= unit_vector[1] * speed * 0.9
-        elif distance > preferred_distance * 1.3:
-            # Advance
-            enemy.x += unit_vector[0] * speed * 0.6
-            enemy.y += unit_vector[1] * speed * 0.6
-        else:
-            # Strafe movement
-            enemy.x += -unit_vector[1] * speed * 0.5
-            enemy.y += unit_vector[0] * speed * 0.5
-        
-        # Attack if in range
-        if (distance <= enemy.attack_range and enemy.attack_cooldown <= 0 
-            and not getattr(enemy, 'is_dying', False)):
-            self._execute_enemy_attack(enemy)
-    
+         
     def _move_to_formation(self, enemy, dt: float, player_distance: float) -> None:
         """Move enemy to formation position."""
         target_x, target_y = enemy.form_target
@@ -242,34 +255,8 @@ class GameplayCore:
             # Ranged combat
             if distance <= enemy.attack_range and enemy.attack_cooldown <= 0:
                 self._execute_enemy_attack(enemy)
-    
-    def _execute_enemy_attack(self, enemy) -> None:
-        """Execute enemy attack if not dying."""
-        if getattr(enemy, 'is_dying', False):
-            return
-        
-        if enemy.type in {"crawler", "brute"}:
-            self.player.take_damage(enemy.attack_power, enemy=enemy)
-            enemy.attack_cooldown = 0.9
-        else:
-            enemy._initiate_ranged_attack(self.player)
-    
-    def _get_player_distance(self, enemy) -> float:
-        """Calculate distance from enemy to player."""
-        return math.hypot(self.player.x - enemy.x, self.player.y - enemy.y)
-    
-    def _get_unit_vector_to_player(self, enemy, distance: Optional[float] = None) -> Tuple[float, float]:
-        """Get unit vector from enemy to player."""
-        if distance is None:
-            distance = self._get_player_distance(enemy)
-        
-        if distance > 0:
-            dx = self.player.x - enemy.x
-            dy = self.player.y - enemy.y
-            return dx / distance, dy / distance
-        
-        return 0.0, 0.0
-    
+
+    # -------------------Background Properties-------------------------
     def _update_systems(self, dt: float) -> None:
         """Update world systems and wave management."""
         self.background.update(dt)
@@ -278,3 +265,28 @@ class GameplayCore:
         # Handle wave progression
         if self.wave_manager.update(dt, self.enemies):
             self.wave_manager.start_wave(self.wave_manager.current_wave + 1)
+
+    # -------------------GAME STATE HANDLE-----------------------------
+    def update(self, dt: float) -> Optional[str]:
+        """Main update loop returning next state or None."""
+        if self.is_paused:
+            return None
+            
+        self.game_time += dt
+        self.input_handler.update()
+        
+        # Process input first
+        if next_state := self._handle_input():
+            return next_state
+        
+        # Update game systems
+        self._update_player(dt)
+        self._update_combat(dt)
+        self._update_systems(dt)
+        
+        # Check game over condition
+        return "game_over" if self.player.hp <= 0 else None
+    
+    # TODO: ADD THE RENDERING FUNCTION FROM gameplay_renderer.py for READABILITY
+    # def render(self, other):
+    #   pass

@@ -18,6 +18,11 @@ class GameplayCore:
     """Core gameplay logic with clean separation of concerns."""
     
     def __init__(self, sound_manager):
+        '''
+        These are the packages will be used for a gameplay.
+            1. Update on the game_data() method for rendering.
+            2. Use on the CLASS PROPERTIES for modifying the flow of gameplay.
+        '''
         self.sound_manager = sound_manager
         
         # Game entities
@@ -68,7 +73,7 @@ class GameplayCore:
         """Resume the game."""
         self.is_paused = False
     
-    # -------------------CLASS METHOD-------------------------------------
+    # -------------------CLASS PROPERTIES---------------------------------
     @property
     def game_data(self) -> Dict[str, Any]:
         """Return all data needed for rendering."""
@@ -183,22 +188,6 @@ class GameplayCore:
             enemy._initiate_ranged_attack(self.player)
     
     # -------------------Combat Formation Properties-------------------      
-    def _update_combat(self, dt: float) -> None:
-        """Update combat system with formation management."""
-        self.formation_system.update(dt, self.enemies, self.player)
-        
-        # Remove enemies that have completed death animations
-        self.enemies = [enemy for enemy in self.enemies if not enemy.should_be_removed()]
-        
-        # Update each enemy with enhanced AI
-        for enemy in self.enemies:
-            if getattr(enemy, 'form_active', False):
-                self._update_formation_ai(enemy, dt)
-            else:
-                self._update_standard_ai(enemy, dt)
-            
-            enemy.update(dt, self.player)
-    
     def _update_formation_ai(self, enemy, dt: float) -> None:
         """Update AI for enemies in formation."""
         player_distance = self._get_player_distance(enemy)
@@ -256,6 +245,22 @@ class GameplayCore:
             if distance <= enemy.attack_range and enemy.attack_cooldown <= 0:
                 self._execute_enemy_attack(enemy)
 
+    def _update_combat(self, dt: float) -> None:
+        """Update combat system with formation management."""
+        self.formation_system.update(dt, self.enemies, self.player)
+        
+        # Remove enemies that have completed death animations
+        self.enemies = [enemy for enemy in self.enemies if not enemy.should_be_removed()]
+        
+        # Update each enemy with enhanced AI
+        for enemy in self.enemies:
+            if getattr(enemy, 'form_active', False):
+                self._update_formation_ai(enemy, dt)
+            else:
+                self._update_standard_ai(enemy, dt)
+            
+            enemy.update(dt, self.player)
+    
     # -------------------Background Properties-------------------------
     def _update_systems(self, dt: float) -> None:
         """Update world systems and wave management."""
@@ -287,6 +292,5 @@ class GameplayCore:
         # Check game over condition
         return "game_over" if self.player.hp <= 0 else None
     
-    # TODO: ADD THE RENDERING FUNCTION FROM gameplay_renderer.py for READABILITY
-    # def render(self, other):
-    #   pass
+    def render(self): # DO NOTHING: Since the gameplay_renderer.py will handle those
+        pass

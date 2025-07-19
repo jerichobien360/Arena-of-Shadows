@@ -25,13 +25,20 @@ class MainMenuState(GameState):
         self.particle_system = ParticleSystem()
         self.renderer = MainMenuRenderer(font, self.lighting_config)
         self.input_enabled = False
-        
+    
+    # -------------------INITIALIZE & CLEANUP-----------------------------
     def enter(self) -> None:
         """Initialize menu state and start background music."""
         self.animate_state.reset()
         self.input_enabled = False
         self._start_background_music()
     
+    def cleanup(self) -> None:
+        """Clean up resources when leaving state."""
+        self.sound_manager.stop_background_music()
+        self.particle_system.clear()
+
+    # -------------------CLASS METHOD-------------------------------------
     def start_transition(self, target_state: str) -> None:
         """Initiate fade transition to target state."""
         if self.animate_state.transitioning:
@@ -42,6 +49,7 @@ class MainMenuState(GameState):
         self.animate_state.fade_direction = -1
         self.input_enabled = False
 
+    # -------------------CLASS PROPERTIES---------------------------------
     def _start_background_music(self) -> None:
         """Load and start background music with error handling."""
         music_path = "assets/background_music/main_menu.mp3"
@@ -85,11 +93,7 @@ class MainMenuState(GameState):
         
         return None
 
-    def cleanup(self) -> None:
-        """Clean up resources when leaving state."""
-        self.sound_manager.stop_background_music()
-        self.particle_system.clear()
-
+    # -------------------GAME STATE HANDLE-----------------------------
     def update(self, dt: float) -> Optional[str]:
         """Main update loop - handles animations, particles, and input."""
         # Update animations and particles

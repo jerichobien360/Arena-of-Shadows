@@ -7,6 +7,8 @@ from panel_function import *
 
 
 class UniversalPanel:
+    '''This is the UniversalPanel as a main panel for the Game UI, so that it can be used
+    to develop with a different parts (Save/Load, Game Settings, Shop Panel, etc.) as a development tool'''
     def __init__(self, width: int = 400, height: int = 600, title: str = "Panel"):
         """Initialize a UniversalPanel with given dimensions and title."""
         self.width = width
@@ -515,6 +517,8 @@ class UniversalPanel:
 
 # PanelTemplates: Efficient, extensible, and ready for deployment
 class PanelTemplates:
+    '''This is the creation of the panel should be as a pre-implementation,
+    think of it as choosing a tool to be used instead.'''
     @staticmethod
     def game_settings_panel():
         panel = UniversalPanel(400, 500, "Game Settings")
@@ -602,6 +606,7 @@ class PanelTemplates:
 
 
 def main():
+    '''This is where on how the tools to be used in the main function'''
     pygame.init()
     screen = pygame.display.set_mode((1200, 800))
     pygame.display.set_caption("Universal Panel System Demo - Pythonic")

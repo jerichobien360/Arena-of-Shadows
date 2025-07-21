@@ -7,6 +7,8 @@ from panel_function import *
 
 
 class UniversalPanel:
+    '''This is the UniversalPanel as a main panel for the Game UI, so that it can be used
+    to develop with a different parts (Save/Load, Game Settings, Shop Panel, etc.) as a development tool'''
     def __init__(self, width: int = 400, height: int = 600, title: str = "Panel"):
         """Initialize a UniversalPanel with given dimensions and title."""
         self.width = width

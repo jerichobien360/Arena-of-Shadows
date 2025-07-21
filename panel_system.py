@@ -517,6 +517,8 @@ class UniversalPanel:
 
 # PanelTemplates: Efficient, extensible, and ready for deployment
 class PanelTemplates:
+    '''This is the creation of the panel should be as a pre-implementation,
+    think of it as choosing a tool to be used instead.'''
     @staticmethod
     def game_settings_panel():
         panel = UniversalPanel(400, 500, "Game Settings")
@@ -604,6 +606,7 @@ class PanelTemplates:
 
 
 def main():
+    '''This is where on how the tools to be used in the main function'''
     pygame.init()
     screen = pygame.display.set_mode((1200, 800))
     pygame.display.set_caption("Universal Panel System Demo - Pythonic")

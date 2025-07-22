@@ -1,5 +1,5 @@
 import pygame
-import sys
+# import sys
 from settings import *
 
 # System files - Core game management systems

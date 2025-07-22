@@ -29,7 +29,7 @@ class ArenaOfShadows:
         self._setup_display()
         self._init_managers()
         self._setup_states()
-        self.state_manager.change_state("main_menu") # Default: Selected Game State
+        self.state_manager.change_state("main_menu") # Default on the chosen game state
     
     def _init_pygame(self):
         """Initialize pygame subsystems."""

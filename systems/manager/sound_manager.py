@@ -3,6 +3,7 @@ import numpy as np
 from settings import *
 
 class SoundManager:
+    # TODO: Create an automation of importing, creation, and selection of the audio
     def __init__(self):
         self.sounds = {} # Data Handler for Music, SFX
         self.music_volume = MUSIC_VOLUME

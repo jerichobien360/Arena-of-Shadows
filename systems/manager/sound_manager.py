@@ -1,12 +1,12 @@
 import math, pygame, os
 import numpy as np
-
+from settings import *
 
 class SoundManager:
     def __init__(self):
         self.sounds = {}
-        self.music_volume = 0.5
-        self.sfx_volume = 0.7
+        self.music_volume = MUSIC_VOLUME
+        self.sfx_volume = SFX_VOLUME
         self.load_sounds()
     
     def load_sounds(self):

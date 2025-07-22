@@ -1,0 +1,3 @@
+
+Note: this will also be used for handling a various feature of sub_states for the upcoming
+    stage of this game, handling HUD functionalities.

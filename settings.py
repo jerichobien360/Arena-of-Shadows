@@ -82,3 +82,7 @@ MOVE_DOWN = pygame.K_DOWN
 MOVE_UP = pygame.K_UP
 JUMP = pygame.K_SPACE
 ESCAPE = pygame.K_ESCAPE
+
+# Audio
+MUSIC_VOLUME = 0.5
+SFX_VOLUME = 0.7

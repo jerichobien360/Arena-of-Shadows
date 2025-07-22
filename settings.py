@@ -84,5 +84,5 @@ JUMP = pygame.K_SPACE
 ESCAPE = pygame.K_ESCAPE
 
 # Audio
-MUSIC_VOLUME = 0.5
-SFX_VOLUME = 0.7
+MUSIC_VOLUME = 0.5  # Range: 0.0 ~ 1.0
+SFX_VOLUME = 0.7    # Range: 0.0 ~ 1.0

@@ -4,7 +4,7 @@ from settings import *
 
 class SoundManager:
     def __init__(self):
-        self.sounds = {}
+        self.sounds = {} # Data Handler for Music, SFX
         self.music_volume = MUSIC_VOLUME
         self.sfx_volume = SFX_VOLUME
         self.load_sounds()
@@ -140,6 +140,8 @@ class SoundManager:
         
         sound = pygame.sndarray.make_sound(np.array(arr, dtype=np.int16))
         sound.set_volume(self.sfx_volume)
+
+        # Adding/Updating on the Sound Data Handler
         self.sounds[name] = sound
     
     def play_sound(self, name):

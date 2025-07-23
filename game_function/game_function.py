@@ -48,8 +48,8 @@ def GAME_INPUT_HANDLER(event):
         return False
     
     # Allow ESC key to quit
-    if event.type == pygame.KEYDOWN and event.key == ESCAPE:
-        return False
+    #if event.type == pygame.KEYDOWN and event.key == ESCAPE:
+    #    return False
 
     return True
 

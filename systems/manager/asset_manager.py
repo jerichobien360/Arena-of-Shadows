@@ -26,7 +26,7 @@ def image_background_load(file_path, SCREEN_WIDTH, SCREEN_HEIGHT):
 
 def create_font(file_path, size=12):
     try:
-        font = pygame.font.Font(file_path, 18)
+        font = pygame.font.Font(file_path, size)
     except pygame.error:
         error_message(file_path, name="Font")
         pass

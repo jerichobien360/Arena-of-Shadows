@@ -86,3 +86,37 @@ ESCAPE = pygame.K_ESCAPE
 # Audio
 MUSIC_VOLUME = 0.5  # Range: 0.0 ~ 1.0
 SFX_VOLUME = 0.7    # Range: 0.0 ~ 1.0
+
+
+# Packages
+
+SOUND_FILES = {
+            # Game sounds
+            'attack': 'assets/audio/sounds/attack.wav',
+            'enemy_hit': 'assets/audio/sounds/enemy_hit.wav',
+            'enemy_death': 'assets/audio/sounds/enemy_death.wav',
+            'player_damage': 'assets/audio/sounds/player_damage.wav',
+            'level_up': 'assets/audio/sounds/level_up.wav',
+            'wave_complete': 'assets/audio/sounds/wave_complete.wav',
+            
+            # UI sounds
+            'ui_click': 'assets/audio/sounds/ui_click.wav',
+            'ui_hover': 'assets/audio/sounds/ui_hover.wav',
+            'ui_slider': 'assets/audio/sounds/ui_slider.wav',
+            'ui_toggle': 'assets/audio/sounds/ui_toggle.wav',
+            'ui_dropdown': 'assets/audio/sounds/ui_dropdown.wav',
+            'ui_focus': 'assets/audio/sounds/ui_focus.wav',
+            'ui_panel': 'assets/audio/sounds/ui_panel.wav',
+            'ui_error': 'assets/audio/sounds/ui_error.wav',
+            'ui_success': 'assets/audio/sounds/ui_success.wav',
+            
+            # Ambient/feedback sounds
+            'notification': 'assets/audio/sounds/notification.wav',
+            'coin_collect': 'assets/audio/sounds/coin_collect.wav',
+            'item_pickup': 'assets/audio/sounds/item_pickup.wav',
+            'magic_cast': 'assets/audio/sounds/magic_cast.wav'
+        }
+
+
+MENU_MUSIC_PATH = "assets/audio/background_music/main_menu.mp3"
+CLASS_SELECTION_MUSIC_PATH = "assets/audio/background_music/class_selection.mp3"

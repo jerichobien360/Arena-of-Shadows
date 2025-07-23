@@ -604,5 +604,37 @@ class PanelTemplates:
         panel.add_separator()
         panel.add_button("Exit Shop", lambda: print("Shop closed!"))
         return panel
+    
+    @staticmethod
+    def pause_menu_panel():
+        """Create a pause menu panel with standard game pause options."""
+        panel = UniversalPanel(350, 450, "Game Paused")
+        
+        # Game status info
+        panel.add_label("Game is paused")
+        panel.add_separator()
+        
+        # Main menu buttons
+        panel.add_button("Resume Game", lambda: print("[Pause Menu] Resuming game..."))
+        panel.add_button("Save Game", lambda: print("[Pause Menu] Saving game..."))
+        panel.add_button("Load Game", lambda: print("[Pause Menu] Loading game..."))
+        panel.add_separator()
+        
+        # Settings and options
+        panel.add_button("Settings", lambda: print("[Pause Menu] Opening settings..."))
+        panel.add_button("Controls", lambda: print("[Pause Menu] Opening controls..."))
+        panel.add_separator()
+        
+        # Quick settings
+        panel.add_label("Quick Settings")
+        panel.add_checkbox("Mute Audio", False, id="mute_audio")
+        panel.add_slider("Master Volume", 75, 0, 100, id="master_vol")
+        panel.add_separator()
+        
+        # Exit options
+        panel.add_button("Main Menu", lambda: print("[Pause Menu] Returning to main menu..."))
+        panel.add_button("Quit Game", lambda: print("[Pause Menu] Quitting game..."))
+        
+        return panel
 
 

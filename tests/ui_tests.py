@@ -19,7 +19,8 @@ def main():
         PanelTemplates.game_settings_panel(), 
         PanelTemplates.quest_panel(),
         PanelTemplates.upgrade_panel(),
-        PanelTemplates.shop_panel()
+        PanelTemplates.shop_panel(),
+        PanelTemplates.pause_menu_panel()
     ]
     current_panel_idx = 0
     target_panel_pos = (400, 100)
@@ -63,7 +64,7 @@ def main():
         screen.blit(text, (switch_button.centerx - text.get_width()//2, switch_button.centery - text.get_height()//2))
         
         # Display current panel name
-        panel_names = ["Game Settings", "Quest Creator", "Upgrade Panel", "Shop"]
+        panel_names = ["Game Settings", "Quest Creator", "Upgrade Panel", "Shop", "Pause Menu"]
         current_panel_text = button_font.render(f"Current: {panel_names[current_panel_idx]}", True, (200, 200, 200))
         screen.blit(current_panel_text, (50, 100))
         

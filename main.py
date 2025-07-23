@@ -3,7 +3,7 @@
 import pygame
 import sys
 from settings import *
-from game_function import *
+from game_function.game_function import *
 
 # System files - Core game management systems
 from systems.manager.sound_manager import *

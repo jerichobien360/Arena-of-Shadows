@@ -94,7 +94,7 @@ class ClassSelectionState:
         
         # Play selection music if available
         self.sound_manager.stop_background_music()
-        if self.sound_manager.load_background_music("assets/background_music/class_selection.mp3"):
+        if self.sound_manager.load_background_music(CLASS_SELECTION_MUSIC_PATH):
             self.sound_manager.play_background_music()
     
     def update(self, dt):

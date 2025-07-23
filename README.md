@@ -68,7 +68,11 @@ Fight against waves of shadow creatures in intense top-down combat. Master your 
 ## Installation
 
 ### Prerequisites
-Make sure you have Python installed on your system.
+Make sure you have Python installed on your system. If you don't have Python installed:
+- **Download Python:** [https://www.python.org/downloads/](https://www.python.org/downloads/)
+- **Recommended version:** Python 3.8+
+- **Important:** During installation, make sure to check "Add Python to PATH"  
+📖 **Installation Guide:** [How to install Python and add to PATH](https://realpython.com/installing-python/)
 
 ### Setup Instructions
 #### For Windows
@@ -132,6 +136,7 @@ Feedback for this project is greatly appreciated as it's currently in developmen
 Feel free to reach out with any questions or suggestions about the game!
 
 **Developer:** Jericho Bien  
+**Email:** [jerichobien360@gmail.com](mailto:jerichobien360@gmail.com)  
 **GitHub:** [@jerichobien360](https://github.com/jerichobien360)
 
 ---

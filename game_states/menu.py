@@ -52,8 +52,8 @@ class MainMenuState(GameState):
     # -------------------CLASS PROPERTIES---------------------------------
     def _start_background_music(self) -> None:
         """Load and start background music with error handling."""
-        music_path = "assets/background_music/main_menu.mp3"
-        if self.sound_manager.load_background_music(music_path):
+        # MENEU_MUSIC_PATH
+        if self.sound_manager.load_background_music(MENU_MUSIC_PATH):
             self.sound_manager.play_background_music()
     
     def _update_animations(self, dt: float) -> None:

@@ -90,8 +90,8 @@ class GameplayCore:
     def _setup_audio(self) -> None:
         """Setup background music for gameplay."""
         self.sound_manager.stop_background_music()
-        music_path = "assets/background_music/gameplay.mp3"
-        if self.sound_manager.load_background_music(music_path):
+        # GAMEPLAY_MUSIC_PATH
+        if self.sound_manager.load_background_music(GAMEPLAY_MUSIC_PATH):
             self.sound_manager.play_background_music()
     
     def _handle_input(self) -> Optional[str]:

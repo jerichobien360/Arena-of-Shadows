@@ -11,7 +11,7 @@ from systems.manager.ui_manager import *
 def main():
     pygame.init()
     screen = pygame.display.set_mode((1200, 800))
-    pygame.display.set_caption("Universal Panel System Demo - Pythonic")
+    pygame.display.set_caption("UI Test")
     clock = pygame.time.Clock()
     
     # Add the upgrade panel and shop panel to the existing panels

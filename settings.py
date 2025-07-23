@@ -1,6 +1,8 @@
-import pygame
-from dataclasses import dataclass
 from enum import Enum
+from typing import List, Callable, Optional
+from dataclasses import dataclass, field
+import pygame
+
 
 # Constants
 SCREEN_WIDTH = 700
@@ -35,7 +37,9 @@ FIRESHOOTER_INNER_COLOR = (255, 200, 0)
 
 # ASSET HANDLER
 GAME_ICON = "assets\\icon.png"
-CUSTOM_FONT = "assets\\font\\PixelifySans-Medium.ttf"
+CUSTOM_FONT = "assets\\font\\pixelifySans\\PixelifySans-Medium.ttf"
+CUSTOM_FONT_UI = "assets\\font\\segoeui\\segoeui.ttf"
+CUSTOM_FONT_UI_BOLD = "assets\\font\\segoeui\\segoeuithebd.ttf"
 
 # DATABASE FILEPATH
 DATABASE_FILE = "data\\AOS_player_data.db"
@@ -84,7 +88,7 @@ JUMP = pygame.K_SPACE
 ESCAPE = pygame.K_ESCAPE
 
 # Audio
-MUSIC_VOLUME = 0.5  # Range: 0.0 ~ 1.0
+MUSIC_VOLUME = 0.8  # Range: 0.0 ~ 1.0
 SFX_VOLUME = 0.7    # Range: 0.0 ~ 1.0
 
 
@@ -120,3 +124,53 @@ SOUND_FILES = {
 
 MENU_MUSIC_PATH = "assets/audio/background_music/main_menu.mp3"
 CLASS_SELECTION_MUSIC_PATH = "assets/audio/background_music/class_selection.mp3"
+GAMEPLAY_MUSIC_PATH = "assets/audio/background_music/gameplay.mp3"
+
+
+# UI Manager
+class ElementType(Enum):
+    BUTTON = "button"
+    LABEL = "label"
+    INPUT = "input"
+    SLIDER = "slider"
+    CHECKBOX = "checkbox"
+    DROPDOWN = "dropdown"
+    SEPARATOR = "separator"
+
+@dataclass
+class PanelElement:
+    type: ElementType
+    id: str = ""
+    text: str = ""
+    value: str = ""
+    options: List[str] = field(default_factory=list)
+    callback: Optional[Callable] = None
+    rect: pygame.Rect = field(default_factory=lambda: pygame.Rect(0, 0, 0, 0))
+    active: bool = False
+    enabled: bool = True
+    min_val: float = 0
+    max_val: float = 100
+    checked: bool = False
+    dropdown_open: bool = False
+    selected_option: int = 0
+    dragging: bool = False
+    placeholder: str = ""
+    cursor_pos: int = 0
+    selection_start: int = 0
+    selection_end: int = 0
+    cursor_timer: int = 0
+    selecting: bool = False  # Track if user is selecting text with mouse
+
+COLORS = {
+        'bg': (40, 40, 40), 'panel': (60, 60, 60), 'button': (80, 80, 80),
+        'button_hover': (100, 100, 100), 'button_active': (120, 120, 120),
+        'text': (255, 255, 255), 'input': (30, 30, 30), 'input_active': (50, 50, 50),
+        'separator': (100, 100, 100), 'slider': (120, 120, 120),
+        'checkbox': (200, 200, 200), 'placeholder': (150, 150, 150),
+        'selection': (100, 150, 255)
+    }
+
+
+# Audio
+MUSIC_VOLUME = 0.8
+SFX_VOLUME = 0.7

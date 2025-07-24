@@ -1,25 +1,7 @@
 import math, pygame, os
 import numpy as np
-from settings import SOUND_FILES
+from settings import *
 
-# Settings constants (you should have these in your settings.py)
-MUSIC_VOLUME = 0.7
-SFX_VOLUME = 0.8
-COLORS = {
-    'panel': (40, 40, 40),
-    'bg': (30, 30, 30),
-    'text': (255, 255, 255),
-    'button': (70, 70, 70),
-    'button_hover': (90, 90, 90),
-    'button_active': (50, 50, 50),
-    'input': (60, 60, 60),
-    'input_active': (80, 80, 80),
-    'slider': (100, 100, 100),
-    'checkbox': (0, 255, 0),
-    'selection': (100, 150, 255),
-    'placeholder': (150, 150, 150),
-    'separator': (100, 100, 100)
-}
 
 class SoundManager:
     """
@@ -32,6 +14,7 @@ class SoundManager:
         self.music_volume = MUSIC_VOLUME
         self.sfx_volume = SFX_VOLUME
         self.ui_sounds_enabled = True
+        self.music_paused = False  # Track music pause state
         self.load_sounds()
         
         # UI Sound mapping - automatically triggered by UI interactions
@@ -58,8 +41,6 @@ class SoundManager:
     def load_sound_files(self):
         """Load WAV sound files from assets directory"""
         
-        # SOUND_FILES
-
         # Create assets/sounds directory if it doesn't exist
         sound_dir = 'assets/sounds'
         if not os.path.exists(sound_dir):
@@ -275,6 +256,8 @@ class SoundManager:
                 amplitude = 4096 * (1 - progress)
                 wave = amplitude * math.sin(2 * math.pi * freq * t)
             
+            # Clamp wave values to prevent audio artifacts
+            wave = max(-32767, min(32767, wave))
             arr.append([int(wave), int(wave)])
         
         sound = pygame.sndarray.make_sound(np.array(arr, dtype=np.int16))
@@ -287,8 +270,8 @@ class SoundManager:
         if name in self.sounds:
             try:
                 self.sounds[name].play()
-            except:
-                pass
+            except pygame.error as e:
+                print(f"Error playing sound {name}: {e}")
     
     def play_ui_sound(self, ui_action):
         """Play a UI sound based on action type"""
@@ -359,30 +342,51 @@ class SoundManager:
         try:
             pygame.mixer.music.set_volume(self.music_volume)
             pygame.mixer.music.play(-1 if loop else 0)
-        except:
-            pass
+            self.music_paused = False
+        except pygame.error as e:
+            print(f"Error playing background music: {e}")
     
     def stop_background_music(self):
         """Stop background music"""
         try:
             pygame.mixer.music.stop()
-        except:
-            pass
+            self.music_paused = False
+        except pygame.error as e:
+            print(f"Error stopping background music: {e}")
+    
+    def pause_background_music(self):
+        """Pause background music"""
+        try:
+            pygame.mixer.music.pause()
+            self.music_paused = True
+        except pygame.error as e:
+            print(f"Error pausing background music: {e}")
+    
+    def resume_background_music(self):
+        """Resume paused background music"""
+        try:
+            pygame.mixer.music.unpause()
+            self.music_paused = False
+        except pygame.error as e:
+            print(f"Error resuming background music: {e}")
     
     # Volume control methods
     def set_master_volume(self, volume):
         """Set master volume for all SFX (0.0 to 1.0)"""
         self.sfx_volume = max(0.0, min(1.0, volume))
         for sound in self.sounds.values():
-            sound.set_volume(self.sfx_volume)
+            try:
+                sound.set_volume(self.sfx_volume)
+            except pygame.error as e:
+                print(f"Error setting sound volume: {e}")
     
     def set_music_volume(self, volume):
         """Set music volume (0.0 to 1.0)"""
         self.music_volume = max(0.0, min(1.0, volume))
         try:
             pygame.mixer.music.set_volume(self.music_volume)
-        except:
-            pass
+        except pygame.error as e:
+            print(f"Error setting music volume: {e}")
     
     def toggle_ui_sounds(self, enabled=None):
         """Toggle UI sounds on/off"""

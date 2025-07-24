@@ -31,9 +31,7 @@ MIN_ZOOM = 0
 WORLD_WIDTH = 3000
 WORLD_HEIGHT = 3000
 
-
 FIRESHOOTER_INNER_COLOR = (255, 200, 0)
-
 
 # ASSET HANDLER
 GAME_ICON = "assets\\icon.png"
@@ -44,7 +42,7 @@ CUSTOM_FONT_UI_BOLD = "assets\\font\\segoeui\\segoeuithebd.ttf"
 # DATABASE FILEPATH
 DATABASE_FILE = "data\\AOS_player_data.db"
 
-# Gamerplay Renderer Configuration
+# Gameplay Renderer Configuration
 @dataclass
 class UIConfig:
     """UI configuration constants."""
@@ -78,7 +76,6 @@ class ParticleType(Enum):
     SMOOTH_SCALE = 9
     SMOOTH_FLOAT = 10
 
-
 # Input Handler
 MOVE_LEFT = pygame.K_LEFT
 MOVE_RIGHT = pygame.K_RIGHT
@@ -87,47 +84,44 @@ MOVE_UP = pygame.K_UP
 JUMP = pygame.K_SPACE
 ESCAPE = pygame.K_ESCAPE
 
-# Audio
+# Audio Configuration
 MUSIC_VOLUME = 0.8  # Range: 0.0 ~ 1.0
 SFX_VOLUME = 0.7    # Range: 0.0 ~ 1.0
 
-
-# Packages
-
+# Sound Files Dictionary
 SOUND_FILES = {
-            # Game sounds
-            'attack': 'assets/audio/sounds/attack.wav',
-            'enemy_hit': 'assets/audio/sounds/enemy_hit.wav',
-            'enemy_death': 'assets/audio/sounds/enemy_death.wav',
-            'player_damage': 'assets/audio/sounds/player_damage.wav',
-            'level_up': 'assets/audio/sounds/level_up.wav',
-            'wave_complete': 'assets/audio/sounds/wave_complete.wav',
-            
-            # UI sounds
-            'ui_click': 'assets/audio/sounds/ui_click.wav',
-            'ui_hover': 'assets/audio/sounds/ui_hover.wav',
-            'ui_slider': 'assets/audio/sounds/ui_slider.wav',
-            'ui_toggle': 'assets/audio/sounds/ui_toggle.wav',
-            'ui_dropdown': 'assets/audio/sounds/ui_dropdown.wav',
-            'ui_focus': 'assets/audio/sounds/ui_focus.wav',
-            'ui_panel': 'assets/audio/sounds/ui_panel.wav',
-            'ui_error': 'assets/audio/sounds/ui_error.wav',
-            'ui_success': 'assets/audio/sounds/ui_success.wav',
-            
-            # Ambient/feedback sounds
-            'notification': 'assets/audio/sounds/notification.wav',
-            'coin_collect': 'assets/audio/sounds/coin_collect.wav',
-            'item_pickup': 'assets/audio/sounds/item_pickup.wav',
-            'magic_cast': 'assets/audio/sounds/magic_cast.wav'
-        }
+    # Game sounds
+    'attack': 'assets/audio/sounds/attack.wav',
+    'enemy_hit': 'assets/audio/sounds/enemy_hit.wav',
+    'enemy_death': 'assets/audio/sounds/enemy_death.wav',
+    'player_damage': 'assets/audio/sounds/player_damage.wav',
+    'level_up': 'assets/audio/sounds/level_up.wav',
+    'wave_complete': 'assets/audio/sounds/wave_complete.wav',
+    
+    # UI sounds
+    'ui_click': 'assets/audio/sounds/ui_click.wav',
+    'ui_hover': 'assets/audio/sounds/ui_hover.wav',
+    'ui_slider': 'assets/audio/sounds/ui_slider.wav',
+    'ui_toggle': 'assets/audio/sounds/ui_toggle.wav',
+    'ui_dropdown': 'assets/audio/sounds/ui_dropdown.wav',
+    'ui_focus': 'assets/audio/sounds/ui_focus.wav',
+    'ui_panel': 'assets/audio/sounds/ui_panel.wav',
+    'ui_error': 'assets/audio/sounds/ui_error.wav',
+    'ui_success': 'assets/audio/sounds/ui_success.wav',
+    
+    # Ambient/feedback sounds
+    'notification': 'assets/audio/sounds/notification.wav',
+    'coin_collect': 'assets/audio/sounds/coin_collect.wav',
+    'item_pickup': 'assets/audio/sounds/item_pickup.wav',
+    'magic_cast': 'assets/audio/sounds/magic_cast.wav'
+}
 
-
+# Background Music Paths
 MENU_MUSIC_PATH = "assets/audio/background_music/main_menu.mp3"
 CLASS_SELECTION_MUSIC_PATH = "assets/audio/background_music/class_selection.mp3"
 GAMEPLAY_MUSIC_PATH = "assets/audio/background_music/gameplay.mp3"
 
-
-# UI Manager
+# UI Manager Enums and Classes
 class ElementType(Enum):
     BUTTON = "button"
     LABEL = "label"
@@ -161,16 +155,19 @@ class PanelElement:
     cursor_timer: int = 0
     selecting: bool = False  # Track if user is selecting text with mouse
 
+# UI Color Scheme
 COLORS = {
-        'bg': (40, 40, 40), 'panel': (60, 60, 60), 'button': (80, 80, 80),
-        'button_hover': (100, 100, 100), 'button_active': (120, 120, 120),
-        'text': (255, 255, 255), 'input': (30, 30, 30), 'input_active': (50, 50, 50),
-        'separator': (100, 100, 100), 'slider': (120, 120, 120),
-        'checkbox': (200, 200, 200), 'placeholder': (150, 150, 150),
-        'selection': (100, 150, 255)
-    }
-
-
-# Audio
-MUSIC_VOLUME = 0.8
-SFX_VOLUME = 0.7
+    'bg': (40, 40, 40), 
+    'panel': (60, 60, 60), 
+    'button': (80, 80, 80),
+    'button_hover': (100, 100, 100), 
+    'button_active': (120, 120, 120),
+    'text': (255, 255, 255), 
+    'input': (30, 30, 30), 
+    'input_active': (50, 50, 50),
+    'separator': (100, 100, 100), 
+    'slider': (120, 120, 120),
+    'checkbox': (200, 200, 200), 
+    'placeholder': (150, 150, 150),
+    'selection': (100, 150, 255)
+}

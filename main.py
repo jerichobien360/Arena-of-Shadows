@@ -2,216 +2,160 @@
 
 import pygame
 import sys
+import traceback
 from settings import *
+
+# Module Packages
 from game_function.game_function import *
-# System files - Core game management systems
 from systems.manager.sound_manager import *
-from systems.manager.wave_manager import *
 from systems.manager.game_state_manager import *
-from systems.manager.asset_manager import *
-# Entities - Game objects and characters
-from entities.player import *
-# Game states - Different screens/modes of the game
-from game_states.gameplay import *
-from game_states.menu import *
-from game_states.game_over import *
+
+# Game States
+from game_states.gameplay import GameplayState
+from game_states.menu import MainMenuState
+from game_states.game_over import GameOverState
 
 
 class ArenaOfShadows:
-    """Main game class handling initialization and game loop."""
+    """Main game class - simplified version."""
     
     def __init__(self):
-        """Initialize pygame subsystems and game components."""
-        self._init_pygame()
-        self._setup_display()
-        self._init_managers()
-        self._setup_states()
-        self.state_manager.change_state("main_menu")  # Default on the chosen game state
+        print("\n[System]: Initializing the Game\n")
+
         self.running = True
-    
-    def _init_pygame(self):
-        """Initialize pygame subsystems."""
-        pygame.init()
-        pygame.mixer.init(
-            frequency=22050,
-            size=-16,
-            channels=2,
-            buffer=512
-        )
-    
-    def _setup_display(self):
-        """Setup display and core visual components."""
-        # Load Windows
-        self.screen = SCREEN()
-        TITLE_CAPTION()
-        ICON_IMPORT()
+        self.debug_mode = False
         
-        # Other Essentials
+        # Initialize pygame
+        pygame.init()
+        pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
+        
+        # Setup display - use your existing GameWindow
+        self.screen = SCREEN(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.clock = CLOCK()
         self.font = FONT()
-    
-    def _init_managers(self):
-        """Initialize game managers."""
-        # Main Game Composition
+        
+        # Load game icon properly
+        TITLE_CAPTION(TITLE)
+        ICON_IMPORT(GAME_ICON)
+        self.input_handler = InputHandler()
+        
+        # Initialize managers
         self.sound_manager = SoundManager()
         self.state_manager = GameStateManager()
-    
-    def _setup_states(self):
-        """Initialize all game states with required dependencies."""
-        # Create all game states
-        main_menu = MainMenuState(self.font, self.sound_manager)
-        gameplay = GameplayState(self.font, self.sound_manager)
-        game_over = GameOverState(self.font, self.sound_manager)
         
-        # Add states to manager
-        self.state_manager.add_state("main_menu", main_menu)
-        self.state_manager.add_state("gameplay", gameplay)
-        self.state_manager.add_state("game_over", game_over)
+        # Setup states
+        states = {
+            "main_menu": MainMenuState(self.font, self.sound_manager),
+            "gameplay": GameplayState(self.font, self.sound_manager),
+            "game_over": GameOverState(self.font, self.sound_manager)
+        }
+        
+        for name, state in states.items():
+            self.state_manager.add_state(name, state)
+        
+        # Start with main menu
+        self.state_manager.change_state("main_menu")
     
-    def _handle_events(self):
-        """Process pygame events and handle quit conditions."""
+    def _handle_events(self) -> bool:
+        """Handle pygame events."""
         for event in pygame.event.get():
-            # Handle quit events
             if event.type == pygame.QUIT:
                 return False
             
-            # Use your custom game input handler if it exists
-            if hasattr(self, 'GAME_INPUT_HANDLER'):
-                if GAME_INPUT_HANDLER(event):
-                    continue
+            # Global input handling
+            if not self.input_handler.handle_event(event):
+                return False
             
             # Let current state handle the event
             current_state = self.state_manager.get_current_state()
             if current_state and hasattr(current_state, 'handle_event'):
-                if current_state.handle_event(event):
-                    continue
+                current_state.handle_event(event)
             
-            # Handle global key events
+            # Global keys
             if event.type == pygame.KEYDOWN:
+                # Alt+F4 to quit
                 if event.key == pygame.K_F4 and (event.mod & pygame.KMOD_ALT):
-                    return False  # Alt+F4 to quit
-                elif event.key == pygame.K_F11:
-                    self._toggle_fullscreen()
+                    return False
+                
+                # F11 fullscreen
+                if event.key == pygame.K_F11:
+                    current_flags = self.screen.get_flags()
+                    if current_flags & pygame.FULLSCREEN:
+                        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+                    else:
+                        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
+                
+                # F3 debug
+                if event.key == pygame.K_F3:
+                    self.debug_mode = not self.debug_mode
         
         return True
     
-    def _toggle_fullscreen(self):
-        """Toggle between fullscreen and windowed mode."""
-        try:
-            if self.screen.get_flags() & pygame.FULLSCREEN:
-                # Switch to windowed mode
-                self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-            else:
-                # Switch to fullscreen mode
-                self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
-        except Exception as e:
-            print(f"Failed to toggle fullscreen: {e}")
-    
-    def _update_game(self, dt):
-        """Update game logic and handle state transitions."""
-        # Update current state and get potential state change
-        next_state = self.state_manager.update(dt)
+    def _update_game(self, delta_time: float) -> None:
+        """Update game logic."""
+        next_state = self.state_manager.update(delta_time)
         
-        # Handle state transitions
         if next_state:
             if next_state == "quit":
                 self.running = False
             else:
                 self.state_manager.change_state(next_state)
     
-    def _render_game(self):
-        """Render current game state and update display."""
-        # Clear screen with black background
+    def _render_game(self) -> None:
+        """Render game."""
         self.screen.fill(BLACK)
-        
-        # Render current state
         self.state_manager.render(self.screen)
         
-        # Optional: Add global UI elements here (like FPS counter in debug mode)
-        if hasattr(self, 'debug_mode') and self.debug_mode:
-            self._render_debug_info()
-        
-        # Update display
-        pygame.display.flip()
-    
-    def _render_debug_info(self):
-        """Render debug information like FPS."""
-        if hasattr(self.clock, 'get_fps'):
+        # Debug info
+        if self.debug_mode:
             fps = int(self.clock.get_fps())
             fps_text = self.font.render(f"FPS: {fps}", True, WHITE)
             self.screen.blit(fps_text, (SCREEN_WIDTH - 100, 10))
+            
+            # Get state name properly
+            if hasattr(self.state_manager, 'current_state_name'):
+                state_name = self.state_manager.current_state_name
+            else:
+                state_name = "Unknown"
+            
+            state_text = self.font.render(f"State: {state_name}", True, WHITE)
+            self.screen.blit(state_text, (10, 10))
+        
+        pygame.display.flip()
     
-    def _handle_state_changes(self):
-        """Handle any pending state changes."""
-        # This method can be expanded to handle more complex state transitions
-        # For now, the state manager handles transitions internally
-        pass
-    
-    def run(self):
-        """Main game loop - handles events, updates, and rendering."""
+    def run(self) -> None:
+        """Main game loop."""
         print("Starting Arena of Shadows...")
         
-        try:
-            while self.running:
-                # Calculate delta time for frame-independent movement
-                dt = self.clock.tick(FPS) / 1000.0
-                
-                # Process input events
-                if not self._handle_events():
-                    self.running = False
-                    break
-                
-                # Update game logic
-                self._update_game(dt)
-                
-                # Render everything
-                self._render_game()
-                
-                # Handle any state changes
-                self._handle_state_changes()
-                
-        except KeyboardInterrupt:
-            print("\nGame interrupted by user")
-        except Exception as e:
-            print(f"Game error during main loop: {e}")
-            import traceback
-            traceback.print_exc()
-        finally:
-            # Clean shutdown
-            self._cleanup()
+        while self.running:
+            delta_time = self.clock.tick(FPS) / 1000.0
+            
+            if not self._handle_events():
+                break
+            
+            self._update_game(delta_time)
+            self._render_game()
+        
+        self._cleanup()
     
-    def _cleanup(self):
-        """Clean up resources and exit gracefully."""
-        print("Cleaning up game resources...")
-        
-        # Clean up managers
-        if hasattr(self, 'sound_manager'):
-            pass
-            # self.sound_manager.cleanup()
-        
-        if hasattr(self, 'state_manager'):
-            pass
-            # self.state_manager.cleanup()
-        
-        # Quit pygame
+    def _cleanup(self) -> None:
+        """Clean up."""
+        print("Cleaning up...")
         pygame.quit()
-        print("Arena of Shadows closed successfully")
-        sys.exit()
+        print("Arena of Shadows closed")
 
 
-def main():
-    """Entry point for the game."""
-    print("Initializing Arena of Shadows...")
-    
+def main() -> None:
+    """Entry point."""
     try:
         game = ArenaOfShadows()
         game.run()
     except Exception as e:
-        print(f"Fatal game error: {e}")
-        import traceback
+        print(f"Game error: {e}")
         traceback.print_exc()
+    finally:
         pygame.quit()
-        sys.exit(1)
+        sys.exit()
 
 
 if __name__ == "__main__":

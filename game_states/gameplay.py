@@ -1,12 +1,9 @@
 """Main Gameplay State (Abstraction | Refactor)"""
-
 from abc import ABC, abstractmethod
 from typing import Optional, Any
 import pygame
-
 from systems.gameplay_core import GameplayCore
 from ui.components.gameplay_renderer import GameplayRenderer
-
 
 class GameState(ABC):
     """Abstract base class for all game states."""
@@ -28,7 +25,10 @@ class GameState(ABC):
     def render(self, screen: pygame.Surface) -> None:
         """Render this state to the screen."""
         pass
-
+    
+    def handle_event(self, event: pygame.event.Event) -> bool:
+        """Handle pygame events. Return True if event was consumed."""
+        return False
 
 class GameplayState(GameState):
     """Main gameplay state - combines core logic and rendering."""
@@ -50,20 +50,17 @@ class GameplayState(GameState):
         if self._initialized:
             self.core.cleanup()
             self._initialized = False
-
+    
     # -------------------CLASS METHOD-------------------------------------
-    #TODO: Implement the Pause-Layout
     def pause(self) -> None:
         """Pause the game."""
         self.core.pause()
     
-    #TODO: Implement the Pause-Layout
     def unpause(self) -> None:
         """Resume the game."""
         self.core.unpause()
     
     # -------------------CLASS PROPERTIES---------------------------------
-    #TODO: Implement the Pause-Layout
     @property
     def is_paused(self) -> bool:
         """Check if game is currently paused."""
@@ -73,7 +70,17 @@ class GameplayState(GameState):
     def game_data(self) -> dict:
         """Access to current game data for debugging/testing."""
         return self.core.game_data
-
+    
+    # -------------------EVENT HANDLING-----------------------------------
+    def handle_event(self, event: pygame.event.Event) -> bool:
+        """Handle pygame events, including pause panel interactions."""
+        # Let the core handle the event first (for pause panel)
+        if self.core.handle_event(event):
+            return True
+        
+        # Handle other gameplay-specific events here if needed
+        return False
+    
     # -------------------GAME STATE HANDLE-----------------------------
     def update(self, dt: float) -> Optional[str]:
         """Update game logic and return next state if needed."""

@@ -12,6 +12,7 @@ from systems.game_feature.camera import *
 from systems.game_feature.background_system import *
 from systems.game_feature.battle_formation_system import FormationSystem
 from systems.manager.input_manager import InputHandler
+from systems.manager.ui_manager import UniversalPanel, PanelTemplates
 
 
 class GameplayCore:
@@ -37,14 +38,19 @@ class GameplayCore:
         self.input_handler = InputHandler()
         
         # Game state
-        self.is_paused = False #TODO: Implement the Pause-Layout
+        self.is_paused = False
         self.game_time = 0.0
+        
+        # Pause panel system
+        self.pause_panel: Optional[UniversalPanel] = None
+        self.show_pause_panel = False
     
     # -------------------INITIALIZE & CLEANUP-----------------------------
     def initialize(self) -> None:
         """Initialize all gameplay systems and entities."""
         self.game_time = 0.0
-        self.is_paused = False #TODO: Implement the Pause-Layout
+        self.is_paused = False
+        self.show_pause_panel = False
         
         # Initialize systems
         self.camera = Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -56,22 +62,123 @@ class GameplayCore:
         self.player = Player(self.sound_manager, self.camera)
         self.enemies = []
         
+        # Initialize pause panel
+        self._setup_pause_panel()
+        
         # Start first wave and setup audio
         self.wave_manager.start_wave(1)
         self._setup_audio()
     
-    def cleanup(self) -> None: # TODO: Add an exit from the line of 279 & 288
+    def cleanup(self) -> None:
         """Clean up resources when exiting gameplay."""
         self.sound_manager.stop_background_music()
 
+    # -------------------PAUSE PANEL SETUP--------------------------------
+    def _setup_pause_panel(self) -> None:
+        """Setup the pause panel with callbacks."""
+        self.pause_panel = PanelTemplates.pause_menu_panel()
+        
+        # Override the default callbacks with actual functionality
+        for element in self.pause_panel.elements:
+            if element.text == "Resume Game":
+                element.callback = self._resume_game
+            elif element.text == "Save Game":
+                element.callback = self._save_game
+            elif element.text == "Load Game":
+                element.callback = self._load_game
+            elif element.text == "Settings":
+                element.callback = self._open_settings
+            elif element.text == "Controls":
+                element.callback = self._open_controls
+            elif element.text == "Main Menu":
+                element.callback = self._return_to_menu
+            elif element.text == "Quit Game":
+                element.callback = self._quit_game
+            elif element.id == "mute_audio":
+                element.callback = self._toggle_mute
+            elif element.id == "master_vol":
+                element.callback = self._update_volume
+
+    def _resume_game(self) -> None:
+        """Resume the game from pause."""
+        self.unpause()
+        
+    def _save_game(self) -> None:
+        """Save current game state."""
+        print("[Pause Menu] Game saved successfully!")
+        # TODO: Implement actual save functionality
+        
+    def _load_game(self) -> None:
+        """Load a saved game state."""
+        print("[Pause Menu] Game loaded!")
+        # TODO: Implement actual load functionality
+        
+    def _open_settings(self) -> None:
+        """Open settings menu."""
+        print("[Pause Menu] Opening settings...")
+        # TODO: Could create a settings panel here
+        
+    def _open_controls(self) -> None:
+        """Open controls menu."""
+        print("[Pause Menu] Opening controls...")
+        # TODO: Could show control scheme
+        
+    def _return_to_menu(self) -> None:
+        """Return to main menu."""
+        print("[Pause Menu] Returning to main menu...")
+        # This should trigger a state change
+        self._next_state = "main_menu"
+        
+    def _quit_game(self) -> None:
+        """Quit the game."""
+        print("[Pause Menu] Quitting game...")
+        pygame.quit()
+        exit()
+        
+    def _toggle_mute(self, checked: bool) -> None:
+        """Toggle audio mute."""
+        if checked:
+            self.sound_manager.set_master_volume(0)
+            print("[Pause Menu] Audio muted")
+        else:
+            # Get the current volume slider value
+            volume_element = None
+            for element in self.pause_panel.elements:
+                if element.id == "master_vol":
+                    volume_element = element
+                    break
+            
+            if volume_element:
+                self.sound_manager.set_master_volume(volume_element.value / 100.0)
+            print("[Pause Menu] Audio unmuted")
+            
+    def _update_volume(self, value: float) -> None:
+        """Update master volume."""
+        # Check if audio is not muted
+        mute_element = None
+        for element in self.pause_panel.elements:
+            if element.id == "mute_audio":
+                mute_element = element
+                break
+        
+        if not (mute_element and mute_element.checked):
+            self.sound_manager.set_master_volume(value / 100.0)
+            print(f"[Pause Menu] Volume set to {int(value)}%")
+
     # -------------------CLASS METHOD-------------------------------------
     def pause(self) -> None:
-        """Pause the game."""
+        """Pause the game and show pause panel."""
         self.is_paused = True
+        self.show_pause_panel = True
+        # Pause background music or reduce volume
+        self.sound_manager.pause_background_music()
     
     def unpause(self) -> None:
-        """Resume the game."""
+        """Resume the game and hide pause panel."""
         self.is_paused = False
+        self.show_pause_panel = False
+        # Resume background music
+        self.sound_manager.resume_background_music()
     
     # -------------------CLASS PROPERTIES---------------------------------
     @property
@@ -84,7 +191,9 @@ class GameplayCore:
             'background': self.background,
             'wave_manager': self.wave_manager,
             'game_time': self.game_time,
-            'is_paused': self.is_paused
+            'is_paused': self.is_paused,
+            'pause_panel': self.pause_panel,
+            'show_pause_panel': self.show_pause_panel
         }
     
     def _setup_audio(self) -> None:
@@ -98,11 +207,22 @@ class GameplayCore:
         """Process player input and return state change if needed."""
         keys = pygame.key.get_pressed()
         
-        # Check for pause
-        if self.input_handler.is_key_just_pressed(pygame.K_ESCAPE):
-            return "pause"
+        # Check for pause toggle using key state instead of InputHandler
+        if keys[pygame.K_ESCAPE]:
+            # Add a simple debounce to prevent multiple toggles
+            current_time = pygame.time.get_ticks()
+            if not hasattr(self, '_last_esc_time') or current_time - self._last_esc_time > 200:
+                self._last_esc_time = current_time
+                if self.is_paused:
+                    self.unpause()
+                else:
+                    self.pause()
         
-        # Player actions
+        # If paused, don't process game input
+        if self.is_paused:
+            return None
+            
+        # Player actions (only when not paused)
         if keys[pygame.K_SPACE]:
             self.player.attack(self.enemies)
         
@@ -112,7 +232,26 @@ class GameplayCore:
             new_zoom = max(MIN_ZOOM, min(MAX_ZOOM, self.camera.target_zoom + zoom_change))
             self.camera.set_zoom(new_zoom)
         
+        # Check for state changes from pause panel actions
+        if hasattr(self, '_next_state'):
+            next_state = self._next_state
+            delattr(self, '_next_state')
+            return next_state
+        
         return None
+
+    def _handle_pause_panel_events(self, event) -> bool:
+        """Handle events for the pause panel when visible."""
+        if not self.show_pause_panel or not self.pause_panel:
+            return False
+            
+        # Calculate panel position (centered on screen)
+        panel_x = (SCREEN_WIDTH - self.pause_panel.width) // 2
+        panel_y = (SCREEN_HEIGHT - self.pause_panel.height) // 2
+        panel_position = (panel_x, panel_y)
+        
+        # Let the panel handle the event
+        return self.pause_panel.handle_event(event, panel_position)
 
     # -------------------Player Properties-----------------------------
     def _get_player_distance(self, enemy) -> float:
@@ -121,6 +260,9 @@ class GameplayCore:
     
     def _update_player(self, dt: float) -> None:
         """Update player with world boundary constraints."""
+        if self.is_paused:
+            return
+            
         self.player.update(dt)
         
         # Apply world boundaries
@@ -247,6 +389,9 @@ class GameplayCore:
 
     def _update_combat(self, dt: float) -> None:
         """Update combat system with formation management."""
+        if self.is_paused:
+            return
+            
         self.formation_system.update(dt, self.enemies, self.player)
         
         # Remove enemies that have completed death animations
@@ -264,6 +409,11 @@ class GameplayCore:
     # -------------------Background Properties-------------------------
     def _update_systems(self, dt: float) -> None:
         """Update world systems and wave management."""
+        if self.is_paused:
+            # Still update camera for smooth pause transitions
+            self.camera.update(dt, self.player.x, self.player.y)
+            return
+            
         self.background.update(dt)
         self.camera.update(dt, self.player.x, self.player.y)
         
@@ -274,9 +424,6 @@ class GameplayCore:
     # -------------------GAME STATE HANDLE-----------------------------
     def update(self, dt: float) -> Optional[str]:
         """Main update loop returning next state or None."""
-        if self.is_paused:
-            return None
-            
         self.game_time += dt
         self.input_handler.update()
         
@@ -284,13 +431,29 @@ class GameplayCore:
         if next_state := self._handle_input():
             return next_state
         
-        # Update game systems
+        # Update pause panel if visible
+        if self.show_pause_panel and self.pause_panel:
+            self.pause_panel.update()
+        
+        # Update game systems (respects pause state internally)
         self._update_player(dt)
         self._update_combat(dt)
         self._update_systems(dt)
         
-        # Check game over condition
-        return "game_over" if self.player.hp <= 0 else None
+        # Check game over condition (only when not paused)
+        if not self.is_paused and self.player.hp <= 0:
+            return "game_over"
+            
+        return None
+    
+    def handle_event(self, event) -> bool:
+        """Handle pygame events, return True if event was consumed."""
+        # First, let pause panel handle events if it's visible
+        if self.show_pause_panel and self.pause_panel:
+            if self._handle_pause_panel_events(event):
+                return True
+        
+        return False
     
     def render(self): # DO NOTHING: Since the gameplay_renderer.py will handle those
         pass

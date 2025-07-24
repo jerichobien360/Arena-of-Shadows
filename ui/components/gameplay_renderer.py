@@ -222,6 +222,11 @@ class GameplayRenderer:
         self.hp_bar = AnimatedProgressBar()
         self.exp_bar = AnimatedProgressBar()
         self._initialized = False
+        
+        # Create overlay surface for pause effect
+        self.pause_overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.pause_overlay.set_alpha(128)  # Semi-transparent
+        self.pause_overlay.fill((0, 0, 0))  # Black overlay
     
     # -------------------CLASS METHOD-------------------------------------
     def render(self, screen: pygame.Surface, game_data: Dict[str, Any]) -> None:
@@ -246,8 +251,9 @@ class GameplayRenderer:
         self._render_ui(screen, game_data, current_time_ms)
         self.screen_effects.render(screen, player, current_time_ms)
         
-        if game_data['is_paused']:
-            self._render_pause_overlay(screen)
+        # Render pause overlay if paused
+        if game_data.get('is_paused', False):
+            self._render_pause_overlay(screen, game_data)
     
     # -------------------CLASS PROPERTIES---------------------------------
     # HUD 1 - HP & EXP =========================================
@@ -367,32 +373,29 @@ class GameplayRenderer:
                 entity.render(screen)
     
     # GAME PAUSE ===============================================
-    def _render_pause_overlay(self, screen: pygame.Surface) -> None:
-        """Render pause screen overlay."""
-        # Semi-transparent overlay
-        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 160))
-        screen.blit(overlay, (0, 0))
+    def _render_pause_overlay(self, screen: pygame.Surface, game_data: Dict[str, Any]) -> None:
+        """Render pause overlay and pause panel."""
+        # Draw semi-transparent overlay
+        screen.blit(self.pause_overlay, (0, 0))
         
-        # Pause panel
-        panel_size = (300, 100)
-        panel_pos = ((SCREEN_WIDTH - panel_size[0]) // 2, (SCREEN_HEIGHT - panel_size[1]) // 2)
+        # Get pause panel from game data
+        pause_panel = game_data.get('pause_panel')
+        show_pause_panel = game_data.get('show_pause_panel', False)
         
-        panel = pygame.Surface(panel_size, pygame.SRCALPHA)
-        rect = pygame.Rect(0, 0, *panel_size)
-        pygame.draw.rect(panel, (20, 20, 20, 240), rect, border_radius=15)
-        pygame.draw.rect(panel, (100, 100, 100, 255), rect, width=3, border_radius=15)
-        screen.blit(panel, panel_pos)
-        
-        # Text
-        center_x = SCREEN_WIDTH // 2
-        center_y = SCREEN_HEIGHT // 2
-        
-        pause_text = self.font.render("PAUSED", True, (255, 255, 255))
-        pause_rect = pause_text.get_rect(center=(center_x, center_y - 10))
-        screen.blit(pause_text, pause_rect)
-        
-        instruction_font = pygame.font.Font(None, 24)
-        instruction_text = instruction_font.render("Press SPACE to continue", True, (180, 180, 180))
-        instruction_rect = instruction_text.get_rect(center=(center_x, center_y + 20))
-        screen.blit(instruction_text, instruction_rect)
+        if show_pause_panel and pause_panel:
+            # Calculate center position for pause panel
+            panel_x = (SCREEN_WIDTH - pause_panel.width) // 2
+            panel_y = (SCREEN_HEIGHT - pause_panel.height) // 2
+            
+            # Draw the pause panel
+            pause_panel.draw(screen, (panel_x, panel_y))
+        else:
+            # Draw simple "PAUSED" text if panel is not available
+            pause_text = self.font.render("PAUSED", True, WHITE)
+            text_rect = pause_text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
+            screen.blit(pause_text, text_rect)
+            
+            # Instructions
+            instruction_text = self.font.render("Press SPACE to resume", True, WHITE)
+            instruction_rect = instruction_text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2 + 40))
+            screen.blit(instruction_text, instruction_rect)

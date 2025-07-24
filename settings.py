@@ -4,6 +4,9 @@ from dataclasses import dataclass, field
 import pygame
 
 
+# Game Configuration
+TITLE = "Arena of Shadows"
+
 # Constants
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 525

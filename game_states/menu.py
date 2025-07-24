@@ -16,6 +16,7 @@ class MainMenuState(GameState):
     """Main menu state handling user input, animations, and transitions."""
     
     def __init__(self, font, sound_manager):
+        print("\n[System]: Initializing the Main Menu Screen\n")
         self.font = font
         self.sound_manager = sound_manager
         

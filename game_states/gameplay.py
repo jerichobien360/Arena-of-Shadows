@@ -34,6 +34,7 @@ class GameplayState(GameState):
     """Main gameplay state - combines core logic and rendering."""
     
     def __init__(self, font: pygame.font.Font, sound_manager: Any):
+        print("\n[System]: Initializing the Gameplay\n")
         self.core = GameplayCore(sound_manager)
         self.renderer = GameplayRenderer(font)
         self._initialized = False
@@ -41,6 +42,7 @@ class GameplayState(GameState):
     # -------------------INITIALIZE & CLEANUP-----------------------------
     def enter(self) -> None:
         """Initialize gameplay when entering state."""
+        print("\t>Entering the gameplay\n")
         if not self._initialized:
             self.core.initialize()
             self._initialized = True

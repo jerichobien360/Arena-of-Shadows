@@ -8,7 +8,7 @@ from systems.manager.asset_manager import *
 from systems.manager.sound_manager import *
 
 
-class UniversalPanel: # TODO: Apply the animation system
+class UniversalPanel:
     def __init__(self, width: int = 400, height: int = 600, title: str = "Panel"):
         """Initialize a UniversalPanel with given dimensions and title."""
         self.width = width

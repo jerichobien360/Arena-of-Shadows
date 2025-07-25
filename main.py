@@ -20,10 +20,9 @@ class ArenaOfShadows:
     """Main game class - simplified version."""
     
     def __init__(self):
-        print("\n[System]: Initializing the Game\n")
-
+        # Debugging
         self.running = True
-        self.debug_mode = False
+        self.debug_mode = False # Debugging for memory optimization
         
         # Initialize pygame
         pygame.init()

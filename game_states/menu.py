@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from settings import *
+from game_function.game_function import *
 from game_states.gameplay import GameState
 from ui.effects.particles import ParticleSystem
 from ui.screens.main_menu_screen import MainMenuRenderer
@@ -16,7 +17,7 @@ class MainMenuState(GameState):
     """Main menu state handling user input, animations, and transitions."""
     
     def __init__(self, font, sound_manager):
-        print("\n[System]: Initializing the Main Menu Screen\n")
+        DEBUGGING('MENU_INIT', DEBUGGING_ENABLE)
         self.font = font
         self.sound_manager = sound_manager
         
@@ -36,6 +37,7 @@ class MainMenuState(GameState):
     
     def cleanup(self) -> None:
         """Clean up resources when leaving state."""
+        DEBUGGING('MENU_CLEANUP', DEBUGGING_ENABLE)
         self.sound_manager.stop_background_music()
         self.particle_system.clear()
 

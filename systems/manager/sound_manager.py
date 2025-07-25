@@ -1,6 +1,7 @@
 import math, pygame, os
 import numpy as np
 from settings import *
+from game_function.game_function import *
 
 
 class SoundManager:
@@ -54,7 +55,8 @@ class SoundManager:
                     sound = pygame.mixer.Sound(filepath)
                     sound.set_volume(self.sfx_volume)
                     self.sounds[sound_name] = sound
-                    print(f"Loaded sound: {filepath}")
+                    DEBUGGING('LOADED_SOUNDS', DEBUGGING_ENABLE,
+                              item=filepath, details=DEBUGGING_ENABLE_DETAILS)
                 except pygame.error as e:
                     print(f"Failed to load {filepath}: {e}")
                     self.generate_fallback_sound(sound_name)
@@ -63,7 +65,8 @@ class SoundManager:
     
     def generate_fallback_sound(self, sound_name):
         """Generate a single fallback sound if WAV file is missing"""
-        print(f"Generating fallback sound for: {sound_name}")
+        DEBUGGING('GENERATE_FALLBACK', DEBUGGING_ENABLE,
+                  item=sound_name, details=DEBUGGING_ENABLE_DETAILS)
         
         # Define fallback sound parameters
         sound_params = {

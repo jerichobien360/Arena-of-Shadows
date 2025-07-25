@@ -9,9 +9,6 @@ TITLE = "Arena of Shadows"
 DEBUGGING_ENABLE = True
 DEBUGGING_ENABLE_DETAILS = False
 
-
-
-
 # Constants
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 525

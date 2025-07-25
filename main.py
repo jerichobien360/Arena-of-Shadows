@@ -140,9 +140,9 @@ class ArenaOfShadows:
     
     def _cleanup(self) -> None:
         """Clean up."""
-        print("Cleaning up...")
+        DEBUGGING('MENU_CLEANUP', DEBUGGING_ENABLE)
         pygame.quit()
-        print("Arena of Shadows closed")
+        DEBUGGING('GAME_CLOSED', DEBUGGING_ENABLE)
 
 
 def main() -> None:

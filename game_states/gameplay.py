@@ -4,6 +4,9 @@ from typing import Optional, Any
 import pygame
 from systems.gameplay_core import GameplayCore
 from ui.components.gameplay_renderer import GameplayRenderer
+from settings import *
+from game_function.game_function import *
+
 
 class GameState(ABC):
     """Abstract base class for all game states."""
@@ -34,7 +37,6 @@ class GameplayState(GameState):
     """Main gameplay state - combines core logic and rendering."""
     
     def __init__(self, font: pygame.font.Font, sound_manager: Any):
-        print("\n[System]: Initializing the Gameplay\n")
         self.core = GameplayCore(sound_manager)
         self.renderer = GameplayRenderer(font)
         self._initialized = False
@@ -42,8 +44,8 @@ class GameplayState(GameState):
     # -------------------INITIALIZE & CLEANUP-----------------------------
     def enter(self) -> None:
         """Initialize gameplay when entering state."""
-        print("\t>Entering the gameplay\n")
         if not self._initialized:
+            DEBUGGING('GAMEPLAY_ENTER', DEBUGGING_ENABLE)
             self.core.initialize()
             self._initialized = True
     

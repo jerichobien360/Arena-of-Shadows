@@ -107,7 +107,6 @@ def DEBUGGING(state, enable, item=None, details=False):
     if (state == 'GAME_OVER_EXIT') and enable:
         print("\t>Exiting the game over screen successfully")
 
-    
     if (state == 'GAME_CLOSED') and enable:
         print("\nArena of Shadows closed")
 

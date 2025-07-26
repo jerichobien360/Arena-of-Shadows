@@ -123,14 +123,9 @@ python3 main.py
 | **ESC** | Pause menu |
 
 ## Contributing
-Feedback for this project is greatly appreciated as it's currently in development! Contributions, suggestions, and feedback are all welcome. 
-
-### How to Contribute:
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/game_feature`)
-3. Commit your changes (`git commit -m 'Added feature'`)
-4. Push to the branch (`git push origin feature/game_feature`)
-5. Open a Pull Request
+Feedback for this project is greatly appreciated as it's currently in development! Contributions, suggestions, and feedback are all welcome.
+>[!NOTE]
+> Make sure to follow the [contribution guidelines](CONTRIBUTING.md) before submitting pull requests.
 
 ## Contact
 Feel free to reach out with any questions or suggestions about the game!

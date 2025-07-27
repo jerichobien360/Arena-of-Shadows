@@ -637,4 +637,14 @@ class PanelTemplates:
         
         return panel
 
+    @staticmethod
+    def level_editor_panel():
+        pass
 
+    @staticmethod
+    def world_map_editor_panel():
+        pass
+
+    @staticmethod
+    def mini_map_panel():
+        pass

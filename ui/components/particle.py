@@ -8,7 +8,7 @@ from functools import lru_cache
 from settings import *
 
 
-
+# TODO: Simplify the code and follow on the DRY and KISS Principle
 
 class EaseType(Enum):
     """Different easing functions for smooth animations"""

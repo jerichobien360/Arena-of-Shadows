@@ -20,7 +20,7 @@ class ArenaOfShadows:
     """Main game class - simplified version."""
     
     def __init__(self):
-        # Debugging
+        # Debugging Interface for Dev
         self.running = True
         self.debug_mode = False # Debugging for memory optimization
         
@@ -47,6 +47,7 @@ class ArenaOfShadows:
             "main_menu": MainMenuState(self.font, self.sound_manager),
             "gameplay": GameplayState(self.font, self.sound_manager),
             "game_over": GameOverState(self.font, self.sound_manager)
+            # TODO: Implement the Level-editor
         }
         
         for name, state in states.items():

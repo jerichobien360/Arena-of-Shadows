@@ -6,6 +6,8 @@ from typing import List, Tuple, Dict
 from abc import ABC, abstractmethod
 
 
+# TODO: Simplify the code and follow on the DRY and KISS Principle
+
 @dataclass
 class ParticleConfig:
     """Configuration for particle properties"""

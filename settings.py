@@ -7,7 +7,7 @@ import pygame
 # Game Configuration
 TITLE = "Arena of Shadows"
 DEBUGGING_ENABLE = True
-DEBUGGING_ENABLE_DETAILS = False
+DEBUGGING_ENABLE_DETAILS = True
 
 # Constants
 SCREEN_WIDTH = 700
@@ -176,3 +176,7 @@ COLORS = {
     'placeholder': (150, 150, 150),
     'selection': (100, 150, 255)
 }
+
+
+# GAMEPLAY SETTINGS
+WAVE_STARTING_POINT = 1 # Default: 1

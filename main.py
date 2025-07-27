@@ -12,13 +12,14 @@ pygame.init()
 
 class MapEditor:
     def __init__(self):
+        # Map Editor Initialization
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption("Simple Map Editor")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 24)
         self.small_font = pygame.font.Font(None, 18)
         
-        # Initialize database
+        # Database Initialization
         self.init_database()
         
         # Grid data
@@ -39,10 +40,16 @@ class MapEditor:
             y = GRID_HEIGHT + 50
             self.tile_buttons.append((pygame.Rect(x, y, 60, 30), tile_id))
         
+        # Message
         self.typing = False
         self.message = ""
         self.message_timer = 0
-    
+
+        # Game loop
+        self.running = True
+
+    # ====================== Class Method Properties ======================
+    # DATABASE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     def init_database(self):
         """Initialize SQLite database for storing maps"""
         self.conn = sqlite3.connect('maps.db')
@@ -99,6 +106,7 @@ class MapEditor:
         cursor.execute('SELECT name, created_at FROM maps ORDER BY updated_at DESC')
         return cursor.fetchall()
     
+    # MAP ENTITIES >>>>>>>>>>>>>>>>>>>>>>>>>>
     def show_message(self, text, color):
         """Show a temporary message"""
         self.message = text
@@ -207,79 +215,87 @@ class MapEditor:
             else:
                 if len(self.map_name) < 20:  # Limit name length
                     self.map_name += event.unicode
-    
+
+    # ====================== Game Loop Properties =========================
     def run(self):
         """Main game loop"""
-        running = True
-        
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    
-                    # Check UI buttons
-                    if self.save_button.collidepoint(mouse_pos):
-                        if self.map_name.strip():
-                            self.save_map(self.map_name.strip())
-                        else:
-                            self.show_message("Please enter a map name!", RED)
-                    
-                    elif self.load_button.collidepoint(mouse_pos):
-                        if self.map_name.strip():
-                            self.load_map(self.map_name.strip())
-                        else:
-                            self.show_message("Please enter a map name to load!", RED)
-                    
-                    elif self.clear_button.collidepoint(mouse_pos):
-                        self.clear_map()
-                    
-                    elif self.name_input.collidepoint(mouse_pos):
-                        self.typing = True
-                        self.map_name = ""
-                    
-                    else:
-                        # Check tile selector buttons
-                        for rect, tile_id in self.tile_buttons:
-                            if rect.collidepoint(mouse_pos):
-                                self.current_tile = tile_id
-                                break
-                        else:
-                            # Grid editing
-                            self.typing = False
-                            grid_x, grid_y = self.get_grid_position(mouse_pos)
-                            if grid_x is not None and grid_y is not None:
-                                if event.button == 1:  # Left click - paint
-                                    self.grid[grid_y][grid_x] = self.current_tile
-                                elif event.button == 3:  # Right click - erase
-                                    self.grid[grid_y][grid_x] = 0
-                
-                elif event.type == pygame.MOUSEMOTION:
-                    # Allow painting while dragging
-                    if pygame.mouse.get_pressed()[0]:  # Left button held
-                        mouse_pos = pygame.mouse.get_pos()
-                        grid_x, grid_y = self.get_grid_position(mouse_pos)
-                        if grid_x is not None and grid_y is not None:
-                            self.grid[grid_y][grid_x] = self.current_tile
-                
-                # Handle text input
-                if self.typing:
-                    self.handle_text_input(event)
+        while self.running:
+            self._handle_event()
             
-            # Draw everything
-            self.screen.fill(WHITE)
-            self.draw_grid()
-            self.draw_ui()
+            self._render()
             
             pygame.display.flip()
             self.clock.tick(60)
         
+        self._cleanup()
+
+    def _handle_event(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                
+                # Check UI buttons
+                if self.save_button.collidepoint(mouse_pos):
+                    if self.map_name.strip():
+                        self.save_map(self.map_name.strip())
+                    else:
+                        self.show_message("Please enter a map name!", RED)
+                
+                elif self.load_button.collidepoint(mouse_pos):
+                    if self.map_name.strip():
+                        self.load_map(self.map_name.strip())
+                    else:
+                        self.show_message("Please enter a map name to load!", RED)
+                
+                elif self.clear_button.collidepoint(mouse_pos):
+                    self.clear_map()
+                
+                elif self.name_input.collidepoint(mouse_pos):
+                    self.typing = True
+                    self.map_name = ""
+                
+                else:
+                    # Check tile selector buttons
+                    for rect, tile_id in self.tile_buttons:
+                        if rect.collidepoint(mouse_pos):
+                            self.current_tile = tile_id
+                            break
+                    else:
+                        # Grid editing
+                        self.typing = False
+                        grid_x, grid_y = self.get_grid_position(mouse_pos)
+                        if grid_x is not None and grid_y is not None:
+                            if event.button == 1:  # Left click - paint
+                                self.grid[grid_y][grid_x] = self.current_tile
+                            elif event.button == 3:  # Right click - erase
+                                self.grid[grid_y][grid_x] = 0
+            
+            elif event.type == pygame.MOUSEMOTION:
+                # Allow painting while dragging
+                if pygame.mouse.get_pressed()[0]:  # Left button held
+                    mouse_pos = pygame.mouse.get_pos()
+                    grid_x, grid_y = self.get_grid_position(mouse_pos)
+                    if grid_x is not None and grid_y is not None:
+                        self.grid[grid_y][grid_x] = self.current_tile
+            
+            # Handle text input
+            if self.typing:
+                self.handle_text_input(event)
+
+    def _cleanup(self):
         # Cleanup
         self.conn.close()
         pygame.quit()
         sys.exit()
+
+    def _render(self):
+        # Draw everything
+        self.screen.fill(GRAY)
+        self.draw_grid()
+        self.draw_ui()
 
 # Run the map editor
 if __name__ == "__main__":

@@ -66,7 +66,7 @@ class GameplayCore:
         self._setup_pause_panel()
         
         # Start first wave and setup audio
-        self.wave_manager.start_wave(1)
+        self.wave_manager.start_wave(WAVE_STARTING_POINT)
         self._setup_audio()
     
     def cleanup(self) -> None:

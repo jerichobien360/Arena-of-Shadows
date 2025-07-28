@@ -392,7 +392,7 @@ class UniversalPanel:
         self.surface.blit(text, text_pos)
     
     def _draw_label(self, el):
-        text = self.font.render(el.text, True, self.COLORS['text'])
+        text = self.font.render(el.text, False, self.COLORS['text'])
         self.surface.blit(text, (el.rect.x + 5, el.rect.centery - text.get_height()//2))
     
     def _draw_input(self, el):
@@ -434,7 +434,7 @@ class UniversalPanel:
     
     def _draw_slider(self, el):
         # Label
-        label = self.font.render(f"{el.text}: {int(el.value)}", True, self.COLORS['text'])
+        label = self.font.render(f"{el.text}: {int(el.value)}", False, self.COLORS['text'])
         self.surface.blit(label, (el.rect.x + 10, el.rect.y - 25))
         
         # Track
@@ -461,7 +461,7 @@ class UniversalPanel:
             pygame.draw.lines(self.surface, self.COLORS['checkbox'], False, points, 2)
         
         # Label
-        text = self.font.render(el.text, True, self.COLORS['text'])
+        text = self.font.render(el.text, False, self.COLORS['text'])
         self.surface.blit(text, (el.rect.x + 26, el.rect.centery - text.get_height()//2))
     
     def _draw_dropdown(self, el):
@@ -470,7 +470,7 @@ class UniversalPanel:
 
         # Selected text
         selected_text = el.options[el.selected_option] if el.options and 0 <= el.selected_option < len(el.options) else el.text
-        text = self.font.render(selected_text, True, self.COLORS['text'])
+        text = self.font.render(selected_text, False, self.COLORS['text'])
         self.surface.blit(text, (el.rect.x + 8, el.rect.centery - text.get_height()//2))
 
         # Arrow
@@ -504,7 +504,7 @@ class UniversalPanel:
                     pygame.draw.rect(self.surface, self.COLORS['button_active'], option_rect)
 
                 # Option text
-                option_text = self.font.render(option, True, self.COLORS['text'])
+                option_text = self.font.render(option, False, self.COLORS['text'])
                 text_y = option_y + 14 - option_text.get_height()//2
                 self.surface.blit(option_text, (el.rect.x + 8, text_y))
 

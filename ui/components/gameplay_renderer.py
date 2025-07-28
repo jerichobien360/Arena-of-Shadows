@@ -80,7 +80,8 @@ class UIRenderer:
         """Render semi-transparent UI panel."""
         panel = pygame.Surface((width, height), pygame.SRCALPHA)
         rect = pygame.Rect(0, 0, width, height)
-        
+
+        # Draw User In-Game Interface Panel at the top-left
         pygame.draw.rect(panel, (0, 0, 0, self.config.panel_alpha), rect, 
                         border_radius=self.config.panel_corner_radius)
         pygame.draw.rect(panel, (80, 80, 80, 200), rect, width=2, 
@@ -91,7 +92,7 @@ class UIRenderer:
     def render_text_elements(self, screen: pygame.Surface, elements: list, start_y: int) -> None:
         """Render list of text elements."""
         for i, text in enumerate(elements):
-            surface = self.font.render(text, True, (240, 240, 240))
+            surface = self.font.render(text, False, (240, 240, 240))
             x = self.config.margin + self.config.panel_padding
             y = start_y + i * self.config.line_height
             screen.blit(surface, (x, y))
@@ -308,7 +309,7 @@ class GameplayRenderer:
         exp_y = bars_start_y + self.config.bar_height + self.config.bar_spacing
         self.ui_renderer.render_progress_bar(
             screen, bar_x, exp_y, self.exp_bar, "EXP",
-            ((50, 100, 220), (100, 150, 255)), current_time_ms
+            ((107, 50, 220), (193, 100, 255)), current_time_ms
         )
 
     def _get_exp_for_next_level(self, level: int) -> int:

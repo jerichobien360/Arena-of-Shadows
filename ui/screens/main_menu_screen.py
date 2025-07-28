@@ -111,7 +111,7 @@ class MainMenuRenderer:
         if alpha <= 0:
             return
             
-        surface = self.font.render("Press ENTER to Start", True, (180, 220, 180))
+        surface = self.font.render("Press ENTER to Start", False, (180, 220, 180))
         
         # Breathing effect when fully visible
         if alpha >= 200:

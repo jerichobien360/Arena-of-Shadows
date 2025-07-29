@@ -218,6 +218,10 @@ class GameplayCore:
                 else:
                     self.pause()
         
+        if keys[DASH_KEY]:
+            # print("This player should take an effect of dash")
+            self.player.dash()
+        
         # If paused, don't process game input
         if self.is_paused:
             return None

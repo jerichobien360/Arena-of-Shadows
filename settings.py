@@ -1,7 +1,8 @@
 from enum import Enum
 from typing import List, Callable, Optional
 from dataclasses import dataclass, field
-import pygame
+from typing import List, Tuple
+import pygame, random, math
 
 
 # Game Configuration
@@ -102,6 +103,7 @@ SOUND_FILES = {
     'player_damage': 'assets/audio/sounds/player_damage.wav',
     'level_up': 'assets/audio/sounds/level_up.wav',
     'wave_complete': 'assets/audio/sounds/wave_complete.wav',
+    'dash': 'assets/audio/sounds/dash.wav',
     
     # UI sounds
     'ui_click': 'assets/audio/sounds/ui_click.wav',
@@ -180,3 +182,35 @@ COLORS = {
 
 # GAMEPLAY SETTINGS
 WAVE_STARTING_POINT = 1 # Default: 1
+
+
+# FORMATION - enemies.py
+class FormationType(Enum):
+    SURROUND = "surround"
+    PINCER = "pincer" 
+    AMBUSH = "ambush"
+
+@dataclass
+class FormationData:
+    target: Tuple[float, float] = (0, 0)
+    active: bool = False
+
+FORMATIONS = {
+    FormationType.SURROUND: lambda pos, n: [(pos[0] + 100*math.cos(2*math.pi*i/n), 
+                                            pos[1] + 100*math.sin(2*math.pi*i/n)) for i in range(n)],
+    FormationType.PINCER: lambda pos, n: [(pos[0] + (-150 if i < n//2 else 150), 
+                                            pos[1] + (i-n//4)*40) for i in range(n)],
+    FormationType.AMBUSH: lambda pos, n: [(pos[0] + random.randint(-200, 200), 
+                                            pos[1] + random.randint(-200, 200)) for i in range(n)]
+}
+
+LAUNCH_ATTACK_COOLDOWN = 3 # Shorter cooldown for faster battles
+
+
+# ENEMY CLASSES
+ENEMY_STATS = {
+        "crawler": (40, 15, 120, 12, RED, 25, 25),
+        "brute": (100, 30, 80, 18, (180, 0, 0), 60, 25),
+        "sniper": (60, 45, 60, 10, (100, 100, 200), 80, 300),
+        "fireshooter": (70, 25, 90, 14, (255, 100, 0), 70, 180)
+    }

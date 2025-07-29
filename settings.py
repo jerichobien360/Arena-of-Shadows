@@ -89,6 +89,7 @@ MOVE_DOWN = pygame.K_DOWN
 MOVE_UP = pygame.K_UP
 JUMP = pygame.K_SPACE
 ESCAPE = pygame.K_ESCAPE
+DASH_KEY = pygame.K_e
 
 # Audio Configuration
 MUSIC_VOLUME = 0.8  # Range: 0.0 ~ 1.0

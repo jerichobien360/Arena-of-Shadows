@@ -129,7 +129,7 @@ class MainMenuRenderer:
         if alpha <= 0:
             return
             
-        surface = self.font.render("WASD/Arrows: Move | SPACE: Attack", True, (120, 160, 120))
+        surface = self.font.render("WASD/Arrows: Move | SPACE: Attack | E: Dash", True, (120, 160, 120))
         surface.set_alpha(alpha)
         
         x = SCREEN_WIDTH // 2 - surface.get_width() // 2

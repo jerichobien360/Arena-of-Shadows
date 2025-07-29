@@ -42,7 +42,7 @@ It can transform into a tool that expands scalability from small to medium proje
 - Simple, clean atmospheric interface
 - Immersive shadow-themed design
 - Quickly access to the responsive game controls
-- Control Keys: <ins>WASD/Arrows</ins>: Move | <ins>SPACE</ins>: Attack
+- Control Keys: <ins>WASD/Arrows</ins>: Move | <ins>SPACE</ins>: Attack | <ins>E</ins>: Dash
 
 The main menu welcomes players into this mystical world of shadows and ancient combat arenas.
 
@@ -155,6 +155,7 @@ python3 main.py
 |-----|--------|
 | **WASD** / **Arrow Keys** | Move character |
 | **SPACE** | Attack |
+| **E** | Dash |
 | **ENTER** | Start game / Confirm |
 | **ESC** | Pause menu |
 

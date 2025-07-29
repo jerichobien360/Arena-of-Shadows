@@ -1,36 +1,14 @@
 from settings import *
-import pygame, math, random
-from dataclasses import dataclass
-from typing import List, Dict, Tuple
-from enum import Enum
+import pygame, math
+from typing import List
 
 from systems.game_feature.particle_system import *
 
 
-class FormationType(Enum):
-    SURROUND = "surround"
-    PINCER = "pincer" 
-    AMBUSH = "ambush"
-
-@dataclass
-class FormationData:
-    target: Tuple[float, float] = (0, 0)
-    active: bool = False
-
 class SmartFormationAI:
     """Fast, tactical enemy formation system"""
-    
-    FORMATIONS = {
-        FormationType.SURROUND: lambda pos, n: [(pos[0] + 100*math.cos(2*math.pi*i/n), 
-                                                pos[1] + 100*math.sin(2*math.pi*i/n)) for i in range(n)],
-        FormationType.PINCER: lambda pos, n: [(pos[0] + (-150 if i < n//2 else 150), 
-                                              pos[1] + (i-n//4)*40) for i in range(n)],
-        FormationType.AMBUSH: lambda pos, n: [(pos[0] + random.randint(-200, 200), 
-                                              pos[1] + random.randint(-200, 200)) for i in range(n)]
-    }
-    
     def __init__(self):
-        self.active_groups = {}
+        self.active_groups = {} # Handling the enemies into group
         self.cooldown = 0
         
     def should_regroup(self, enemies: List, player) -> bool:
@@ -64,7 +42,7 @@ class SmartFormationAI:
             enemy.group_id = group_id
         
         self.active_groups[group_id] = enemies
-        self.cooldown = 5.0  # Shorter cooldown for faster battles
+        self.cooldown = LAUNCH_ATTACK_COOLDOWN  # Shorter cooldown for faster battles
     
     def update_enemy_behavior(self, enemy, dt: float, player):
         """Formation movement with maintained combat capability"""
@@ -120,14 +98,8 @@ class SmartFormationAI:
         if self.should_regroup(unformed, player):
             self.initiate_formation(unformed, player)
 
+
 class Enemy:
-    ENEMY_STATS = {
-        "crawler": (40, 15, 120, 12, RED, 25, 25),
-        "brute": (100, 30, 80, 18, (180, 0, 0), 60, 25),
-        "sniper": (60, 45, 60, 10, (100, 100, 200), 80, 300),
-        "fireshooter": (70, 25, 90, 14, (255, 100, 0), 70, 180)
-    }
-    
     def __init__(self, x, y, enemy_type="crawler"):
         self.x, self.y, self.type = x, y, enemy_type
         self.damage_flash_timer = self.attack_cooldown = 0
@@ -139,7 +111,7 @@ class Enemy:
         self.group_id = None
         
         # Unpack stats
-        stats = self.ENEMY_STATS[enemy_type]
+        stats = ENEMY_STATS[enemy_type]
         (self.hp, self.attack_power, self.speed, self.radius, 
          self.color, self.exp_value, self.attack_range) = stats
         self.max_hp = self.hp

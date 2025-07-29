@@ -77,6 +77,7 @@ class SoundManager:
             'player_damage': (300, 0.3, 'pain'),
             'level_up': (800, 0.6, 'ascend'),
             'wave_complete': (1200, 0.8, 'victory'),
+            'dash': (1200, 0.3, 'dash_swoosh'),
             
             # UI sounds
             'ui_click': (800, 0.05, 'click'),
@@ -113,6 +114,7 @@ class SoundManager:
             'player_damage': (300, 0.3, 'pain'),
             'level_up': (800, 0.6, 'ascend'),
             'wave_complete': (1200, 0.8, 'victory'),
+            'dash': (1200, 0.3, 'dash_swoosh'),  # NEW DASH SOUND
             
             # UI sounds
             'ui_click': (800, 0.05, 'click'),
@@ -180,6 +182,33 @@ class SoundManager:
                 amplitude = 2048 * (math.sin(2 * math.pi * freq1 * t) + 
                                   math.sin(2 * math.pi * freq2 * t)) * (1 - progress)
                 wave = amplitude
+            
+            elif style == 'dash_swoosh':
+                # NEW DASH SOUND EFFECT - Fast swoosh with wind-like characteristics
+                # Multiple frequency layers to create a complex swoosh
+                freq1 = base_freq * (1.5 - progress * 0.8)  # Descending high frequency
+                freq2 = base_freq * 0.7 * (1 + progress * 0.3)  # Slightly ascending low frequency
+                freq3 = base_freq * 0.4  # Consistent bass rumble
+                
+                # Wind noise component
+                noise_freq = base_freq * 2 * (1 + math.sin(progress * math.pi * 8) * 0.3)
+                noise = math.sin(2 * math.pi * noise_freq * t) * 0.15
+                
+                # Create swoosh envelope - quick attack, sustained, quick decay
+                if progress < 0.1:  # Quick attack
+                    envelope = progress * 10
+                elif progress < 0.7:  # Sustained
+                    envelope = 1.0
+                else:  # Quick decay
+                    envelope = (1.0 - progress) / 0.3
+                
+                # Combine wave components
+                wave1 = math.sin(2 * math.pi * freq1 * t) * 0.6
+                wave2 = math.sin(2 * math.pi * freq2 * t) * 0.4
+                wave3 = math.sin(2 * math.pi * freq3 * t) * 0.3
+                
+                amplitude = 3500 * envelope
+                wave = amplitude * (wave1 + wave2 + wave3 + noise)
             
             # UI-specific styles
             elif style == 'click':
@@ -309,6 +338,10 @@ class SoundManager:
     def play_wave_complete_sound(self):
         """Play wave complete sound"""
         self.play_sound('wave_complete')
+    
+    def play_dash_sound(self):
+        """Play dash sound effect"""
+        self.play_sound('dash')
     
     # Feedback and ambient sound methods
     def play_notification_sound(self):

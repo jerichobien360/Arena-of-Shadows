@@ -68,6 +68,9 @@ class SmartFormationAI:
         # Skip combat if enemy is dying
         if getattr(enemy, 'is_dying', False):
             return
+
+        if not self._is_enemy_in_combat_range(enemy):
+            return
             
         player_dist = math.hypot(player.x - enemy.x, player.y - enemy.y)
         
@@ -77,6 +80,13 @@ class SmartFormationAI:
                 enemy.attack_cooldown = 1.0
             else:
                 enemy._initiate_ranged_attack(player)
+    
+    def _is_enemy_in_combat_range(self, enemy):
+        """Check if enemy is within reasonable combat bounds"""
+        # Allow some buffer outside screen for smooth gameplay
+        buffer = 300  # Pixels outside screen where combat is still allowed
+        return (-buffer <= enemy.x <= WORLD_WIDTH + buffer and 
+                -buffer <= enemy.y <= WORLD_HEIGHT + buffer)
     
     def update(self, dt: float, all_enemies: List, player):
         """Streamlined formation system update"""
@@ -165,10 +175,15 @@ class Enemy:
     def _update_physics(self, dt):
         """Physics update with boundary constraints"""
         if any(abs(v) > 5 for v in self.knockback_velocity):
-            self.x = max(self.radius, min(SCREEN_WIDTH - self.radius, 
-                        self.x + self.knockback_velocity[0] * dt))
-            self.y = max(self.radius, min(SCREEN_HEIGHT - self.radius, 
-                        self.y + self.knockback_velocity[1] * dt))
+            # FIX: Use WORLD bounds instead of SCREEN bounds for enemies
+            new_x = self.x + self.knockback_velocity[0] * dt
+            new_y = self.y + self.knockback_velocity[1] * dt
+            
+            # Clamp to world bounds with buffer
+            buffer = self.radius + 10
+            self.x = max(buffer, min(WORLD_WIDTH - buffer, new_x))
+            self.y = max(buffer, min(WORLD_HEIGHT - buffer, new_y))
+            
             self.knockback_velocity = [v * 0.85 for v in self.knockback_velocity]
         else:
             self.knockback_velocity = [0, 0]
@@ -178,7 +193,17 @@ class Enemy:
         # Skip AI if dying
         if getattr(self, 'is_dying', False):
             return
-            
+        
+        if not self._is_in_attack_bounds():
+            # Move back toward world center if too far out
+            center_x, center_y = WORLD_WIDTH / 2, WORLD_HEIGHT / 2
+            dx, dy = center_x - self.x, center_y - self.y
+            distance = math.hypot(dx, dy) or 1
+            move_speed = self.speed * dt
+            self.x += (dx / distance) * move_speed * 0.5
+            self.y += (dy / distance) * move_speed * 0.5
+            return
+
         dx, dy = player.x - self.x, player.y - self.y
         distance = math.hypot(dx, dy) or 1
         unit_x, unit_y = dx / distance, dy / distance
@@ -188,27 +213,49 @@ class Enemy:
         
         if self.type in ["crawler", "brute"]:
             if distance > self.attack_range:
-                self.x += unit_x * move_speed
-                self.y += unit_y * move_speed
+                new_x = self.x + unit_x * move_speed
+                new_y = self.y + unit_y * move_speed
+                
+                # FIX: Keep enemy within reasonable bounds
+                self.x = max(0, min(WORLD_WIDTH, new_x))
+                self.y = max(0, min(WORLD_HEIGHT, new_y))
             elif self.attack_cooldown <= 0:
                 player.take_damage(self.attack_power, enemy=self)
                 self.attack_cooldown = 1.0
         else:
+            # Ranged enemy movement with bounds checking
+            new_x, new_y = self.x, self.y
+            
             if distance < self.preferred_distance * 0.7:
-                self.x -= unit_x * move_speed * 0.8
-                self.y -= unit_y * move_speed * 0.8
+                new_x -= unit_x * move_speed * 0.8
+                new_y -= unit_y * move_speed * 0.8
             elif distance > self.preferred_distance * 1.3:
-                self.x += unit_x * move_speed * 0.6
-                self.y += unit_y * move_speed * 0.6
+                new_x += unit_x * move_speed * 0.6
+                new_y += unit_y * move_speed * 0.6
             else:
-                self.x += -unit_y * move_speed * 0.4
-                self.y += unit_x * move_speed * 0.4
+                new_x += -unit_y * move_speed * 0.4
+                new_y += unit_x * move_speed * 0.4
+            
+            # FIX: Apply bounds checking to ranged enemy movement
+            buffer = 50
+            self.x = max(buffer, min(WORLD_WIDTH - buffer, new_x))
+            self.y = max(buffer, min(WORLD_HEIGHT - buffer, new_y))
             
             if distance <= self.attack_range and self.attack_cooldown <= 0:
                 self._initiate_ranged_attack(player)
     
+    def _is_in_attack_bounds(self):
+        """Check if enemy is within bounds to attack"""
+        buffer = 400  # Generous buffer for attacks
+        return (-buffer <= self.x <= WORLD_WIDTH + buffer and 
+                -buffer <= self.y <= WORLD_HEIGHT + buffer)
+
     def _initiate_ranged_attack(self, player):
         """Ranged attack initialization"""
+        # Don't attack if the enemy is too far outside of bounds
+        if not self._is_in_attack_bounds():
+            return
+        
         configs = {
             "sniper": (1, 1.2, (255, 255, 0), 2.5, 0),
             "fireshooter": (3, 0.6, (255, 100, 0), 2.0, 0.1)
@@ -230,32 +277,75 @@ class Enemy:
         for indicator in self.attack_indicators[:]:
             indicator.update(dt, player)
             if indicator.should_fire:
-                self._fire_projectile(indicator)
+                # FIX: Validate projectile creation
+                if self._can_create_projectile(indicator):
+                    self._fire_projectile(indicator)
                 indicator.should_fire = False
             if indicator.expired:
                 self.attack_indicators.remove(indicator)
         
-        # Update projectiles
+        # Update projectiles with better bounds checking
         for projectile in self.projectiles[:]:
             projectile.update(dt)
-            if projectile.check_collision(player):
+            
+            # FIX: Check if projectile is valid before collision
+            if projectile.is_valid() and projectile.check_collision(player):
                 player.take_damage(projectile.damage, enemy=self)
-                self.particle_system.create_attack_effect(projectile.x, projectile.y, "projectile") # Particle effect
+                self.particle_system.create_attack_effect(projectile.x, projectile.y, "projectile")
                 self.projectiles.remove(projectile)
-            elif projectile.is_off_world():
+            elif projectile.is_off_world() or not projectile.is_valid():
                 self.projectiles.remove(projectile)
     
+    def _can_create_projectile(self, indicator):
+        """Check if projectile creation is valid"""
+        # Don't create projectiles if target is invalid
+        if (indicator.final_target_x is None or indicator.final_target_y is None):
+            return False
+            
+        # Don't create projectiles if they would go way outside bounds
+        distance_to_target = math.hypot(
+            indicator.final_target_x - self.x,
+            indicator.final_target_y - self.y
+        )
+        
+        # Reasonable max distance to prevent extreme projectiles
+        return distance_to_target < 2000
+
     def _fire_projectile(self, indicator):
         """Fire projectile"""
         configs = {
             "sniper": (400, (255, 255, 100), 3),
             "fireshooter": (250, (255, 150, 0), 5)
         }
+        
+        if indicator.attack_type not in configs:
+            return
+            
         speed, color, size = configs[indicator.attack_type]
         
-        projectile = Projectile(self.x, self.y, indicator.final_target_x, 
-                              indicator.final_target_y, speed, self.attack_power, color, size)
-        self.projectiles.append(projectile)
+        # FIX: Validate target position before creating projectile
+        target_x = indicator.final_target_x
+        target_y = indicator.final_target_y
+        
+        # Clamp target to reasonable bounds
+        max_range = 1500  # Maximum projectile range
+        dx, dy = target_x - self.x, target_y - self.y
+        distance = math.hypot(dx, dy)
+        
+        if distance > max_range:
+            # Limit target to max range
+            scale = max_range / distance
+            target_x = self.x + dx * scale
+            target_y = self.y + dy * scale
+        
+        try:
+            projectile = Projectile(self.x, self.y, target_x, target_y, 
+                                  speed, self.attack_power, color, size)
+            if projectile.is_valid():
+                self.projectiles.append(projectile)
+        except (ValueError, ZeroDivisionError, OverflowError):
+            # Handle any math errors gracefully
+            pass
     
     def apply_knockback_velocity(self, vel_x, vel_y):
         """Apply capped knockback"""
@@ -407,6 +497,7 @@ class AttackIndicator:
         self.timer = 0
         self.should_fire = self.expired = False
         self.final_target_x = self.final_target_y = None
+        self.current_target_x = self.current_target_y = None
         self._update_target(player)
     
     def _update_target(self, player):
@@ -419,6 +510,11 @@ class AttackIndicator:
             offset = 25
             self.current_target_x = player.x + math.cos(spread_angle) * offset
             self.current_target_y = player.y + math.sin(spread_angle) * offset
+        
+        # FIX: Clamp target should take on to reasonable bounds
+        buffer = 200
+        self.current_target_x = max(-buffer, min(WORLD_WIDTH + buffer, self.current_target_x))
+        self.current_target_y = max(-buffer, min(WORLD_HEIGHT + buffer, self.current_target_y))
     
     def update(self, dt, player):
         """Update indicator"""
@@ -442,6 +538,10 @@ class AttackIndicator:
         else:
             target_x, target_y, zoom = self.current_target_x, self.current_target_y, 1.0
         
+        # FIX: Skip rendering if target is way off screen (for optimization)
+        if camera and not camera.is_point_visible(self.current_target_x, self.current_target_y, margin=100):
+            return
+
         progress = min(1.0, (self.timer - self.delay) / self.duration)
         pulse = 0.5 + 0.5 * abs(math.sin(progress * math.pi * 8))
         
@@ -460,25 +560,81 @@ class Projectile:
     def __init__(self, x, y, target_x, target_y, speed, damage, color, size):
         self.x, self.y, self.speed, self.damage, self.color, self.size = x, y, speed, damage, color, size
         
+        # FIX: Validate inputs
+        if not all(isinstance(val, (int, float)) and not math.isnan(val) and not math.isinf(val) 
+                  for val in [x, y, target_x, target_y, speed]):
+            self.valid = False
+            self.velocity = [0, 0]
+            return
+        
         dx, dy = target_x - x, target_y - y
         distance = math.hypot(dx, dy) or 1
         self.velocity = [(dx / distance) * speed, (dy / distance) * speed]
+
+        if distance < 0.1:  # Too close to target
+            self.valid = False
+            self.velocity = [0, 0]
+        else:
+            self.valid = True
+            self.velocity = [(dx / distance) * speed, (dy / distance) * speed]
     
+    def is_valid(self):
+        """Check if projectile is valid"""
+        return (hasattr(self, 'valid') and self.valid and 
+                all(isinstance(val, (int, float)) and not math.isnan(val) and not math.isinf(val) 
+                    for val in [self.x, self.y] + self.velocity))
+
     def update(self, dt):
-        self.x += self.velocity[0] * dt
-        self.y += self.velocity[1] * dt
+        """FIX: Safe update with validation"""
+        if not self.is_valid():
+            return
+            
+        try:
+            self.x += self.velocity[0] * dt
+            self.y += self.velocity[1] * dt
+            
+            # Validate position after update
+            if (math.isnan(self.x) or math.isnan(self.y) or 
+                math.isinf(self.x) or math.isinf(self.y)):
+                self.valid = False
+        except (ValueError, OverflowError):
+            self.valid = False
     
     def check_collision(self, player):
-        return math.hypot(player.x - self.x, player.y - self.y) < (player.radius + self.size)
+        """Safe collision check"""
+        if not self.is_valid():
+            return False
+            
+        try:
+            return math.hypot(player.x - self.x, player.y - self.y) < (player.radius + self.size)
+        except (ValueError, OverflowError):
+            return False
     
     def is_off_world(self):
-        return not (-200 <= self.x <= WORLD_WIDTH + 200 and -200 <= self.y <= WORLD_HEIGHT + 200)
+        """FIX: More generous bounds checking"""
+        if not self.is_valid():
+            return True
+            
+        buffer = 500  # Larger buffer to prevent premature removal
+        return not (-buffer <= self.x <= WORLD_WIDTH + buffer and 
+                   -buffer <= self.y <= WORLD_HEIGHT + buffer)
     
     def render(self, screen, camera=None):
-        if camera:
-            screen_x, screen_y = camera.world_to_screen(self.x, self.y)
-            size = max(1, int(self.size * camera.zoom))
-        else:
-            screen_x, screen_y, size = self.x, self.y, self.size
+        """Safe rendering with bounds checking"""
+        if not self.is_valid():
+            return
             
-        pygame.draw.circle(screen, self.color, (int(screen_x), int(screen_y)), size)
+        try:
+            if camera:
+                screen_x, screen_y = camera.world_to_screen(self.x, self.y)
+                size = max(1, int(self.size * camera.zoom))
+                
+                # Skip if way off screen
+                if not (0 <= screen_x <= screen.get_width() and 0 <= screen_y <= screen.get_height()):
+                    return
+            else:
+                screen_x, screen_y, size = self.x, self.y, self.size
+            
+            pygame.draw.circle(screen, self.color, (int(screen_x), int(screen_y)), size)
+        except (ValueError, OverflowError, TypeError):
+            pass

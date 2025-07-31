@@ -146,6 +146,47 @@ class UIRenderer:
         # Labels and values
         self._render_bar_labels(screen, x, y, label, animated_bar, progress)
     
+    def render_dash_cooldown_indicator(self, screen: pygame.Surface, x: int, y: int, 
+                                     cooldown_percent: float, radius: int = 15) -> None:
+        """Render dash cooldown circular indicator in the HUD."""
+        center_x = x + radius
+        center_y = y + radius
+        
+        # Background circle (darker)
+        pygame.draw.circle(screen, (30, 30, 30, 180), (center_x, center_y), radius)
+        pygame.draw.circle(screen, (100, 100, 100, 200), (center_x, center_y), radius, 2)
+        
+        if cooldown_percent > 0:
+            # Draw cooldown progress as a filled arc
+            # Convert percentage to angle (0 to 2π)
+            angle = 2 * math.pi * (1.0 - cooldown_percent)
+            
+            # Create points for the arc
+            points = [(center_x, center_y)]
+            num_points = max(3, int(angle * radius / 2))  # More points for smoother arc
+            
+            for i in range(num_points + 1):
+                current_angle = (i / num_points) * angle - math.pi / 2  # Start from top
+                point_x = center_x + int((radius - 2) * math.cos(current_angle))
+                point_y = center_y + int((radius - 2) * math.sin(current_angle))
+                points.append((point_x, point_y))
+            
+            if len(points) > 2:
+                pygame.draw.polygon(screen, (50, 150, 255, 180), points)
+        else:
+            # Dash is ready - show ready indicator
+            pygame.draw.circle(screen, (50, 255, 100, 150), (center_x, center_y), radius - 3)
+            
+            # Draw dash icon (arrow or lightning bolt)
+            # Simple arrow pointing right
+            arrow_points = [
+                (center_x - 6, center_y - 4),
+                (center_x + 2, center_y),
+                (center_x - 6, center_y + 4),
+                (center_x - 3, center_y)
+            ]
+            pygame.draw.polygon(screen, (255, 255, 255), arrow_points)
+    
     # -------------------CLASS PROPERTIES---------------------------------
     def _get_animated_color(self, base_color: Tuple[int, int, int], 
                           glow_color: Tuple[int, int, int], is_animating: bool) -> Tuple[int, int, int]:
@@ -282,10 +323,11 @@ class GameplayRenderer:
             f"Zoom: {camera.zoom:.1f}x"
         ]
         
-        # Calculate panel dimensions
+        # Calculate panel dimensions (including space for dash indicator)
         text_height = len(ui_elements) * self.config.line_height
         bars_height = 2 * (self.config.bar_height + self.config.bar_spacing) - self.config.bar_spacing
-        panel_height = text_height + 12 + bars_height + 2 * self.config.panel_padding
+        dash_indicator_height = 40  # Space for dash cooldown indicator
+        panel_height = text_height + 12 + bars_height + dash_indicator_height + 2 * self.config.panel_padding
         
         # Render UI panel
         self.ui_renderer.render_panel(screen, self.config.margin, self.config.margin, 
@@ -311,6 +353,44 @@ class GameplayRenderer:
             screen, bar_x, exp_y, self.exp_bar, "EXP",
             ((107, 50, 220), (193, 100, 255)), current_time_ms
         )
+        
+        # Dash cooldown indicator
+        self._render_dash_cooldown_hud(screen, player, bars_start_y + bars_height - 15) # 10 + bars_start_y
+
+    def _render_dash_cooldown_hud(self, screen: pygame.Surface, player, y_offset: int) -> None:
+        """Render dash cooldown indicator in the HUD panel."""
+        # Position for dash indicator
+        dash_x = self.config.margin + self.config.panel_padding
+        dash_y = self.config.margin + self.config.panel_padding + y_offset
+        
+        # Render "DASH:" label
+        dash_label = self.font.render("DASH:", True, (255, 255, 255))
+        screen.blit(dash_label, (dash_x, dash_y + 5))
+        
+        # Position the circular indicator next to the label
+        indicator_x = dash_x + dash_label.get_width() + 10
+        indicator_y = dash_y
+        
+        # Get cooldown percentage from player
+        cooldown_percent = player.get_dash_cooldown_percent()
+        
+        # Render the circular dash cooldown indicator
+        self.ui_renderer.render_dash_cooldown_indicator(screen, indicator_x, indicator_y, cooldown_percent)
+        
+        # Optional: Show cooldown time remaining as text
+        if cooldown_percent > 0:
+            remaining_time = player.dash_cooldown
+            time_text = f"{remaining_time:.1f}s"
+            time_surface = self.font.render(time_text, True, (200, 200, 200))
+            time_x = indicator_x + 40
+            time_y = dash_y + 8
+            screen.blit(time_surface, (time_x, time_y))
+        else:
+            # Show "READY" when dash is available
+            ready_surface = self.font.render("READY", True, (100, 255, 100))
+            ready_x = indicator_x + 40
+            ready_y = dash_y + 8
+            screen.blit(ready_surface, (ready_x, ready_y))
 
     def _get_exp_for_next_level(self, level: int) -> int:
         """Get experience needed for next level."""

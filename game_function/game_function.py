@@ -55,9 +55,6 @@ class InputHandler:
         return True
 
 
-
-
-
 def SCREEN(width, height) -> pygame.Surface:
     screen = pygame.display.set_mode((width, height))
     return screen
@@ -93,19 +90,19 @@ def GAME_INPUT_HANDLER(event: pygame.event.Event) -> bool:
 
 def DEBUGGING(state, enable, item=None, details=False):
     if (state == 'MENU_INIT') and enable:
-        print("\n[System]: Initializing the Main Menu Screen\n")
+        print("\n[System] Initializing the Main Menu Screen\n")
 
     if (state == 'MENU_CLEANUP') and enable:
-        print("\tCleaning up...")
+        print("\t> Cleaning up...")
 
     if (state == 'GAMEPLAY_ENTER') and enable:
-        print("\t>Entering the gameplay\n")
+        print("\t> Entering the gameplay\n")
 
     if (state == 'GAME_OVER_INIT') and enable:
-        print("\n[System]: Initializing the Game Over Screen\n")
+        print("\n[System] Initializing the Game Over Screen\n")
 
     if (state == 'GAME_OVER_EXIT') and enable:
-        print("\t>Exiting the game over screen successfully")
+        print("\t> Exiting the game over screen successfully")
 
     if (state == 'GAME_CLOSED') and enable:
         print("\nArena of Shadows closed")

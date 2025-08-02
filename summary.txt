@@ -1,12 +1,14 @@
 Bug to Fix:
 1. Combat System: The enemy were glitching when they make a formation, other code classes were possibly not used there correctly.
 2. Canera System: When perfirming to zoom in/out, the other objects were not affected (attack range of player), and when it reverts back, they are not the same as the original one.
+3. Clean code: Through rearranging and refactoring the large code into a simple one
 
 
 For Improvement:
 1. Background System: The background itself were not great, so it should refine it and make it more lively atmosphere.
 2. Collision System: Since it is for prototyping, it shall be used a masking collision to get accurately when the objects collide.
 3. Game Difficulty: Since the enemies were too OP (especially to the sniper and fireshooter), implementing of dash skills and inventory system
+4. Music: Adding the fade in/out effect to avoid a stuttering effect.
 
 
 Additional Features to be Added:
@@ -18,12 +20,20 @@ Additional Features to be Added:
 6. Save/Load System
 7. Stats (as for the result of the game and achievements in general)
 8. Game Settings (Configuration on the screen size, audio, etc.)
+9. Changelogs
 
 
 Possible to Add in the Future:
-1. Loading Screen (Since Pygame is slow and thus this will be used for multi-purposes)1
-
+1. Loading Screen (Since Pygame is slow and thus this will be used for multi-purposes)
+2. Potions for HP and Mana (to make the game more balanced)
+3. Mana, since the game is for prototyping ideas, implementing that to make a restriction for the dash effect (maybe for the other classes as well)
 
 
 Final Thought:
 Since this game meant to have fun, and this is on what game created for.
+
+
+# NOTES:
+## BUG FIXED (v1.1.4)
+1. UI Manager: In the pause menu, when clicking to the menu button, it should directly go back to the main menu instead of when it performing the continue button to take an effect.
+2. Mouse Cursor: When it performs on the pause and continue the game, the hand should transform back to the mouse pointer.

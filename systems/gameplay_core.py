@@ -13,6 +13,7 @@ from systems.game_feature.background_system import *
 from systems.game_feature.battle_formation_system import FormationSystem
 from systems.manager.input_manager import InputHandler
 from systems.manager.ui_manager import UniversalPanel, PanelTemplates
+from game_function.ui import *
 
 
 class GameplayCore:
@@ -127,6 +128,7 @@ class GameplayCore:
         """Return to main menu."""
         print("[Pause Menu] Returning to main menu...")
         # This should trigger a state change
+        self.unpause()
         self._next_state = "main_menu"
         
     def _quit_game(self) -> None:
@@ -425,7 +427,7 @@ class GameplayCore:
         if self.wave_manager.update(dt, self.enemies):
             self.wave_manager.start_wave(self.wave_manager.current_wave + 1)
 
-    # -------------------GAME STATE HANDLE-----------------------------
+    # -------------------MAIN GAMEPLAY STATE HANDLE--------------------
     def update(self, dt: float) -> Optional[str]:
         """Main update loop returning next state or None."""
         self.game_time += dt
@@ -438,6 +440,13 @@ class GameplayCore:
         # Update pause panel if visible
         if self.show_pause_panel and self.pause_panel:
             self.pause_panel.update()
+            # Add cursor management for pause panel
+            panel_x = (SCREEN_WIDTH - self.pause_panel.width) // 2
+            panel_y = (SCREEN_HEIGHT - self.pause_panel.height) // 2
+            self.pause_panel.update_cursor((panel_x, panel_y))
+        else:
+            # Reset cursor to default when pause panel is not shown
+            set_cursor_pointer()
         
         # Update game systems (respects pause state internally)
         self._update_player(dt)

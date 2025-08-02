@@ -6,6 +6,7 @@ from typing import Optional
 
 from settings import *
 from game_function.game_function import *
+from game_function.ui import *
 from game_states.gameplay import GameState
 from ui.effects.particles import ParticleSystem
 from ui.screens.main_menu_screen import MainMenuRenderer
@@ -34,6 +35,9 @@ class MainMenuState(GameState):
         self.animate_state.reset()
         self.input_enabled = False
         self._start_background_music()
+        
+        # Reset into the initial mouse pointer cursor
+        set_cursor_pointer()
     
     def cleanup(self) -> None:
         """Clean up resources when leaving state."""

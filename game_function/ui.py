@@ -295,3 +295,11 @@ def handle_element_click(panel, element, mouse_pos):
         update_slider_value(element, mouse_pos)
         element.dragging = True
     return True
+
+
+# -- Mouse Cursor --
+def set_cursor_pointer():
+    try:
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+    except Exception:
+        pass

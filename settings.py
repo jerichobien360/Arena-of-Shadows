@@ -92,9 +92,9 @@ GAMEPLAY_MUSIC_PATH = "assets/audio/background_music/gameplay.mp3"
 
 # WINDOW_MANAGER FILEPATH
 GAME_ICON = "assets\\icon.png"
-CUSTOM_FONT = "assets\\font\\pixelifySans\\PixelifySans-Medium.ttf"
-CUSTOM_FONT_UI = "assets\\font\\segoeui\\segoeui.ttf"
-CUSTOM_FONT_UI_BOLD = "assets\\font\\segoeui\\segoeuithebd.ttf"
+CUSTOM_FONT = "assets\\font\\Pixelify_Sans\\static\\PixelifySans-Medium.ttf"
+CUSTOM_FONT_UI = "assets\\font\Exo\\static\\Exo-Light.ttf"
+CUSTOM_FONT_UI_BOLD = "assets\\font\\Exo\\static\\Exo-Medium.ttf"
 
 # DATABASE FILEPATH
 DATABASE_FILE = "data\\AOS_player_data.db"

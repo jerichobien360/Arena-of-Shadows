@@ -21,18 +21,18 @@ class UniversalPanel:
         try:
             self.font = create_font(CUSTOM_FONT_UI, 20) #20
             self.small_font = create_font(CUSTOM_FONT_UI, 16)
-            print("[Font Test] Loaded custom font: segoeui.ttf")
+            print("[Font Test] Loaded custom font: Exo-Light.ttf")
             try:
                 self.title_font = create_font(CUSTOM_FONT_UI_BOLD, 32)
-                print("[Font Test] Loaded custom bold font: segoeuithebd.ttf")
+                print("[Font Test] Loaded custom bold font: Exo-Medium.ttf")
             except Exception:
                 self.title_font = create_font(CUSTOM_FONT_UI, 32)
-                print("[Font Test] Bold font segoeuithebd.ttf not found, using segoeui.ttf for title font.")
+                print("[Font Test] Bold font Exo-Medium.ttf not found, using Exo-Light for title font.")
         except Exception:
-            self.font = pygame.font.SysFont("Segoe UI", 24)
-            self.small_font = pygame.font.SysFont("Segoe UI", 20)
-            self.title_font = pygame.font.SysFont("Segoe UI", 32)
-            print("[Font Test] Custom font segoeui.ttf not found, using system font Segoe UI.")
+            self.font = pygame.font.SysFont("Exo", 24)
+            self.small_font = pygame.font.SysFont("Exo", 20)
+            self.title_font = pygame.font.SysFont("Exo", 32)
+            print("[Font Test] Custom font Exo-Light not found, using system font Exo.")
         self.scroll_offset = 0
         self.max_scroll = 0
         self.keys_held = set()

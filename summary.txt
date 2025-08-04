@@ -8,7 +8,6 @@ For Improvement:
 1. Background System: The background itself were not great, so it should refine it and make it more lively atmosphere.
 2. Collision System: Since it is for prototyping, it shall be used a masking collision to get accurately when the objects collide.
 3. Game Difficulty: Since the enemies were too OP (especially to the sniper and fireshooter), implementing of dash skills and inventory system
-4. Music: Adding the fade in/out effect to avoid a stuttering effect.
 
 
 Additional Features to be Added:
@@ -37,3 +36,5 @@ Since this game meant to have fun, and this is on what game created for.
 ## BUG FIXED (v1.1.4)
 1. UI Manager: In the pause menu, when clicking to the menu button, it should directly go back to the main menu instead of when it performing the continue button to take an effect.
 2. Mouse Cursor: When it performs on the pause and continue the game, the hand should transform back to the mouse pointer.
+3. 
+Music: Adding the fade in/out effect to avoid a stuttering effect.

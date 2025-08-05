@@ -42,7 +42,6 @@ class Player:
         self.particle_system = ParticleSystem()
         self.particle_system.set_world_bounds((0, 0, WORLD_WIDTH, WORLD_HEIGHT))
         
-
         # Reset/Update
         self._reset_stats()
         self._update_rect()
@@ -120,7 +119,8 @@ class Player:
         # Don't handle normal movement during dash
         if self.dash_duration > 0:
             return
-            
+        
+        # Player's Movement
         keys = pygame.key.get_pressed()
         dx = (keys[pygame.K_d] or keys[pygame.K_RIGHT]) - (keys[pygame.K_a] or keys[pygame.K_LEFT])
         dy = (keys[pygame.K_s] or keys[pygame.K_DOWN]) - (keys[pygame.K_w] or keys[pygame.K_UP])
@@ -143,6 +143,7 @@ class Player:
         new_x = self.x + dx * move_speed * dt
         new_y = self.y + dy * move_speed * dt
         
+        # Updating (x, y) coordinates before to take an effect
         self.x, self.y = self._apply_bounds(new_x, new_y)
 
     def dash(self) -> bool:

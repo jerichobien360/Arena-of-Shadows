@@ -11,6 +11,9 @@ Thank you for your interest in contributing to Arena of Shadows! This guide will
 - 🎮 **Testing** - Play the game and provide feedback
 
 ## Getting Started
+<img width="1280" height="720" alt="contributions" src="https://github.com/user-attachments/assets/e854ebfc-a332-4938-897b-c1630f3838ac" />
+
+
 
 ### Prerequisites
 

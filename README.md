@@ -4,7 +4,15 @@
 ![WIP](https://img.shields.io/badge/status-WIP-orange)
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue)
 
-## Overview
+### Supported Platforms
+<p align="left">
+  <img src="https://img.icons8.com/color/48/000000/windows-10.png" alt="Windows Logo" height="32"/>
+  <img src="https://img.icons8.com/color/48/000000/linux.png" alt="Linux Logo" height="32"/>
+</p>
+
+<img width="1280" height="720" alt="Work In Progress" src="https://github.com/user-attachments/assets/2e407da4-15ed-4f80-85bb-ec8b62990f2a" />
+
+## Game Overview
 A 2D pixel RPG fighting game where you battle waves of shadowy enemies in an ancient arena. Choose your class, upgrade your stats, and master light, heavy, block, and dodge mechanics to survive. Fight, level up, and conquer this arena.
 
 ### _Short Break: This kitten wants you to welcome about on this on-going development_
@@ -37,8 +45,7 @@ It can transform into a tool that expands scalability from small to medium proje
 <td><img src="https://github.com/user-attachments/assets/e83f3b14-a1fe-48d8-853d-26af6f9f8f3c" width="400"></td>
 <td>
 
-**Main Menu Features:**
-- Press <ins><b>ENTER</b></ins> to start your adventure
+**Features:**
 - Simple, clean atmospheric interface
 - Immersive shadow-themed design
 - Quickly access to the responsive game controls

@@ -15,8 +15,7 @@
 ## Game Overview
 A 2D pixel RPG fighting game where you battle waves of shadowy enemies in an ancient arena. Choose your class, upgrade your stats, and master light, heavy, block, and dodge mechanics to survive. Fight, level up, and conquer this arena.
 
-### _Short Break: This kitten wants you to welcome about on this on-going development_
-<img width="204" height="306" alt="hello" src="https://github.com/user-attachments/assets/3d69b770-e4b8-46c1-a32e-a3a77d736bb2" />
+## About This Game
 <details>
 <summary>Show more...</summary>
 
@@ -49,7 +48,6 @@ It can transform into a tool that expands scalability from small to medium proje
 - Simple, clean atmospheric interface
 - Immersive shadow-themed design
 - Quickly access to the responsive game controls
-- Control Keys: <ins>WASD/Arrows</ins>: Move | <ins>SPACE</ins>: Attack | <ins>E</ins>: Dash
 
 The main menu welcomes players into this mystical world of shadows and ancient combat arenas.
 

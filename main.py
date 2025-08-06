@@ -14,6 +14,7 @@ from systems.manager.game_state_manager import GameStateManager
 from game_states.gameplay import GameplayState
 from game_states.menu import MainMenuState
 from game_states.game_over import GameOverState
+from game_states.loading import LoadingScreenState
 
 
 class ArenaOfShadows:
@@ -59,13 +60,15 @@ class ArenaOfShadows:
         states = {
             "main_menu": MainMenuState(self.font, self.sound_manager),
             "gameplay": GameplayState(self.font, self.sound_manager),
-            "game_over": GameOverState(self.font, self.sound_manager)
+            "game_over": GameOverState(self.font, self.sound_manager),
+            "loading_screen_menu": LoadingScreenState("main_menu", self.sound_manager),
+            "loading_screen_gameplay": LoadingScreenState("gameplay", self.sound_manager)
         }
         
         for name, state in states.items():
             self.state_manager.add_state(name, state)
         
-        self.state_manager.change_state("main_menu")
+        self.state_manager.change_state("loading_screen_menu") # ORIGINAL CODE: "main_menu"
     
     def _handle_events(self):
         """Handle pygame events and return False if game should quit."""

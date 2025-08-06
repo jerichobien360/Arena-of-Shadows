@@ -9,14 +9,14 @@ from systems.manager.sound_manager import *
 
 
 class UniversalPanel:
-    def __init__(self, width: int = 400, height: int = 600, title: str = "Panel"):
+    def __init__(self, width: int = 400, height: int = 600, title: str = "Panel", sound_manager=None):
         """Initialize a UniversalPanel with given dimensions and title."""
         self.width = width
         self.height = height
         self.title = title
         self.elements: List[PanelElement] = []
         self.surface = pygame.Surface((width, height))
-        self.sound_manager = SoundManager()
+        self.sound_manager = sound_manager
         # Use try/except to load custom fonts, print result for testing, and do not use os
         try:
             self.font = create_font(CUSTOM_FONT_UI, 20) #20
@@ -520,9 +520,11 @@ class UniversalPanel:
 
 # PanelTemplates: Efficient, extensible, and ready for deployment
 class PanelTemplates:
-    @staticmethod
-    def game_settings_panel():
-        panel = UniversalPanel(400, 500, "Game Settings")
+    def __init__(self, sound_manager=None):
+        self.sound_manager = sound_manager
+    
+    def game_settings_panel(self):
+        panel = UniversalPanel(400, 500, "Game Settings", sound_manager=self.sound_manager)
         panel.add_label("Audio Settings")
         for name, val in [("Master Volume", 75), ("Music Volume", 50), ("SFX Volume", 80)]:
             panel.add_slider(name, val)
@@ -540,9 +542,8 @@ class PanelTemplates:
         panel.add_button("Reset to Default", lambda: print("Settings reset!"))
         return panel
 
-    @staticmethod
-    def quest_panel():
-        panel = UniversalPanel(500, 600, "Quest Creator")
+    def quest_panel(self):
+        panel = UniversalPanel(500, 600, "Quest Creator", sound_manager=self.sound_manager)
         panel.add_label("Basic Information")
         panel.add_input(placeholder="Quest Name", id="quest_name")
         panel.add_input(placeholder="Quest Description", id="quest_desc")
@@ -561,29 +562,26 @@ class PanelTemplates:
         panel.add_button("Save Template", lambda: print("Template saved!"))
         return panel
 
-    @staticmethod
-    def notification_panel(message: str = "", title: str = "Notification"):
-        panel = UniversalPanel(350, 180, title)
+    def notification_panel(self, message: str = "", title: str = "Notification"):
+        panel = UniversalPanel(350, 180, title, self.sound_manager)
         panel.add_label(message)
         panel.add_separator()
         panel.add_button("OK", lambda: print("Notification closed!"))
         return panel
 
-    @staticmethod
-    def class_selection_panel(classes=None):
+    def class_selection_panel(self, classes=None):
         if classes is None:
             classes = ["Warrior", "Mage", "Rogue", "Cleric"]
-        panel = UniversalPanel(400, 350, "Class Selection")
+        panel = UniversalPanel(400, 350, "Class Selection", sound_manager=self.sound_manager)
         panel.add_label("Choose Your Class:")
         for c in classes:
             panel.add_button(c, lambda c=c: print(f"Selected: {c}"))
         return panel
 
-    @staticmethod
-    def upgrade_panel(upgrades=None):
+    def upgrade_panel(self, upgrades=None):
         if upgrades is None:
             upgrades = ["Health +10", "Mana +5", "Attack +2", "Defense +3"]
-        panel = UniversalPanel(400, 350, "Upgrade")
+        panel = UniversalPanel(400, 350, "Upgrade", sound_manager=self.sound_manager)
         panel.add_label("Available Upgrades:")
         for up in upgrades:
             panel.add_checkbox(up, False)
@@ -591,13 +589,12 @@ class PanelTemplates:
         panel.add_button("Apply Upgrades", lambda: print("Upgrades applied!"))
         return panel
 
-    @staticmethod
-    def shop_panel(items=None):
+    def shop_panel(self, items=None):
         if items is None:
             items = [
                 ("Potion", 10), ("Elixir", 25), ("Sword", 100), ("Shield", 80)
             ]
-        panel = UniversalPanel(400, 400, "Shop")
+        panel = UniversalPanel(400, 400, "Shop", sound_manager=self.sound_manager)
         panel.add_label("Shop Items:")
         for name, price in items:
             panel.add_button(f"Buy {name} - {price}G", lambda n=name, p=price: print(f"Bought {n} for {p}G"))
@@ -605,10 +602,9 @@ class PanelTemplates:
         panel.add_button("Exit Shop", lambda: print("Shop closed!"))
         return panel
     
-    @staticmethod
-    def pause_menu_panel():
+    def pause_menu_panel(self):
         """Create a pause menu panel with standard game pause options."""
-        panel = UniversalPanel(350, 450, "Game Paused")
+        panel = UniversalPanel(350, 450, "Game Paused", sound_manager=self.sound_manager)
         
         # Game status info
         panel.add_label("Game is paused")
@@ -637,14 +633,11 @@ class PanelTemplates:
         
         return panel
 
-    @staticmethod
-    def level_editor_panel():
+    def level_editor_panel(self):
         pass
 
-    @staticmethod
-    def world_map_editor_panel():
+    def world_map_editor_panel(self):
         pass
 
-    @staticmethod
-    def mini_map_panel():
+    def mini_map_panel(self):
         pass

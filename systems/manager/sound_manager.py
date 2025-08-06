@@ -16,7 +16,6 @@ class SoundManager:
         self.sfx_volume = SFX_VOLUME
         self.ui_sounds_enabled = True
         self.music_paused = False  # Track music pause state
-        self.load_sounds()
         
         # UI Sound mapping - automatically triggered by UI interactions
         self.ui_sound_map = {
@@ -30,39 +29,60 @@ class SoundManager:
             'error': 'ui_error',
             'success': 'ui_success'
         }
-        
-    def load_sounds(self):
-        """Load sound effects from WAV files with comprehensive fallbacks"""
-        try:
-            self.load_sound_files()
-        except Exception as e:
-            print(f"Sound initialization failed: {e}")
-            self.generate_fallback_sounds()
-    
-    def load_sound_files(self):
-        """Load WAV sound files from assets directory"""
-        
-        # Create assets/sounds directory if it doesn't exist
-        sound_dir = 'assets/sounds'
-        if not os.path.exists(sound_dir):
-            os.makedirs(sound_dir, exist_ok=True)
-            print(f"Created directory: {sound_dir}")
-        
-        # Load each sound file
-        for sound_name, filepath in SOUND_FILES.items():
+
+        # Asset Loading Counters for Loading Classes
+        self.total_assets = 0
+        self.loaded_assets = 0
+        self.failed_assets = 0
+        self.fallback_assets = 0
+
+        # Setup for incremental loading
+        self.files_to_load = list(SOUND_FILES.items())
+        self.current_file_index = 0
+        self.loading_complete = False
+
+        self._calculate_total_assets()
+
+    def update_loading(self):
+        """Load one file per call (called each frame)"""
+        if self.current_file_index < len(self.files_to_load) and not self.loading_complete:
+            sound_name, filepath = self.files_to_load[self.current_file_index]
+            
+            # Load this one file
             if os.path.exists(filepath):
                 try:
                     sound = pygame.mixer.Sound(filepath)
                     sound.set_volume(self.sfx_volume)
                     self.sounds[sound_name] = sound
                     DEBUGGING('LOADED_SOUNDS', DEBUGGING_ENABLE,
-                              item=filepath, details=DEBUGGING_ENABLE_DETAILS)
+                            item=filepath, details=DEBUGGING_ENABLE_DETAILS)
+                    self._increment_loaded_counter()
                 except pygame.error as e:
                     print(f"Failed to load {filepath}: {e}")
+                    self._increment_failed_counter()
                     self.generate_fallback_sound(sound_name)
             else:
+                self._increment_failed_counter()
                 self.generate_fallback_sound(sound_name)
+            
+            self.current_file_index += 1
+            
+            # Check if loading is complete
+            if self.current_file_index >= len(self.files_to_load):
+                self.loading_complete = True
     
+    def _increment_loaded_counter(self):
+        self.loaded_assets += 1
+    
+    def _increment_failed_counter(self):
+        self.failed_assets += 1
+    
+    def _increment_fallback_counter(self):
+        self.fallback_assets += 1
+
+    def _calculate_total_assets(self):
+        self.total_assets = len(SOUND_FILES)
+
     def generate_fallback_sound(self, sound_name):
         """Generate a single fallback sound if WAV file is missing"""
         DEBUGGING('GENERATE_FALLBACK', DEBUGGING_ENABLE,
@@ -97,9 +117,12 @@ class SoundManager:
             'magic_cast': (600, 0.8, 'magic')
         }
         
+        # Creating sfx from sound_params
         if sound_name in sound_params:
             base_freq, duration, style = sound_params[sound_name]
             self.create_tone(sound_name, base_freq, duration, style)
+            self._increment_fallback_counter()
+            self._increment_loaded_counter()
     
     def generate_fallback_sounds(self):
         """Generate all procedural sound effects as fallback"""
@@ -136,6 +159,8 @@ class SoundManager:
         
         for sound_name, (base_freq, duration, style) in sound_params.items():
             self.create_tone(sound_name, base_freq, duration, style)
+            self._increment_fallback_counter()
+            self._increment_loaded_counter()
     
     def create_tone(self, name, base_freq, duration, style='fade'):
         """Create different types of tones based on style (fallback method)"""
@@ -377,7 +402,7 @@ class SoundManager:
         """Play background music"""
         try:
             pygame.mixer.music.set_volume(self.music_volume)
-            pygame.mixer.music.play(-1 if loop else 0)
+            pygame.mixer.music.play(-1 if loop else 0, fade_ms=150)
             self.music_paused = False
         except pygame.error as e:
             print(f"Error playing background music: {e}")

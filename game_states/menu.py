@@ -96,7 +96,7 @@ class MainMenuState(GameState):
             return None
             
         if pygame.key.get_pressed()[pygame.K_RETURN]:
-            self.start_transition("gameplay")
+            self.start_transition("loading_screen_gameplay")
         
         return None
 

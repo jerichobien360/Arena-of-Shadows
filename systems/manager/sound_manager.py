@@ -10,7 +10,12 @@ class SoundManager:
     and provides easy-to-use sound effects for game events.
     """
     def __init__(self):
-        pygame.mixer.init()
+        # Ensure mixer is initialized once with consistent settings
+        if not pygame.mixer.get_init():
+            try:
+                pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
+            except pygame.error as e:
+                print(f"Failed to initialize mixer: {e}")
         self.sounds = {}  # Data Handler for Music, SFX
         self.music_volume = MUSIC_VOLUME
         self.sfx_volume = SFX_VOLUME

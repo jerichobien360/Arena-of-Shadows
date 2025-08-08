@@ -12,9 +12,12 @@ DEBUGGING_ENABLE = True
 DEBUGGING_ENABLE_DETAILS = True
 
 # Window Manager - CONSTANTS
-SCREEN_WIDTH = 700
-SCREEN_HEIGHT = 525
+SCREEN_WIDTH = 700 # 700
+SCREEN_HEIGHT = 525 # 525
 FPS = 60
+
+# Background
+image_path = "assets\\background\\background_tile.jpg"
 
 # Colors
 BLACK = (0, 0, 0)
@@ -33,7 +36,7 @@ DARK_BLUE = (0, 0, 139)
 FIRESHOOTER_INNER_COLOR = (255, 200, 0)
 
 # CAMERA
-CAMERA_SMOOTHING = 1 # Default: 0.10
+CAMERA_SMOOTHING = 0.12 # Default: 0.10
 MAX_ZOOM = 500
 MIN_ZOOM = 0
 
@@ -93,7 +96,7 @@ GAMEPLAY_MUSIC_PATH = "assets/audio/background_music/gameplay.mp3"
 # WINDOW_MANAGER FILEPATH
 GAME_ICON = "assets\\icon.png"
 CUSTOM_FONT = "assets\\font\\Pixelify_Sans\\static\\PixelifySans-Medium.ttf"
-CUSTOM_FONT_UI = "assets\\font\Exo\\static\\Exo-Light.ttf"
+CUSTOM_FONT_UI = "assets\\font\\Exo\\static\\Exo-Light.ttf"
 CUSTOM_FONT_UI_BOLD = "assets\\font\\Exo\\static\\Exo-Medium.ttf"
 
 # DATABASE FILEPATH

@@ -75,6 +75,16 @@ class GameplayCore:
         """Clean up resources when exiting gameplay."""
         self.sound_manager.stop_background_music()
 
+    # -------------------EVENT HANDLING-----------------------------------
+    def handle_event(self, event) -> bool:
+        """Handle pygame events. Return True if event was consumed."""
+        # Give priority to pause panel interactions when visible
+        if self._handle_pause_panel_events(event):
+            return True
+        
+        # Add additional per-event handling here as needed
+        return False
+
     # -------------------PAUSE PANEL SETUP--------------------------------
     def _setup_pause_panel(self) -> None:
         """Setup the pause panel with callbacks."""

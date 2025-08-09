@@ -56,16 +56,14 @@ class InputHandler:
 
 
 def SCREEN(width, height) -> pygame.Surface:
-    screen = pygame.display.set_mode((width, height))
-    return screen
+    return pygame.display.set_mode((width, height))
 
 def ICON_IMPORT(path) -> None:
     try:
-        # Check if GAME_ICON is defined and file exists
-        if 'GAME_ICON' in globals() and Path(path).exists():
+        if Path(path).exists():
             image_icon_load(path)
         else:
-            print(f"Icon file not found or GAME_ICON not defined: {globals().get('GAME_ICON', 'Not defined')}")
+            print(f"Icon file not found: {path}")
     except (pygame.error, FileNotFoundError, AttributeError) as e:
         print(f"Could not load game icon: {e}")
 
@@ -92,23 +90,20 @@ def DEBUGGING(state, enable, item=None, details=False):
     if (state == 'MENU_INIT') and enable:
         print("\n[System] Initializing the Main Menu Screen\n")
 
-    if (state == 'MENU_CLEANUP') and enable:
-        print("\t> Cleaning up...")
+    messages = {
+        'MENU_INIT': "\n[System] Initializing the Main Menu Screen\n",
+        'MENU_CLEANUP': "\t> Cleaning up...",
+        'GAMEPLAY_ENTER': "\t> Entering the gameplay\n",
+        'GAME_OVER_INIT': "\n[System] Initializing the Game Over Screen\n",
+        'GAME_OVER_EXIT': "\t> Exiting the game over screen successfully",
+        'GAME_CLOSED': "\nArena of Shadows closed",
+    }
 
-    if (state == 'GAMEPLAY_ENTER') and enable:
-        print("\t> Entering the gameplay\n")
+    if state in ('GENERATE_FALLBACK', 'LOADED_SOUNDS') and details:
+        label = 'Generating fallback sound for' if state == 'GENERATE_FALLBACK' else 'Loaded sound'
+        print(f"{label}: {item}")
+        return
 
-    if (state == 'GAME_OVER_INIT') and enable:
-        print("\n[System] Initializing the Game Over Screen\n")
-
-    if (state == 'GAME_OVER_EXIT') and enable:
-        print("\t> Exiting the game over screen successfully")
-
-    if (state == 'GAME_CLOSED') and enable:
-        print("\nArena of Shadows closed")
-
-    if (state == 'GENERATE_FALLBACK') and (enable and details):
-        print(f"Generating fallback sound for: {item}")
-
-    if (state == 'LOADED_SOUNDS') and (enable and details):
-        print(f"Loaded sound: {item}")
+    message = messages.get(state)
+    if message:
+        print(message)

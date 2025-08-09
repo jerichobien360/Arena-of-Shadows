@@ -1,8 +1,9 @@
 from enum import Enum
-from typing import List, Callable, Optional
 from dataclasses import dataclass, field
-from typing import List, Tuple
-import pygame, random, math
+from typing import Callable, List, Optional, Tuple
+import math
+import random
+import pygame
 
 
 # ======================= Game Configuration ================================
@@ -17,7 +18,7 @@ SCREEN_HEIGHT = 525 # 525
 FPS = 60
 
 # Background
-image_path = "assets\\background\\background_tile.jpg"
+BACKGROUND_TILE_PATH = "assets\\background\\background_tile.jpg"
 
 # Colors
 BLACK = (0, 0, 0)

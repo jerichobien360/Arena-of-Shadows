@@ -22,7 +22,7 @@ class MainMenuRenderer:
         
     def _load_background(self) -> pygame.Surface:
         """Load background with gradient fallback""" 
-        file_path = "assets/background/background_2.jpg"
+        file_path = "assets/background/background_2.jpg" # TODO: Change to BACKGROUND_TILE_PATH when implemented
         return image_background_load(file_path, SCREEN_WIDTH, SCREEN_HEIGHT)
         
     def _create_gradient_background(self) -> pygame.Surface:

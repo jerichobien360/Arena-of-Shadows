@@ -400,7 +400,7 @@ class Enemy:
                 projectile.render(screen, camera)
         
         zoom = camera.zoom if camera else 1.0
-        radius = int(self.radius * zoom)
+        radius = int(self.radius)
         
         # Calculate color with damage flash
         color = self.color
@@ -452,7 +452,7 @@ class Enemy:
                                    (self.x, self.y + line_len), 1)
             
             elif self.type == "fireshooter":
-                inner_radius = max(1, int((self.radius - 3) * zoom))
+                inner_radius = max(1, int((self.radius - 3)))
                 inner_alpha = int(255 * current_alpha)
                 inner_color = (*FIRESHOOTER_INNER_COLOR, inner_alpha)  # Define this color
                 if current_alpha < 1.0:
@@ -469,9 +469,12 @@ class Enemy:
     def _draw_health_bar(self, screen, camera=None, alpha=1.0):
         """Health bar with alpha support"""
         zoom = camera.zoom if camera else 1.0
-        bar_width, bar_height = int(20 * zoom), int(3 * zoom)
+        if camera.zoom > 1:
+            bar_width, bar_height = int(20 * zoom), int(3 * zoom)
+        else:
+            bar_width, bar_height = int(20), int(3)
         bar_x = self.x - bar_width // 2
-        bar_y = self.y - (self.radius * zoom) - 6 * zoom
+        bar_y = self.y - (self.radius) - 6
         
         red_alpha = int(255 * alpha)
         green_alpha = int(255 * alpha)
@@ -547,7 +550,7 @@ class AttackIndicator:
         
         intensity = pulse * (0.8 if self.attack_type == "sniper" else 0.6)
         color = tuple(min(255, int(c * intensity)) for c in self.color)
-        radius = int((6 if self.attack_type == "sniper" else 8) * zoom * (0.8 + 0.4 * pulse))
+        radius = int((6 if self.attack_type == "sniper" else 8) * (0.8 + 0.4 * pulse))
         
         try:
             pygame.draw.circle(screen, color, (int(target_x), int(target_y)), radius, 2)

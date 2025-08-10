@@ -33,6 +33,17 @@ CYAN = (0, 255, 255)
 DARK_RED = (139, 0, 0)
 DARK_BLUE = (0, 0, 139)
 
+# Game Color Theme
+COLOR_THEME = {
+    1: (251,245,239), # White: Bianca
+    2: (242,211,171), # Light Brown: Wheat
+    3: (198,159,165), # Light Red: Oriental Pink
+    4: (139,109,156), # Purple: Trendy Pink
+    5: (73,77,126), # Moon Blue: East Bay
+    6: (39,39,68) # Dark Blue: Ebony Clay
+}
+
+
 # Custom Color
 FIRESHOOTER_INNER_COLOR = (255, 200, 0)
 

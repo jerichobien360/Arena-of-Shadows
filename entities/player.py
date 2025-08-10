@@ -218,8 +218,13 @@ class Player:
         
         hit_count = 0
         for enemy in enemies[:]:  # Shallow copy to avoid modification issues
-            distance = math.hypot(enemy.x - self.x, enemy.y - self.y)
-            if distance <= 60:  # Attack range
+            distance = math.hypot(enemy.x - self.x, enemy.y - self.y) * self.camera.zoom
+
+            # Converting from world to screen size
+            attack_range = 60
+            screen_range = self.camera.screen_view(attack_range)
+            
+            if distance <= screen_range:  # Check if the player's enemies within range
                 damage = self.attack_power + random.randint(-3, 3)
 
                 self.particle_system.create_attack_effect(enemy.x, enemy.y, "melee") # Particle effect
@@ -387,12 +392,18 @@ class Player:
             self._render_motion_trail(screen, color)
         
         # Draw player
-        pygame.draw.circle(screen, color, (int(self.x), int(self.y)), self.radius)
+        player_scale = self.radius
+        pygame.draw.circle(screen, color, (int(self.x), int(self.y)), int(player_scale))
         
         # Show attack range when ready (but not during dash)
         if self.attack_cooldown <= 0 and self.dash_duration <= 0:
+            # Converting from world to screen size
+            attack_range = 60
+            screen_range = self.camera.screen_view(attack_range)
+
+            # Create a max limit range of an attacking player
             pygame.draw.circle(screen, (0, 255, 0, 30), 
-                            (int(self.x), int(self.y)), 60, 1)
+                            (int(self.x), int(self.y)), int(screen_range), 1)
         
         # Update the particle rendering (universal update)
         self.particle_system.render(screen, self.camera)

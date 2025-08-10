@@ -1,7 +1,6 @@
 Bug to Fix:
 1. Combat System: The enemy were glitching when they make a formation, other code classes were possibly not used there correctly.
-2. Canera System: When perfirming to zoom in/out, the other objects were not affected (attack range of player), and when it reverts back, they are not the same as the original one.
-3. Clean code: Through rearranging and refactoring the large code into a simple one
+2. Clean code: Through rearranging and refactoring the large code into a simple one
 
 
 For Improvement:
@@ -36,5 +35,5 @@ Since this game meant to have fun, and this is on what game created for.
 ## BUG FIXED (v1.1.4)
 1. UI Manager: In the pause menu, when clicking to the menu button, it should directly go back to the main menu instead of when it performing the continue button to take an effect.
 2. Mouse Cursor: When it performs on the pause and continue the game, the hand should transform back to the mouse pointer.
-3. 
-Music: Adding the fade in/out effect to avoid a stuttering effect.
+3. Music: Adding the fade in/out effect to avoid a stuttering effect.
+4. Camera System: When performing to zoom in/out, the other objects were not affected (attack range of player), and when it reverts back, they are not the same as the original one.

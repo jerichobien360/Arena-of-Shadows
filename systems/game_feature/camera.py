@@ -129,6 +129,10 @@ class Camera:
         self.x = max(min_x, min(max_x - cam_width, self.x))
         self.y = max(min_y, min(max_y - cam_height, self.y))
     
+    def screen_view(self, world_size:float) -> float:
+        """Convert world size to screen size based on zoom"""
+        return world_size * self.zoom # pow(self.zoom, pow(0.3, 0.5)) # Non-exponential
+    
     @property
     def position(self) -> Tuple[float, float]:
         """Get current camera position."""

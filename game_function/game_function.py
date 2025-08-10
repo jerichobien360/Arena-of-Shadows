@@ -97,6 +97,7 @@ def DEBUGGING(state, enable, item=None, details=False):
         'GAME_OVER_INIT': "\n[System] Initializing the Game Over Screen\n",
         'GAME_OVER_EXIT': "\t> Exiting the game over screen successfully",
         'GAME_CLOSED': "\nArena of Shadows closed",
+        'GAME_STARTUP': "\n[System] Starting Arena of Shadows..."
     }
 
     if state in ('GENERATE_FALLBACK', 'LOADED_SOUNDS') and details:

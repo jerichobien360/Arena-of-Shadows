@@ -7,8 +7,8 @@ from settings import *
 
 # Module Packages
 from game_function.game_function import *
-from systems.manager.sound_manager import SoundManager
-from systems.manager.game_state_manager import GameStateManager
+from systems.manager.sound_manager import *
+from systems.manager.game_state_manager import *
 
 # Game States
 from game_states.gameplay import GameplayState
@@ -18,7 +18,7 @@ from game_states.loading import LoadingScreenState
 
 
 class ArenaOfShadows:
-    """Main game class for Arena of Shadows."""
+    """Main Game Class of Arena of Shadows."""
     
     def __init__(self):
         self.running = True
@@ -29,6 +29,7 @@ class ArenaOfShadows:
         self._initialize_managers()
         self._setup_game_states()
     
+    # -------------------- INITIALIZE -------------------------------------
     def _initialize_pygame(self):
         """Initialize pygame and mixer."""
         pygame.init()
@@ -70,6 +71,7 @@ class ArenaOfShadows:
         
         self.state_manager.change_state("loading_screen_menu") # ORIGINAL CODE: "main_menu"
     
+    # -------------------- HANDLE EVENTS ----------------------------------
     def _handle_events(self):
         """Handle pygame events and return False if game should quit."""
         for event in pygame.event.get():
@@ -121,6 +123,7 @@ class ArenaOfShadows:
                 pygame.FULLSCREEN
             )
     
+    # -------------------- GAME UPDATE ------------------------------------
     def _update_game(self, delta_time):
         """Update game logic."""
         next_state = self.state_manager.update(delta_time)
@@ -152,13 +155,16 @@ class ArenaOfShadows:
         state_text = self.font.render(f"State: {state_name}", True, WHITE)
         self.screen.blit(state_text, (10, 10))
     
+    # -------------------- CLEANUP ----------------------------------------
     def run(self):
         """Main game loop."""
-        print("Starting Arena of Shadows...")
+        DEBUGGING('GAME_STARTUP', DEBUGGING_ENABLE)
         
         while self.running:
+            # Updating the delta for game manager
             delta_time = self.clock.tick(FPS) / 1000.0
             
+            # Closing the game
             if not self._handle_events():
                 break
             
@@ -175,7 +181,7 @@ class ArenaOfShadows:
 
 
 def main():
-    """Entry point for the game."""
+    """Entry point for this game."""
     try:
         game = ArenaOfShadows()
         game.run()

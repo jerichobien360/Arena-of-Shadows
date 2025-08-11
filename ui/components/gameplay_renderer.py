@@ -6,7 +6,10 @@ from dataclasses import dataclass
 from typing import Dict, Tuple, Any, Optional
 from contextlib import contextmanager
 from settings import *
-from ui.effects.animations import AnimationConfig, AnimatedProgressBar
+
+# UI Packages
+from ui.effects.animations import *
+from ui.components.minimap import *
 
 
 class ScreenEffects:
@@ -256,6 +259,7 @@ class GameplayRenderer:
     
     def __init__(self, font: pygame.font.Font):
         self.font = font
+        self.minimap = MiniMap(WORLD_WIDTH, WORLD_HEIGHT)
         self.config = UIConfig()
         
         self.ui_renderer = UIRenderer(font, self.config)
@@ -293,6 +297,14 @@ class GameplayRenderer:
         self._render_ui(screen, game_data, current_time_ms)
         self.screen_effects.render(screen, player, current_time_ms)
         
+        # Draw Minimap Overlay
+        self.minimap.draw(
+            screen,
+            player=game_data['player'],
+            enemies=game_data['enemies'],
+            camera=game_data.get('camera')
+        )
+
         # Render pause overlay if paused
         if game_data.get('is_paused', False):
             self._render_pause_overlay(screen, game_data)

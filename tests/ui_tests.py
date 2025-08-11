@@ -11,16 +11,18 @@ from systems.manager.ui_manager import *
 def main():
     pygame.init()
     screen = pygame.display.set_mode((1200, 800))
+    sound_manager = SoundManager()
+    panel_template = PanelTemplates(sound_manager)
     pygame.display.set_caption("UI Test")
     clock = pygame.time.Clock()
     
     # Add the upgrade panel and shop panel to the existing panels
     panels = [
-        PanelTemplates.game_settings_panel(), 
-        PanelTemplates.quest_panel(),
-        PanelTemplates.upgrade_panel(),
-        PanelTemplates.shop_panel(),
-        PanelTemplates.pause_menu_panel()
+        panel_template.game_settings_panel(), 
+        panel_template.quest_panel(),
+        panel_template.upgrade_panel(),
+        panel_template.shop_panel(),
+        panel_template.pause_menu_panel()
     ]
     current_panel_idx = 0
     target_panel_pos = (400, 100)

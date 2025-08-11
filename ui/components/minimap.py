@@ -1,7 +1,7 @@
 import pygame
 
 class MiniMap:
-    def __init__(self, world_width, world_height, width=180, height=180, margin=16):
+    def __init__(self, world_width, world_height, width=180, height=120, margin=16):
         self.world_width = world_width
         self.world_height = world_height
         self.width = width

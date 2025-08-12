@@ -1,3 +1,0 @@
-
-Note: This will be used for the upcoming polishing stage of this game, so that, it needs
-    to design first for handling the complexities of a problem. 

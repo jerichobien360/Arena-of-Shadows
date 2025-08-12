@@ -82,9 +82,9 @@ These are the stages towards the development of a prototyping game project.
 - [x] Combat Mechanics
 - [x] Game Over Interface
 - [X] Save/Load System
+- [x] Character Classes
 - [ ] Level Stages
 - [ ] Boss Battles
-- [ ] Character Classes
 - [ ] Level Editor
 - [ ] Statistics System
 

@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from typing import Optional, Any
 import pygame
 from systems.gameplay_core import GameplayCore
-from ui.components.gameplay_renderer import GameplayRenderer
 from settings import *
 from game_function.game_function import *
 
@@ -37,8 +36,7 @@ class GameplayState(GameState):
     """Main gameplay state - combines core logic and rendering."""
     
     def __init__(self, font: pygame.font.Font, sound_manager: Any):
-        self.core = GameplayCore(sound_manager)
-        self.renderer = GameplayRenderer(font)
+        self.core = GameplayCore(font, sound_manager)
         self._initialized = False
     
     # -------------------INITIALIZE & CLEANUP-----------------------------
@@ -92,4 +90,4 @@ class GameplayState(GameState):
     
     def render(self, screen: pygame.Surface) -> None:
         """Render current game state."""
-        self.renderer.render(screen, self.core.game_data)
+        self.core.renderer.render(screen, self.core.game_data)

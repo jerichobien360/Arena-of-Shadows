@@ -1,13 +1,16 @@
 import pygame
 
 class MiniMap:
-    def __init__(self, world_width, world_height, width=180, height=120, margin=16):
+    def __init__(self, world_width, world_height, background=None, width=180, height=120, margin=16):
         self.world_width = world_width
         self.world_height = world_height
         self.width = width
         self.height = height
         self.margin = margin
         self.surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+
+        # Components
+        self.background = background # DO NOTHING FOR NOW
 
         # Minimap Properties
         self._visible = True
@@ -31,6 +34,8 @@ class MiniMap:
 
             # Draw the enemies inside of the minimap
             pygame.draw.circle(self.surface, (255, 0, 0), (ex, ey), 3)
+
+            # TODO: Make a transition out when the enemies disappear
 
         # Optionally, draw camera viewport
         if camera:

@@ -257,9 +257,9 @@ class UIRenderer:
 class GameplayRenderer:
     """Handles all rendering for gameplay state."""
     
-    def __init__(self, font: pygame.font.Font):
+    def __init__(self, font: pygame.font.Font, background_system=None):
         self.font = font
-        self.minimap = MiniMap(WORLD_WIDTH, WORLD_HEIGHT)
+        self.minimap = MiniMap(WORLD_WIDTH, WORLD_HEIGHT, background_system)
         self.config = UIConfig()
         
         self.ui_renderer = UIRenderer(font, self.config)

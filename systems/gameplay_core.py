@@ -14,12 +14,13 @@ from systems.game_feature.battle_formation_system import FormationSystem
 from systems.manager.input_manager import InputHandler
 from systems.manager.ui_manager import UniversalPanel, PanelTemplates
 from game_function.ui import *
+from ui.components.gameplay_renderer import GameplayRenderer
 
 
 class GameplayCore:
     """Core gameplay logic with clean separation of concerns."""
 
-    def __init__(self, sound_manager):
+    def __init__(self, font: pygame.font.Font, sound_manager):
         '''
         These are the packages will be used for a gameplay.
             1. Update on the game_data() method for rendering.
@@ -37,6 +38,9 @@ class GameplayCore:
         self.background: Optional[BackgroundSystem] = None
         self.formation_system = FormationSystem()
         self.input_handler = InputHandler()
+
+        # Game Renderer
+        self.renderer = GameplayRenderer(font, self.background)
 
         # Game state
         self.is_paused = False

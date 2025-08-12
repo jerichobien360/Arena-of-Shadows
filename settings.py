@@ -104,6 +104,7 @@ SOUND_FILES = {
 MENU_MUSIC_PATH = "assets/audio/background_music/main_menu.mp3"
 CLASS_SELECTION_MUSIC_PATH = "assets/audio/background_music/class_selection.mp3"
 GAMEPLAY_MUSIC_PATH = "assets/audio/background_music/gameplay.mp3"
+CLASS_SELECTION_MUSIC_PATH = "assets/audio/background_music/class_selection.mp3"
 
 # WINDOW_MANAGER FILEPATH
 GAME_ICON = "assets\\icon.png"

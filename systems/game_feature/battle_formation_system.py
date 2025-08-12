@@ -15,7 +15,7 @@ class FormationSystem:
         """Check if enemies should form a tactical formation."""
         if len(enemies) < self.min_enemies or self.cooldown > 0:
             return False
-        
+            
         # Fast proximity clustering using generator expression
         close_pairs = sum(
             1 for i, e1 in enumerate(enemies[:12])

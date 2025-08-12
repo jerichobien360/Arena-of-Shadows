@@ -15,6 +15,7 @@ from game_states.gameplay import GameplayState
 from game_states.menu import MainMenuState
 from game_states.game_over import GameOverState
 from game_states.loading import LoadingScreenState
+from game_states.game_class.class_selection import ClassSelectionState
 
 
 class ArenaOfShadows:
@@ -60,6 +61,7 @@ class ArenaOfShadows:
         """Setup and register all game states."""
         states = {
             "main_menu": MainMenuState(self.font, self.sound_manager),
+            "class_selection": ClassSelectionState(self.font, self.sound_manager),
             "gameplay": GameplayState(self.font, self.sound_manager),
             "game_over": GameOverState(self.font, self.sound_manager),
             "loading_screen_menu": LoadingScreenState("main_menu", self.sound_manager),

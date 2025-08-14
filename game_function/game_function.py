@@ -104,6 +104,10 @@ def DEBUGGING(state, enable, item=None, details=False):
         label = 'Generating fallback sound for' if state == 'GENERATE_FALLBACK' else 'Loaded sound'
         print(f"{label}: {item}")
         return
+    
+    if state == 'PLAYER_MS' and enable:
+        print(f"Current Position: ({round(item[0], 0)}, {round(item[1], 0)})")
+
 
     message = messages.get(state)
     if message:

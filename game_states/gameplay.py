@@ -35,8 +35,8 @@ class GameState(ABC):
 class GameplayState(GameState):
     """Main gameplay state - combines core logic and rendering."""
     
-    def __init__(self, font: pygame.font.Font, sound_manager: Any):
-        self.core = GameplayCore(font, sound_manager)
+    def __init__(self, font: pygame.font.Font, sound_manager: Any, player):
+        self.core = GameplayCore(font, sound_manager, player)
         self._initialized = False
     
     # -------------------INITIALIZE & CLEANUP-----------------------------

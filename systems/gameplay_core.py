@@ -20,7 +20,7 @@ from ui.components.gameplay_renderer import GameplayRenderer
 class GameplayCore:
     """Core gameplay logic with clean separation of concerns."""
 
-    def __init__(self, font: pygame.font.Font, sound_manager):
+    def __init__(self, font: pygame.font.Font, sound_manager, player):
         '''
         These are the packages will be used for a gameplay.
             1. Update on the game_data() method for rendering.
@@ -29,7 +29,7 @@ class GameplayCore:
         self.sound_manager = sound_manager
 
         # Game entities
-        self.player: Optional[Player] = None
+        self.player = player
         self.enemies: List = []
 
         # Game systems
@@ -65,7 +65,8 @@ class GameplayCore:
         self.formation_system = FormationSystem()
 
         # Initialize entities
-        self.player = Player(self.sound_manager, self.camera)
+        self.player.camera = self.camera
+        self.player.sound_manager = self.sound_manager
         self.enemies = []
 
         # Initialize pause panel

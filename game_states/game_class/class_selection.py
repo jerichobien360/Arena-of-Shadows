@@ -7,15 +7,15 @@ import math
 class ClassSelectionState:
     """State for selecting character class before starting the game"""
     
-    def __init__(self, font, sound_manager):
+    def __init__(self, font, sound_manager, player):
         self.font = font
         self.sound_manager = sound_manager
-        self.large_font = pygame.font.Font(None, 48)  # Reduced from 64
-        self.medium_font = pygame.font.Font(None, 28)  # Reduced from 36
-        self.small_font = pygame.font.Font(None, 20)   # Reduced from 24
+        self.large_font = pygame.font.Font(None, 48)
+        self.medium_font = pygame.font.Font(None, 28)
+        self.small_font = pygame.font.Font(None, 20)
 
         # Global Entities - For Stats Modification
-        self.player = None
+        self.player = player
         
         # Available classes
         self.classes = ['warrior', 'mage', 'fireshooter']

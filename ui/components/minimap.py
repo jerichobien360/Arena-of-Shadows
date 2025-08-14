@@ -19,6 +19,7 @@ class MiniMap:
     def draw(self, screen, player, enemies, camera=None):
         # Clear minimap
         self.surface.fill((0, 0, 0, 120))  # semi-transparent background
+
         # Draw world border
         pygame.draw.rect(self.surface, (200, 200, 200), (0, 0, self.width, self.height), 2)
 
@@ -32,12 +33,13 @@ class MiniMap:
             ex = int((enemy.x / self.world_width) * self.width)
             ey = int((enemy.y / self.world_height) * self.height)
 
-            # Draw the enemies inside of the minimap
-            pygame.draw.circle(self.surface, (255, 0, 0), (ex, ey), 3)
+            # Draw enemies within the minimap bounds
+            if 0 <= ex <= self.width and 0 <= ey <= self.height:
+                pygame.draw.circle(self.surface, (255, 0, 0), (ex, ey), 3)
 
             # TODO: Make a transition out when the enemies disappear
 
-        # Optionally, draw camera viewport
+        # Camera Viewport
         if camera:
             cam_x = int((camera.x / self.world_width) * self.width)
             cam_y = int((camera.y / self.world_height) * self.height)

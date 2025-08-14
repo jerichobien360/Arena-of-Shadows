@@ -90,6 +90,12 @@ class Camera:
     def set_zoom(self, zoom_level: float) -> None:
         """Set target zoom level within constraints."""
         self.target_zoom = max(self.min_zoom, min(self.max_zoom, zoom_level))
+
+    def set_target(self, entities) -> None:
+        entities.x, entities.y = entities.get_camera_target_position()
+    
+    def center_on_target(self, entities) -> None:
+        entities.x, entities.y = (WORLD_WIDTH, WORLD_HEIGHT)
     
     def get_visible_bounds(self) -> Tuple[float, float, float, float]:
         """Get the bounds of what's visible on screen in world coordinates.

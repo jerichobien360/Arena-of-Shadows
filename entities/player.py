@@ -20,9 +20,9 @@ class Player:
 
         # Setup the player's position
         if start_x is None:
-            start_x = SCREEN_WIDTH // 2
+            start_x = WORLD_WIDTH // 2
         if start_y is None:
-            start_y = SCREEN_HEIGHT // 2
+            start_y = WORLD_HEIGHT // 2
 
         self.x, self.y = start_x, start_y
 

@@ -1,4 +1,5 @@
 from settings import *
+from game_function.game_function import *
 import pygame
 import math
 import random
@@ -10,13 +11,21 @@ from systems.game_feature.particle_system import *
 class Player:
     """Player class with movement, combat, leveling, dash ability, and smooth knockback effects."""
     
-    def __init__(self, sound_manager, camera, start_x: float = 0, start_y: float = 0):
+    def __init__(self, sound_manager=None, camera=None, start_x: float = 0, start_y: float = 0):
+        # Components and Properties
         self.sound_manager = sound_manager
         self.camera = camera
-        self.x, self.y = start_x, start_y
         self.radius = 15
         self.world_bounds: Optional[Tuple[float, float, float, float]] = None
-        
+
+        # Setup the player's position
+        if start_x is None:
+            start_x = SCREEN_WIDTH // 2
+        if start_y is None:
+            start_y = SCREEN_HEIGHT // 2
+
+        self.x, self.y = start_x, start_y
+
         # Timers
         self.attack_cooldown = 0
         self.damage_flash_timer = 0
@@ -46,6 +55,9 @@ class Player:
         self._reset_stats()
         self._update_rect()
 
+        # Time
+        self.time = 0
+
     def _reset_stats(self) -> None:
         """Reset player stats to initial values."""
         self.hp = self.max_hp = 100
@@ -54,6 +66,13 @@ class Player:
         self.level = 1
         self.experience = 0
         self.stat_points = 0
+
+    def restart_stats(self):
+        self._reset_stats()
+
+    def get_camera_target_position(self):
+        """Get the position the camera should target."""
+        return (self.x, self.y)
 
     def update(self, dt: float) -> None:
         """Update player state each frame."""
@@ -68,6 +87,12 @@ class Player:
         self._check_level_up()
         self._update_rect()
         self.particle_system.update(dt)
+
+        if DEBUGGING_ENABLE:
+            self.time += dt
+            if self.time >= 1:
+                DEBUGGING('PLAYER_MS', DEBUGGING_ENABLE, item=(self.x, self.y))
+                self.time = 0
 
     def _update_dash(self, dt: float) -> None:
         """Update dash mechanics."""

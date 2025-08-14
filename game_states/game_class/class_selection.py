@@ -13,6 +13,9 @@ class ClassSelectionState:
         self.large_font = pygame.font.Font(None, 48)  # Reduced from 64
         self.medium_font = pygame.font.Font(None, 28)  # Reduced from 36
         self.small_font = pygame.font.Font(None, 20)   # Reduced from 24
+
+        # Global Entities - For Stats Modification
+        self.player = None
         
         # Available classes
         self.classes = ['warrior', 'mage', 'fireshooter']
@@ -38,6 +41,9 @@ class ClassSelectionState:
         
     def _create_preview_surfaces(self):
         """Create preview surfaces for each character class"""
+        if self.player.level != 1:
+            self.player.restart_stats()
+
         for class_name, class_obj in zip(self.classes, self.class_objects):
             surface = pygame.Surface((120, 120), pygame.SRCALPHA)  # Reduced from 200x200
             
@@ -116,6 +122,17 @@ class ClassSelectionState:
     def get_selected_class(self):
         """Get the currently selected class"""
         return self.selected_class
+    
+    def _apply_class_stats(self):
+        """Apply the selected class stats to the player"""
+        if self.selected_class and self.player:
+            selected_class_obj = CHARACTER_CLASSES[self.selected_class]
+            
+            # Use the character class's apply_stats method
+            selected_class_obj.apply_stats(self.player)
+            
+            print(f"Applied {self.selected_class} stats to player:")
+            print(f"HP: {self.player.max_hp}, ATK: {self.player.attack_power}, SPD: {self.player.speed}")
     
     # -------------------GAME STATE HANDLE-----------------------------
     def render(self, screen):
@@ -268,6 +285,7 @@ class ClassSelectionState:
             # Selection
             elif keys[pygame.K_RETURN] or keys[pygame.K_SPACE]:
                 self.selected_class = self.classes[self.selected_index]
+                self._apply_class_stats()
                 self._start_transition()
                 self.sound_manager.play_sound('menu_select')
             

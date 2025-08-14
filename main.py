@@ -9,6 +9,7 @@ from settings import *
 from game_function.game_function import *
 from systems.manager.sound_manager import *
 from systems.manager.game_state_manager import *
+from entities.player import Player
 
 # Game States
 from game_states.gameplay import GameplayState
@@ -28,6 +29,7 @@ class ArenaOfShadows:
         self._initialize_pygame()
         self._setup_display()
         self._initialize_managers()
+        self._global_component()
         self._setup_game_states()
     
     # -------------------- INITIALIZE -------------------------------------
@@ -57,12 +59,15 @@ class ArenaOfShadows:
         self.sound_manager = SoundManager()
         self.state_manager = GameStateManager()
     
+    def _global_component(self):
+        self.player = Player()
+    
     def _setup_game_states(self):
         """Setup and register all game states."""
         states = {
             "main_menu": MainMenuState(self.font, self.sound_manager),
-            "class_selection": ClassSelectionState(self.font, self.sound_manager),
-            "gameplay": GameplayState(self.font, self.sound_manager),
+            "class_selection": ClassSelectionState(self.font, self.sound_manager, self.player),
+            "gameplay": GameplayState(self.font, self.sound_manager, self.player),
             "game_over": GameOverState(self.font, self.sound_manager),
             "loading_screen_menu": LoadingScreenState("main_menu", self.sound_manager),
             "loading_screen_gameplay": LoadingScreenState("gameplay", self.sound_manager)

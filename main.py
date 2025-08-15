@@ -9,6 +9,8 @@ from settings import *
 from game_function.game_function import *
 from systems.manager.sound_manager import *
 from systems.manager.game_state_manager import *
+
+# Global Component
 from entities.player import Player
 
 # Game States
@@ -21,7 +23,6 @@ from game_states.game_class.class_selection import ClassSelectionState
 
 class ArenaOfShadows:
     """Main Game Class of Arena of Shadows."""
-    
     def __init__(self):
         self.running = True
         self.debug_mode = False

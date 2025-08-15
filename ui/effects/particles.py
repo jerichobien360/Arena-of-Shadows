@@ -35,6 +35,8 @@ class Particle(ABC):
         pass
 
 
+# ==================== MAIN MENU PARTICLE ===================================
+
 class Leaf(Particle):
     """Animated falling leaf with natural movement"""
     
@@ -216,6 +218,167 @@ class Firefly(Particle):
             pygame.draw.circle(glow_surf, (*self.base_color, int(alpha)), (size * 3, size * 3), size * 2)
             screen.blit(glow_surf, (x - size * 3, y - size * 3))
 
+
+# ==================== UNIQUE PARTICLE CLASSES SELECTION ====================
+
+class MetallicSpark:
+    """Metallic spark particles for warrior class"""
+    
+    def __init__(self, x, y, color):
+        self.x = self.start_x = x
+        self.y = self.start_y = y
+        self.color = color
+        self.size = random.uniform(2, 4)
+        self.brightness = random.uniform(0.7, 1.0)
+        self.spark_time = 0
+        self.spark_duration = random.uniform(0.3, 0.8)
+        self.metallic_shine = 0
+        
+    def update(self, dt):
+        self.spark_time += dt
+        self.metallic_shine += dt * 5
+        
+        # Pulsing brightness
+        pulse = (math.sin(self.metallic_shine) + 1) * 0.5
+        self.brightness = 0.6 + pulse * 0.4
+        
+    def render(self, screen):
+        # Create metallic spark effect
+        spark_size = int(self.size * self.brightness)
+        if spark_size > 0:
+            # Outer metallic glow
+            glow_surf = pygame.Surface((spark_size * 6, spark_size * 6), pygame.SRCALPHA)
+            
+            # Multiple layers for metallic effect
+            colors = [
+                (*self.color, int(40 * self.brightness)),
+                (200, 200, 255, int(80 * self.brightness)),
+                (255, 255, 255, int(120 * self.brightness))
+            ]
+            
+            for i, color in enumerate(colors):
+                radius = spark_size * (3 - i)
+                if radius > 0:
+                    pygame.draw.circle(glow_surf, color, (spark_size * 3, spark_size * 3), radius)
+            
+            # Sharp center point
+            pygame.draw.circle(glow_surf, (255, 255, 255), (spark_size * 3, spark_size * 3), 1)
+            
+            screen.blit(glow_surf, (self.x - spark_size * 3, self.y - spark_size * 3))
+
+
+class MysticalRune:
+    """Mystical rune particles for mage class"""
+    
+    def __init__(self, x, y, color):
+        self.x = self.start_x = x
+        self.y = self.start_y = y
+        self.color = color
+        self.size = random.uniform(8, 12)
+        self.rotation = random.uniform(0, 360)
+        self.rotation_speed = random.uniform(-1, 1)
+        self.glow_phase = random.uniform(0, 2 * math.pi)
+        self.brightness = 0
+        self.rune_type = random.randint(0, 2)  # Different rune shapes
+        
+    def update(self, dt):
+        self.rotation += self.rotation_speed * dt * 30
+        self.glow_phase += dt * 3
+        
+        # Mystical pulsing
+        pulse = (math.sin(self.glow_phase) + 1) * 0.5
+        self.brightness = 0.4 + pulse * 0.6
+        
+    def render(self, screen):
+        # Create mystical rune
+        rune_surf = pygame.Surface((self.size * 3, self.size * 3), pygame.SRCALPHA)
+        center = (self.size * 1.5, self.size * 1.5)
+        
+        # Mystical glow background
+        glow_alpha = int(100 * self.brightness)
+        pygame.draw.circle(rune_surf, (*self.color, glow_alpha), center, self.size)
+        
+        # Draw rune symbols based on type
+        symbol_color = (200, 150, 255, int(200 * self.brightness))
+        
+        if self.rune_type == 0:  # Circle with cross
+            pygame.draw.circle(rune_surf, symbol_color, center, self.size // 2, 2)
+            pygame.draw.line(rune_surf, symbol_color, 
+                           (center[0] - self.size//3, center[1]), 
+                           (center[0] + self.size//3, center[1]), 2)
+            pygame.draw.line(rune_surf, symbol_color, 
+                           (center[0], center[1] - self.size//3), 
+                           (center[0], center[1] + self.size//3), 2)
+        elif self.rune_type == 1:  # Triangle
+            points = []
+            for i in range(3):
+                angle = math.radians(self.rotation + i * 120)
+                x = center[0] + math.cos(angle) * self.size // 2
+                y = center[1] + math.sin(angle) * self.size // 2
+                points.append((x, y))
+            pygame.draw.polygon(rune_surf, symbol_color, points, 2)
+        else:  # Star
+            points = []
+            for i in range(6):
+                angle = math.radians(self.rotation + i * 60)
+                radius = self.size // 2 if i % 2 == 0 else self.size // 4
+                x = center[0] + math.cos(angle) * radius
+                y = center[1] + math.sin(angle) * radius
+                points.append((x, y))
+            pygame.draw.polygon(rune_surf, symbol_color, points, 2)
+        
+        screen.blit(rune_surf, (self.x - self.size * 1.5, self.y - self.size * 1.5))
+
+
+class FlameEmber:
+    """Flame ember particles for fireshooter class"""
+    
+    def __init__(self, x, y, color):
+        self.x = self.start_x = x
+        self.y = self.start_y = y
+        self.color = color
+        self.size = random.uniform(3, 6)
+        self.flicker_time = 0
+        self.flicker_speed = random.uniform(10, 18)
+        self.heat_intensity = random.uniform(0.7, 1.0)
+        self.ember_life = 1.0
+        
+    def update(self, dt):
+        self.flicker_time += dt * self.flicker_speed
+        
+        # Flickering flame effect
+        flicker = (math.sin(self.flicker_time) + math.sin(self.flicker_time * 2.3)) * 0.25 + 0.75
+        self.heat_intensity = flicker
+        
+    def render(self, screen):
+        # Create flame ember effect
+        ember_size = int(self.size * self.heat_intensity)
+        if ember_size > 0:
+            ember_surf = pygame.Surface((ember_size * 4, ember_size * 4), pygame.SRCALPHA)
+            center = (ember_size * 2, ember_size * 2)
+            
+            # Flame layers - from outer to inner
+            flame_colors = [
+                (255, 100, 0, int(60 * self.heat_intensity)),   # Outer orange
+                (255, 150, 0, int(100 * self.heat_intensity)),  # Mid orange-yellow
+                (255, 200, 50, int(140 * self.heat_intensity)), # Inner yellow
+                (255, 255, 200, int(180 * self.heat_intensity)) # Core white-yellow
+            ]
+            
+            for i, color in enumerate(flame_colors):
+                radius = ember_size * (4 - i) // 2
+                if radius > 0:
+                    pygame.draw.circle(ember_surf, color, center, radius)
+            
+            # Add some flame "wisps"
+            for i in range(3):
+                wisp_angle = math.radians(self.flicker_time * 50 + i * 120)
+                wisp_x = center[0] + math.cos(wisp_angle) * ember_size * 0.7
+                wisp_y = center[1] + math.sin(wisp_angle) * ember_size * 0.7
+                wisp_color = (255, 180, 100, int(80 * self.heat_intensity))
+                pygame.draw.circle(ember_surf, wisp_color, (int(wisp_x), int(wisp_y)), ember_size // 3)
+            
+            screen.blit(ember_surf, (self.x - ember_size * 2, self.y - ember_size * 2))
 
 class ParticleSystem:
     """Manages all particle systems efficiently"""

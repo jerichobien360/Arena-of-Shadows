@@ -5,7 +5,7 @@ import math
 
 
 class ClassSelectionState:
-    """State for selecting character class before starting the game"""
+    """State for selecting character class before to start the game"""
     
     def __init__(self, font, sound_manager, player):
         self.font = font
@@ -134,7 +134,7 @@ class ClassSelectionState:
             print(f"Applied {self.selected_class} stats to player:")
             print(f"HP: {self.player.max_hp}, ATK: {self.player.attack_power}, SPD: {self.player.speed}")
     
-    # -------------------GAME STATE HANDLE-----------------------------
+    # -------------------GAME STATE HANDLE--------------------------------
     def render(self, screen):
         """Render class selection interface"""
         screen.fill((15, 15, 30))  # Darker background for cleaner look

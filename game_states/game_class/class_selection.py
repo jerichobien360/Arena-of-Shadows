@@ -1,5 +1,7 @@
 from settings import *
 from entities.character_classes import CHARACTER_CLASSES
+from ui.effects.particles import ParticleSystem 
+
 import pygame
 import math
 
@@ -35,6 +37,13 @@ class ClassSelectionState:
         self.transitioning = False
         self.transition_target = None
         
+        # Particle system for magical atmosphere
+        self.particle_system = ParticleSystem()
+        
+        # Selection-specific particle effects
+        self.selection_particles = []
+        self.class_aura_particles = {}  # Store particles for each class
+        
         # Create class preview surfaces
         self.preview_surfaces = {}
         self._create_preview_surfaces()
@@ -45,50 +54,183 @@ class ClassSelectionState:
             self.player.restart_stats()
 
         for class_name, class_obj in zip(self.classes, self.class_objects):
-            surface = pygame.Surface((120, 120), pygame.SRCALPHA)  # Reduced from 200x200
+            surface = pygame.Surface((140, 140), pygame.SRCALPHA)  # Increased size for glow
             
             # Draw class representation
-            center = (60, 60)  # Adjusted center
+            center = (70, 70)  # Adjusted center for larger surface
             
-            # Main character circle - smaller
-            pygame.draw.circle(surface, class_obj.color, center, 20)  # Reduced from 30
-            pygame.draw.circle(surface, class_obj.secondary_color, center, 20, 2)  # Thinner border
+            # Create glowing effect for character
+            self._add_character_glow(surface, center, class_obj, class_name)
+            
+            # Main character circle with enhanced glow
+            pygame.draw.circle(surface, class_obj.color, center, 22)
+            pygame.draw.circle(surface, class_obj.secondary_color, center, 22, 3)
+            
+            # Inner glow
+            glow_surf = pygame.Surface((50, 50), pygame.SRCALPHA)
+            pygame.draw.circle(glow_surf, (*class_obj.color, 80), (25, 25), 25)
+            surface.blit(glow_surf, (center[0] - 25, center[1] - 25))
             
             # Class-specific visual elements - scaled down
             if class_name == 'warrior':
-                # Draw sword - smaller
+                # Draw sword with metallic glow
                 sword_points = [
-                    (center[0] - 3, center[1] - 28),
-                    (center[0] + 3, center[1] - 28),
+                    (center[0] - 3, center[1] - 30),
+                    (center[0] + 3, center[1] - 30),
                     (center[0] + 2, center[1] + 15),
                     (center[0] - 2, center[1] + 15)
                 ]
-                pygame.draw.polygon(surface, (150, 150, 150), sword_points)
-                # Sword hilt - smaller
-                pygame.draw.rect(surface, (100, 50, 0), (center[0] - 5, center[1] + 15, 10, 4))
+                # Sword glow
+                glow_points = [(p[0], p[1]) for p in sword_points]
+                for i in range(3):
+                    expanded_points = [(p[0] + (1 if p[0] > center[0] else -1) * i, 
+                                      p[1] + (1 if p[1] > center[1] else -1) * i) for p in glow_points]
+                    pygame.draw.polygon(surface, (200, 200, 255, 30 - i * 10), expanded_points)
+                
+                pygame.draw.polygon(surface, (180, 180, 200), sword_points)
+                # Sword hilt
+                pygame.draw.rect(surface, (120, 70, 20), (center[0] - 6, center[1] + 15, 12, 5))
                 
             elif class_name == 'mage':
-                # Draw staff - smaller
-                pygame.draw.line(surface, (100, 50, 0), 
-                               (center[0] + 15, center[1] - 22), 
-                               (center[0] + 15, center[1] + 22), 2)
-                # Staff orb - smaller
-                pygame.draw.circle(surface, (100, 100, 255), (center[0] + 15, center[1] - 25), 6)
-                pygame.draw.circle(surface, (200, 200, 255), (center[0] + 15, center[1] - 25), 3)
+                # Draw staff with magical glow
+                pygame.draw.line(surface, (120, 70, 20), 
+                               (center[0] + 15, center[1] - 25), 
+                               (center[0] + 15, center[1] + 25), 3)
+                
+                # Staff orb with magical aura
+                orb_center = (center[0] + 15, center[1] - 27)
+                # Magical aura layers
+                for radius in [12, 9, 6]:
+                    alpha = 150 - (radius * 10)
+                    orb_glow = pygame.Surface((radius * 3, radius * 3), pygame.SRCALPHA)
+                    pygame.draw.circle(orb_glow, (150, 150, 255, alpha), 
+                                     (radius * 3 // 2, radius * 3 // 2), radius)
+                    surface.blit(orb_glow, (orb_center[0] - radius * 3 // 2, 
+                                          orb_center[1] - radius * 3 // 2))
+                
+                pygame.draw.circle(surface, (120, 120, 255), orb_center, 7)
+                pygame.draw.circle(surface, (220, 220, 255), orb_center, 4)
                 
             elif class_name == 'fireshooter':
-                # Draw flame weapon - smaller
+                # Draw flame weapon with fire glow
                 flame_points = [
-                    (center[0] + 18, center[1] - 8),
-                    (center[0] + 26, center[1] - 12),
-                    (center[0] + 30, center[1]),
-                    (center[0] + 26, center[1] + 12),
-                    (center[0] + 18, center[1] + 8)
+                    (center[0] + 20, center[1] - 10),
+                    (center[0] + 28, center[1] - 14),
+                    (center[0] + 32, center[1]),
+                    (center[0] + 28, center[1] + 14),
+                    (center[0] + 20, center[1] + 10)
                 ]
-                pygame.draw.polygon(surface, (255, 100, 0), flame_points)
-                pygame.draw.polygon(surface, (255, 200, 0), flame_points[1:-1])
+                
+                # Fire glow effect
+                for i in range(4):
+                    glow_points = [(p[0] + i, p[1]) for p in flame_points]
+                    alpha = 100 - i * 20
+                    flame_glow = pygame.Surface((50, 50), pygame.SRCALPHA)
+                    pygame.draw.polygon(flame_glow, (255, 100 + i * 30, 0, alpha), 
+                                      [(p[0] - center[0] + 25, p[1] - center[1] + 25) for p in glow_points])
+                    surface.blit(flame_glow, (center[0] - 25, center[1] - 25))
+                
+                pygame.draw.polygon(surface, (255, 120, 0), flame_points)
+                pygame.draw.polygon(surface, (255, 220, 50), flame_points[1:-1])
             
             self.preview_surfaces[class_name] = surface
+
+    def _add_character_glow(self, surface, center, class_obj, class_name):
+        """Add unique character glow based on class"""
+        if class_name == 'warrior':
+            # Metallic silver glow
+            for radius in [35, 30, 25]:
+                alpha = 40 - (35 - radius) * 2
+                pygame.draw.circle(surface, (*class_obj.color, alpha), center, radius)
+        elif class_name == 'mage':
+            # Mystical purple-blue glow
+            for radius in [38, 32, 26]:
+                alpha = 50 - (38 - radius) * 3
+                pygame.draw.circle(surface, (150, 100, 255, alpha), center, radius)
+        elif class_name == 'fireshooter':
+            # Fiery orange-red glow
+            for radius in [36, 31, 26]:
+                alpha = 45 - (36 - radius) * 2
+                pygame.draw.circle(surface, (255, 100, 50, alpha), center, radius)
+
+    def _create_selection_particles(self, x, y, class_obj):
+        """Create magical particles around selected class"""
+        import random
+        from ui.effects.particles import Firefly
+        
+        # Clear existing selection particles
+        self.selection_particles.clear()
+        
+        # Create fireflies with class-specific colors around the selected class
+        for _ in range(8):
+            angle = random.uniform(0, 2 * math.pi)
+            distance = random.uniform(60, 100)
+            particle_x = x + math.cos(angle) * distance
+            particle_y = y + math.sin(angle) * distance
+            
+            # Create firefly and customize its color to match class
+            firefly = Firefly(particle_x, particle_y)
+            
+            # Override base color with class colors
+            if hasattr(class_obj, 'color') and class_obj.color:
+                firefly.base_color = class_obj.color
+            
+            # Make them orbit around the selection
+            firefly.orbit_center = (x, y)
+            firefly.orbit_radius = distance
+            firefly.orbit_angle = angle
+            firefly.orbit_speed = random.uniform(0.5, 1.0)
+            
+            self.selection_particles.append(firefly)
+
+    def _update_selection_particles(self, dt, selected_x, selected_y):
+        """Update particles orbiting around selected class"""
+        for particle in self.selection_particles:
+            if hasattr(particle, 'orbit_center'):
+                # Update orbital motion
+                particle.orbit_angle += particle.orbit_speed * dt
+                particle.x = selected_x + math.cos(particle.orbit_angle) * particle.orbit_radius
+                particle.y = selected_y + math.sin(particle.orbit_angle) * particle.orbit_radius
+                
+                # Update particle-specific systems
+                if hasattr(particle, '_update_glow'):
+                    particle._update_glow(dt)
+                if hasattr(particle, '_update_trail'):
+                    particle._update_trail()
+                if hasattr(particle, 'update'):
+                    particle.update(dt)
+
+    def _create_class_aura_effects(self):
+        """Create subtle aura effects for each class position"""
+        class_spacing = 180
+        total_width = class_spacing * (len(self.classes) - 1)
+        start_x = (SCREEN_WIDTH - total_width) // 2
+        class_y = 200
+        
+        for i, (class_name, class_obj) in enumerate(zip(self.classes, self.class_objects)):
+            x = start_x + i * class_spacing
+            y = class_y
+            
+            if class_name not in self.class_aura_particles:
+                self.class_aura_particles[class_name] = []
+            
+            # Create subtle ambient particles for each class
+            if len(self.class_aura_particles[class_name]) < 3:
+                from ui.effects.particles import Firefly
+                import random
+                
+                for _ in range(3 - len(self.class_aura_particles[class_name])):
+                    angle = random.uniform(0, 2 * math.pi)
+                    distance = random.uniform(80, 120)
+                    particle_x = x + math.cos(angle) * distance
+                    particle_y = y + math.sin(angle) * distance
+                    
+                    firefly = Firefly(particle_x, particle_y)
+                    firefly.base_color = class_obj.secondary_color
+                    firefly.brightness *= 0.3  # Make them more subtle
+                    firefly.size *= 0.7
+                    
+                    self.class_aura_particles[class_name].append(firefly)
     
     # -------------------INITIALIZE & CLEANUP-----------------------------
     def enter(self):
@@ -101,6 +243,18 @@ class ClassSelectionState:
         self.fade_alpha = 255
         self.transitioning = False
         
+        # Initialize particle effects
+        self.particle_system = ParticleSystem()
+        self._create_class_aura_effects()
+        
+        # Create initial selection particles
+        class_spacing = 180
+        total_width = class_spacing * (len(self.classes) - 1)
+        start_x = (SCREEN_WIDTH - total_width) // 2
+        class_y = 200
+        selected_x = start_x + self.selected_index * class_spacing
+        self._create_selection_particles(selected_x, class_y, self.class_objects[self.selected_index])
+        
         # Play selection music if available
         self.sound_manager.stop_background_music()
         if self.sound_manager.load_background_music(CLASS_SELECTION_MUSIC_PATH):
@@ -108,7 +262,11 @@ class ClassSelectionState:
     
     def cleanup(self):
         """Clean up when leaving state"""
-        pass
+        # Clear all particle effects
+        self.selection_particles.clear()
+        self.class_aura_particles.clear()
+        if hasattr(self, 'particle_system'):
+            self.particle_system.clear()
 
     # -------------------CLASS METHOD-------------------------------------
     def _start_transition(self, target=None):
@@ -139,16 +297,33 @@ class ClassSelectionState:
         """Render class selection interface"""
         screen.fill((15, 15, 30))  # Darker background for cleaner look
         
+        # Render background particle effects first (behind everything)
+        self.particle_system.update(0.016)  # Approximate dt for smooth animation
+        particles = self.particle_system.get_particles()
+        
+        # Render leaves behind everything
+        for leaf in particles.get('leaves', []):
+            leaf.render(screen)
+        
+        # Render fireflies behind UI but above leaves
+        for firefly in particles.get('fireflies', []):
+            firefly.render(screen)
+        
+        # Render class aura effects
+        for class_particles in self.class_aura_particles.values():
+            for particle in class_particles:
+                particle.render(screen)
+        
         # Render title with better positioning
         title_surface = self.large_font.render("Choose Your Class", True, WHITE)
-        title_rect = title_surface.get_rect(center=(SCREEN_WIDTH // 2, 60))  # Moved up
+        title_rect = title_surface.get_rect(center=(SCREEN_WIDTH // 2, 60))
         screen.blit(title_surface, title_rect)
         
         # Calculate positions for class previews - more compact layout
-        class_spacing = 180  # Reduced spacing
+        class_spacing = 180
         total_width = class_spacing * (len(self.classes) - 1)
         start_x = (SCREEN_WIDTH - total_width) // 2
-        class_y = 200  # Moved up for more space below
+        class_y = 200
         
         # Render each class option
         for i, (class_name, class_obj) in enumerate(zip(self.classes, self.class_objects)):
@@ -160,8 +335,8 @@ class ClassSelectionState:
             
             # Animated selection indicator - smaller
             if is_selected:
-                pulse = 1.0 + 0.08 * math.sin(self.animation_time * 4)  # Reduced pulse
-                glow_radius = int(50 * pulse)  # Smaller glow
+                pulse = 1.0 + 0.08 * math.sin(self.animation_time * 4)
+                glow_radius = int(50 * pulse)
                 
                 # Create glow effect
                 glow_surf = pygame.Surface((glow_radius * 2, glow_radius * 2), pygame.SRCALPHA)
@@ -174,7 +349,7 @@ class ClassSelectionState:
             
             # Background circle for class preview - smaller
             bg_color = (40, 40, 60) if not is_selected else (55, 55, 75)
-            pygame.draw.circle(screen, bg_color, (x, y), 50)  # Reduced from 80
+            pygame.draw.circle(screen, bg_color, (x, y), 50)
             pygame.draw.circle(screen, class_obj.secondary_color, (x, y), 50, 2)
             
             # Render class preview
@@ -185,8 +360,12 @@ class ClassSelectionState:
             # Class name - positioned closer
             name_color = class_obj.color if is_selected else WHITE
             name_surface = self.medium_font.render(class_obj.name.title(), True, name_color)
-            name_rect = name_surface.get_rect(center=(x, y + 75))  # Closer to circle
+            name_rect = name_surface.get_rect(center=(x, y + 75))
             screen.blit(name_surface, name_rect)
+        
+        # Render selection particles (orbiting around selected class)
+        for particle in self.selection_particles:
+            particle.render(screen)
         
         # Create info panel for selected class - more organized
         if 0 <= self.selected_index < len(self.class_objects):
@@ -236,7 +415,7 @@ class ClassSelectionState:
         # Controls - moved to bottom with cleaner styling
         controls_y = SCREEN_HEIGHT - 40
         controls_surface = self.small_font.render(
-            "A/D or ←/→: Navigate | ENTER/SPACE: Select | ESC: Back", 
+            "A/D or LEFT/RIGHT: Navigate | ENTER/SPACE: Select | ESC: Back", 
             True, (120, 120, 120)
         )
         controls_rect = controls_surface.get_rect(center=(SCREEN_WIDTH // 2, controls_y))
@@ -259,6 +438,23 @@ class ClassSelectionState:
         self.animation_time += dt
         self.preview_time += dt
         
+        # Update particle systems
+        self.particle_system.update(dt)
+        
+        # Update class aura particles
+        for class_particles in self.class_aura_particles.values():
+            for particle in class_particles:
+                particle.update(dt)
+        
+        # Update selection particles to orbit around selected class
+        if self.selection_particles:
+            class_spacing = 180
+            total_width = class_spacing * (len(self.classes) - 1)
+            start_x = (SCREEN_WIDTH - total_width) // 2
+            class_y = 200
+            selected_x = start_x + self.selected_index * class_spacing
+            self._update_selection_particles(dt, selected_x, class_y)
+        
         # Handle input cooldown
         if self.input_cooldown > 0:
             self.input_cooldown -= dt
@@ -273,12 +469,30 @@ class ClassSelectionState:
             
             # Navigation
             if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+                old_index = self.selected_index
                 self.selected_index = (self.selected_index - 1) % len(self.classes)
+                if old_index != self.selected_index:
+                    # Recreate selection particles for new class
+                    class_spacing = 180
+                    total_width = class_spacing * (len(self.classes) - 1)
+                    start_x = (SCREEN_WIDTH - total_width) // 2
+                    class_y = 200
+                    selected_x = start_x + self.selected_index * class_spacing
+                    self._create_selection_particles(selected_x, class_y, self.class_objects[self.selected_index])
                 self.input_cooldown = 0.2
                 self.sound_manager.play_sound('menu_move')
                 
             elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+                old_index = self.selected_index
                 self.selected_index = (self.selected_index + 1) % len(self.classes)
+                if old_index != self.selected_index:
+                    # Recreate selection particles for new class
+                    class_spacing = 180
+                    total_width = class_spacing * (len(self.classes) - 1)
+                    start_x = (SCREEN_WIDTH - total_width) // 2
+                    class_y = 200
+                    selected_x = start_x + self.selected_index * class_spacing
+                    self._create_selection_particles(selected_x, class_y, self.class_objects[self.selected_index])
                 self.input_cooldown = 0.2
                 self.sound_manager.play_sound('menu_move')
             

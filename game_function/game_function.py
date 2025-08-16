@@ -73,12 +73,12 @@ def TITLE_CAPTION(title) -> None:
 def CLOCK() -> pygame.time.Clock:
     return pygame.time.Clock()
 
-def FONT() -> pygame.font.Font:
+def FONT(filepath=CUSTOM_FONT, size=18) -> pygame.font.Font:
     try:
-        return create_font(CUSTOM_FONT, 18)
+        return create_font(CUSTOM_FONT, size)
     except Exception as e:
         print(f"Could not load custom font, using default: {e}")
-        return pygame.font.Font(None, 18)
+        return pygame.font.Font(None, size)
 
 def GAME_INPUT_HANDLER(event: pygame.event.Event) -> bool:
     """Legacy wrapper for input handling."""

@@ -1,4 +1,5 @@
 from settings import *
+from game_function.game_function import *
 from entities.character_classes import CHARACTER_CLASSES
 from ui.effects.particles import ParticleSystem 
 
@@ -10,11 +11,14 @@ class ClassSelectionState:
     """State for selecting character class before to start the game"""
     
     def __init__(self, font, sound_manager, player):
+        # Existing Components
         self.font = font
         self.sound_manager = sound_manager
-        self.large_font = pygame.font.Font(None, 48)
-        self.medium_font = pygame.font.Font(None, 28)
-        self.small_font = pygame.font.Font(None, 20)
+
+        # Create a Custom Font
+        self.large_font = FONT(CUSTOM_FONT_UI, 24)
+        self.medium_font = FONT(CUSTOM_FONT_UI, 20)
+        self.small_font = FONT(CUSTOM_FONT_UI, 16)
 
         # Global Entities - For Stats Modification
         self.player = player

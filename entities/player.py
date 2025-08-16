@@ -24,28 +24,20 @@ class Player:
         if start_y is None:
             start_y = WORLD_HEIGHT // 2
 
-        self.x, self.y = start_x, start_y
+        self.position = {'x': start_x, 'y': start_y}
+        self.x = start_x
+        self.y = start_y
 
         # Timers
-        self.attack_cooldown = 0
-        self.damage_flash_timer = 0
+        self.skill_timer = {'attack_cooldown': 0, 'damage_flash_timer': 0}
         
         # Knockback physics
-        self.knockback_velocity = [0.0, 0.0]
-        self.knockback_decay = 0.88
-        self.knockback_threshold = 8
-        self.knockback_resistance = 0.7
+        self.knockback = {'velocity': [0.0, 0.0], 'decay': 0.88, 'threshold': 8, 'resistance': 0.7}
 
         # Dash mechanics
-        self.dash_cooldown = 0
-        self.dash_duration = 0
-        self.dash_velocity = [0.0, 0.0]
-        self.dash_distance = 150
-        self.dash_speed = 800
-        self.dash_cooldown_time = 2.0
-        self.dash_duration_time = 0.2
-        self.dash_invincible = False
-        self.last_movement_direction = [0, 0]
+        self.dash_property = {'cooldown': 0, 'duration': 0, 'velocity': [0.0, 0.0], 'distance': 150,
+                              'speed': 800, 'cooldown_time': 2.0, 'duration_time': 0.2,
+                              'is_invincible': False, 'last_movement_direction': [0, 0]}
 
         # Game Feature
         self.particle_system = ParticleSystem()
@@ -80,9 +72,9 @@ class Player:
         self._update_knockback(dt)
         self._handle_movement(dt)
         
-        self.attack_cooldown = max(0, self.attack_cooldown - dt)
-        self.damage_flash_timer = max(0, self.damage_flash_timer - dt)
-        self.dash_cooldown = max(0, self.dash_cooldown - dt)
+        self.skill_timer['attack_cooldown'] = max(0, self.skill_timer['attack_cooldown'] - dt)
+        self.skill_timer['damage_flash_timer'] = max(0, self.skill_timer['damage_flash_timer'] - dt)
+        self.dash_property['cooldown'] = max(0, self.dash_property['cooldown'] - dt)
         
         self._check_level_up()
         self._update_rect()
@@ -96,12 +88,12 @@ class Player:
 
     def _update_dash(self, dt: float) -> None:
         """Update dash mechanics."""
-        if self.dash_duration > 0:
-            self.dash_duration -= dt
+        if self.dash_property['duration'] > 0:
+            self.dash_property['duration'] -= dt
             
             # Apply dash movement
-            new_x = self.x + self.dash_velocity[0] * dt
-            new_y = self.y + self.dash_velocity[1] * dt
+            new_x = self.x + self.dash_property['velocity'][0] * dt
+            new_y = self.y + self.dash_property['velocity'][1] * dt
             
             # Apply bounds
             new_x, new_y = self._apply_bounds(new_x, new_y)
@@ -111,19 +103,19 @@ class Player:
             self.particle_system.create_dash_trail(self.x, self.y)
             
             # End dash
-            if self.dash_duration <= 0:
-                self.dash_velocity = [0.0, 0.0]
-                self.dash_invincible = False
+            if self.dash_property['duration'] <= 0:
+                self.dash_property['velocity'] = [0.0, 0.0]
+                self.dash_property['is_invincible'] = False
 
     def _update_knockback(self, dt: float) -> None:
         """Update knockback physics."""
         # Don't apply knockback during dash
-        if self.dash_duration > 0:
+        if self.dash_property['duration'] > 0:
             return
             
-        vx, vy = self.knockback_velocity
+        vx, vy = self.knockback['velocity']
         
-        if abs(vx) > self.knockback_threshold or abs(vy) > self.knockback_threshold:
+        if abs(vx) > self.knockback['threshold'] or abs(vy) > self.knockback['threshold']:
             # Apply knockback velocity
             new_x = self.x + vx * dt
             new_y = self.y + vy * dt
@@ -134,15 +126,15 @@ class Player:
             self.x, self.y = new_x, new_y
             
             # Apply decay
-            self.knockback_velocity[0] *= self.knockback_decay
-            self.knockback_velocity[1] *= self.knockback_decay
+            self.knockback['velocity'][0] *= self.knockback['decay']
+            self.knockback['velocity'][1] *= self.knockback['decay']
         else:
-            self.knockback_velocity = [0.0, 0.0]
+            self.knockback['velocity'] = [0.0, 0.0]
 
     def _handle_movement(self, dt: float) -> None:
         """Handle WASD/arrow key movement with bounds checking."""
         # Don't handle normal movement during dash
-        if self.dash_duration > 0:
+        if self.dash_property['duration'] > 0:
             return
         
         # Player's Movement
@@ -152,7 +144,7 @@ class Player:
         
         # Store movement direction for dash
         if dx != 0 or dy != 0:
-            self.last_movement_direction = [dx, dy]
+            self.dash_property['last_movement_direction'] = [dx, dy]
         
         # Normalize diagonal movement
         if dx and dy:
@@ -160,7 +152,7 @@ class Player:
             dy *= 0.707
         
         # Reduce movement during knockback
-        knockback_magnitude = math.hypot(*self.knockback_velocity)
+        knockback_magnitude = math.hypot(*self.knockback['velocity'])
         movement_reduction = max(0.3, 1.0 - (knockback_magnitude / 250))
         
         # Apply movement
@@ -173,7 +165,7 @@ class Player:
 
     def dash(self) -> bool:
         """Perform dash ability."""
-        if self.dash_cooldown > 0 or self.dash_duration > 0:
+        if self.dash_property['cooldown'] > 0 or self.dash_property['duration'] > 0:
             return False
         
         # Get dash direction from current input or last movement
@@ -183,7 +175,7 @@ class Player:
         
         # If no current input, use last movement direction
         if dx == 0 and dy == 0:
-            dx, dy = self.last_movement_direction
+            dx, dy = self.dash_property['last_movement_direction']
         
         # If still no direction, dash forward (right)
         if dx == 0 and dy == 0:
@@ -195,13 +187,13 @@ class Player:
             dy *= 0.707
         
         # Set dash properties
-        self.dash_velocity = [dx * self.dash_speed, dy * self.dash_speed]
-        self.dash_duration = self.dash_duration_time
-        self.dash_cooldown = self.dash_cooldown_time
-        self.dash_invincible = True
+        self.dash_property['velocity'] = [dx * self.dash_property['speed'], dy * self.dash_property['speed']]
+        self.dash_property['duration'] = self.dash_property['duration_time']
+        self.dash_property['cooldown'] = self.dash_property['cooldown_time']
+        self.dash_property['is_invincible'] = True
         
         # Clear existing knockback
-        self.knockback_velocity = [0.0, 0.0]
+        self.knockback['velocity'] = [0.0, 0.0]
         
         # Play dash sound and create effects
         self.sound_manager.play_sound('dash')
@@ -235,10 +227,10 @@ class Player:
 
     def attack(self, enemies: List) -> int:
         """Attack nearby enemies within range."""
-        if self.attack_cooldown > 0 or self.dash_duration > 0:
+        if self.skill_timer['attack_cooldown'] > 0 or self.dash_property['duration'] > 0:
             return 0
         
-        self.attack_cooldown = 0.5
+        self.skill_timer['attack_cooldown'] = 0.5
         self.sound_manager.play_sound('attack')
         
         hit_count = 0
@@ -278,7 +270,7 @@ class Player:
         
         # Calculate knockback force (increased during dash)
         base_knockback = 150
-        if self.dash_duration > 0:
+        if self.dash_property['duration'] > 0:
             base_knockback *= 2.0  # Dash attacks have more knockback
             
         damage_multiplier = damage / 25.0
@@ -290,11 +282,11 @@ class Player:
     def take_damage(self, amount: int, enemy=None) -> None:
         """Take damage with visual feedback and knockback."""
         # Invincible during dash
-        if self.dash_invincible:
+        if self.dash_property['is_invincible']:
             return
             
         self.hp = max(0, self.hp - amount)
-        self.damage_flash_timer = 0.3
+        self.skill_timer['damage_flash_timer'] = 0.3
         
         self.sound_manager.play_sound('player_damage')
 
@@ -322,7 +314,7 @@ class Player:
     def _apply_damage_knockback(self, enemy, damage: int) -> None:
         """Apply knockback when taking damage."""
         # No knockback during dash
-        if self.dash_duration > 0:
+        if self.dash_property['duration'] > 0:
             return
             
         dx = self.x - enemy.x
@@ -344,11 +336,11 @@ class Player:
         
         knockback_force = (base_knockback * size_multiplier * 
                           damage_multiplier * distance_multiplier * 
-                          self.knockback_resistance)
+                          self.knockback['resistance'])
         
         # Apply velocity with capping
-        vx = self.knockback_velocity[0] + dx * knockback_force
-        vy = self.knockback_velocity[1] + dy * knockback_force
+        vx = self.knockback['velocity'][0] + dx * knockback_force
+        vy = self.knockback['velocity'][1] + dy * knockback_force
         
         # Cap maximum velocity
         max_knockback = 300
@@ -358,7 +350,7 @@ class Player:
             vx *= scale
             vy *= scale
         
-        self.knockback_velocity = [vx, vy]
+        self.knockback['velocity'] = [vx, vy]
 
     def add_experience(self, exp: int) -> None:
         """Add experience points."""
@@ -375,11 +367,11 @@ class Player:
             self.max_hp += 15
             self.hp = self.max_hp
             self.attack_power += 3
-            self.knockback_resistance = min(0.9, self.knockback_resistance + 0.02)
+            self.knockback['resistance'] = min(0.9, self.knockback['resistance'] + 0.02)
             
             # Improve dash with level
-            self.dash_cooldown_time = max(1.0, self.dash_cooldown_time - 0.05)
-            self.dash_distance = min(200, self.dash_distance + 5)
+            self.dash_property['cooldown_time'] = max(1.0, self.dash_property['cooldown_time'] - 0.05)
+            self.dash_property['distance'] = min(200, self.dash_property['distance'] + 5)
             
             leveled_up = True
         
@@ -388,24 +380,24 @@ class Player:
 
     def is_dashing(self) -> bool:
         """Check if player is currently dashing."""
-        return self.dash_duration > 0
+        return self.dash_property['duration'] > 0
 
     def get_dash_cooldown_percent(self) -> float:
         """Get dash cooldown as percentage (0-1, where 0 is ready)."""
-        return self.dash_cooldown / self.dash_cooldown_time
+        return self.dash_property['cooldown'] / self.dash_property['cooldown_time']
 
     def render(self, screen: pygame.Surface) -> None:
         """Render player with visual effects."""
         # Calculate color with damage flash and dash effects
         color = GREEN
-        if self.damage_flash_timer > 0:
-            flash = int(255 * self.damage_flash_timer / 0.3)
+        if self.skill_timer['damage_flash_timer'] > 0:
+            flash = int(255 * self.skill_timer['damage_flash_timer'] / 0.3)
             color = (min(255, GREEN[0] + flash), GREEN[1], GREEN[2])
         
         # Dash visual effects
-        if self.dash_duration > 0:
+        if self.dash_property['duration'] > 0:
             # Make player slightly transparent and add blue tint during dash
-            dash_progress = 1.0 - (self.dash_duration / self.dash_duration_time)
+            dash_progress = 1.0 - (self.dash_property['duration'] / self.dash_property['duration_time'])
             blue_tint = int(100 * (1.0 - dash_progress))
             color = (color[0], color[1], min(255, color[2] + blue_tint))
             
@@ -413,7 +405,7 @@ class Player:
             self._render_dash_afterimage(screen, color)
         
         # Render motion trail during knockback (but not during dash)
-        if self.dash_duration <= 0:
+        if self.dash_property['duration'] <= 0:
             self._render_motion_trail(screen, color)
         
         # Draw player
@@ -421,7 +413,7 @@ class Player:
         pygame.draw.circle(screen, color, (int(self.x), int(self.y)), int(player_scale))
         
         # Show attack range when ready (but not during dash)
-        if self.attack_cooldown <= 0 and self.dash_duration <= 0:
+        if self.skill_timer['attack_cooldown'] <= 0 and self.dash_property['duration'] <= 0:
             # Converting from world to screen size
             attack_range = 60
             screen_range = self.camera.screen_view(attack_range)
@@ -435,12 +427,12 @@ class Player:
 
     def _render_dash_afterimage(self, screen: pygame.Surface, color: Tuple[int, int, int]) -> None:
         """Render afterimage effect during dash."""
-        dash_progress = 1.0 - (self.dash_duration / self.dash_duration_time)
+        dash_progress = 1.0 - (self.dash_property['duration'] / self.dash_property['duration_time'])
         
         for i in range(3):
             afterimage_factor = (i + 1) * 0.3
-            afterimage_x = self.x - self.dash_velocity[0] * afterimage_factor * 0.02
-            afterimage_y = self.y - self.dash_velocity[1] * afterimage_factor * 0.02
+            afterimage_x = self.x - self.dash_property['velocity'][0] * afterimage_factor * 0.02
+            afterimage_y = self.y - self.dash_property['velocity'][1] * afterimage_factor * 0.02
             
             try:
                 alpha = int(100 * (1.0 - dash_progress) / (i + 2))
@@ -455,7 +447,7 @@ class Player:
 
     def _render_dash_indicator(self, screen: pygame.Surface) -> None:
         """Render dash cooldown indicator."""
-        if self.dash_cooldown > 0:
+        if self.dash_property['cooldown'] > 0:
             # Draw cooldown circle
             indicator_radius = 20
             indicator_x = int(self.x + self.radius + 10)
@@ -474,7 +466,7 @@ class Player:
 
     def _render_motion_trail(self, screen: pygame.Surface, color: Tuple[int, int, int]) -> None:
         """Render motion trail effect during knockback."""
-        knockback_magnitude = math.hypot(*self.knockback_velocity)
+        knockback_magnitude = math.hypot(*self.knockback['velocity'])
         if knockback_magnitude <= 15:
             return
         
@@ -482,8 +474,8 @@ class Player:
         
         for i in range(2):
             trail_factor = (i + 1) * 0.4
-            trail_x = self.x - self.knockback_velocity[0] * trail_factor * 0.015
-            trail_y = self.y - self.knockback_velocity[1] * trail_factor * 0.015
+            trail_x = self.x - self.knockback['velocity'][0] * trail_factor * 0.015
+            trail_y = self.y - self.knockback['velocity'][1] * trail_factor * 0.015
             
             try:
                 trail_alpha_current = trail_alpha // (i + 2)

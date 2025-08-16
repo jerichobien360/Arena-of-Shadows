@@ -20,7 +20,7 @@ A 2D pixel RPG fighting game where you battle waves of shadowy enemies in an anc
 <summary>Show more...</summary>
 
 <h3>🎯Project Vision</h3>
-<p>The game is built to be more than entertainment, as it is primarily focused on the <b>open-source game project</b>, particularly Python developers who want to get started into game development, like me.
+<p>This game is built to be more than entertainment, whereas it is primarily focused on the <b>open-source game project</b>, particularly for Python developers who want to get started into game development, and use this project as a reference.
 
 With a feature tool of:
 - Modular level system

@@ -391,7 +391,7 @@ class GameplayRenderer:
         
         # Optional: Show cooldown time remaining as text
         if cooldown_percent > 0:
-            remaining_time = player.dash_cooldown
+            remaining_time = player.dash_property['cooldown']
             time_text = f"{remaining_time:.1f}s"
             time_surface = self.font.render(time_text, True, (200, 200, 200))
             time_x = indicator_x + 40

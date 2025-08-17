@@ -115,6 +115,9 @@ CUSTOM_FONT_UI_BOLD = "assets\\font\\Exo\\static\\Exo-Medium.ttf"
 # DATABASE FILEPATH
 DATABASE_FILE = "data\\AOS_player_data.db"
 
+# IMAGE IMPORT
+MENU_BACKGROUND_TILE_PATH = "assets/background/background_2.jpg"
+
 # ======================= UI Configuration ==================================
 # UI Manager Enums and Classes
 class ElementType(Enum):

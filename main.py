@@ -112,7 +112,7 @@ class ArenaOfShadows:
         
         # F11 for fullscreen toggle
         if event.key == pygame.K_F11:
-            self._toggle_fullscreen()
+            pass #self._toggle_fullscreen()
         
         # F3 for debug mode toggle
         if event.key == pygame.K_F3:
@@ -132,7 +132,7 @@ class ArenaOfShadows:
             )
     
     # -------------------- GAME UPDATE ------------------------------------
-    def _update_game(self, delta_time):
+    def _update_game(self, delta_time: float):
         """Update game logic."""
         next_state = self.state_manager.update(delta_time)
         

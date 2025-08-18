@@ -13,12 +13,9 @@ DEBUGGING_ENABLE = True
 DEBUGGING_ENABLE_DETAILS = True
 
 # Window Manager - CONSTANTS
-SCREEN_WIDTH = 700 # 700
-SCREEN_HEIGHT = 525 # 525
+SCREEN_WIDTH = 700
+SCREEN_HEIGHT = 525
 FPS = 60
-
-# Background
-BACKGROUND_TILE_PATH = "assets\\background\\background_tile.jpg"
 
 # Colors
 BLACK = (0, 0, 0)
@@ -117,6 +114,9 @@ DATABASE_FILE = "data\\AOS_player_data.db"
 
 # IMAGE IMPORT
 MENU_BACKGROUND_TILE_PATH = "assets/background/background_2.jpg"
+
+# BACKGROUND GAME TILING
+BACKGROUND_TILE_PATH = "assets\\background\\background_tile.jpg"
 
 # ======================= UI Configuration ==================================
 # UI Manager Enums and Classes

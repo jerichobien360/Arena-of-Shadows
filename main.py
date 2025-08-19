@@ -151,6 +151,7 @@ class ArenaOfShadows:
         
         pygame.display.flip()
     
+    # -------------------- GAME DEBUG -------------------------------------
     def _render_debug_info(self):
         """Render debug information on screen."""
         # FPS counter

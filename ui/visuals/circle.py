@@ -18,16 +18,15 @@ class Circle:
         self.x += self.speed
         self.y += self.speed
         
-        # Updating alpha
-        if self.alpha < self.origin[2]:
-            self.alpha += 5
+        # Updating alpha's fade in fx
+        self.alpha = min(self.alpha+5, self.origin[2])
         
         # Reset position when circle moves off screen
         # Add some padding to ensure smooth transition
         if self.x > SCREEN_WIDTH + self.radius or self.y > SCREEN_HEIGHT + self.radius:
             # Reset to a random position on the top-left edge
-            self.x = self.origin[0] #random.randint(-self.radius * 2, -self.radius)
-            self.y = self.origin[1] #random.randint(-self.radius * 2, -self.radius)
+            self.x = self.origin[0]
+            self.y = self.origin[1]
             self.alpha = 0
     
     def draw(self, surface):

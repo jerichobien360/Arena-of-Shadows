@@ -6,10 +6,11 @@ from contextlib import suppress
 from typing import Dict, List, Any
 from dataclasses import dataclass
 from systems.manager.asset_manager import *
+from ui.visuals.circle import Circle
 
 
 class MainMenuRenderer:
-    """Handles visual rendering for the main menu"""
+    """Handles main menu visual rendering"""
     
     def __init__(self, font: pygame.font.Font, lighting_config):
         """Integrated Components from UI, Managers, Pygame"""
@@ -17,6 +18,19 @@ class MainMenuRenderer:
         self.lighting_config = lighting_config
         self.background_image = self._load_background()
         self.surfaces = self._create_surfaces()
+        
+        # Custom game visuals
+        self.circles = []
+        self._init_circle()
+        
+    def _init_circle(self):
+        for _ in range(50): # Number of circles to be created
+            x = random.randint(-100, SCREEN_WIDTH + 100)
+            y = random.randint(-100, SCREEN_HEIGHT + 100)
+            radius = random.randint(10, 40)
+            color = BLACK # random.choice(BLACK)
+            speed = random.uniform(0.5, 2.0)  # Variance of Speed
+            self.circles.append(Circle(x, y, radius, color, speed)) # Create a bunch of circles
         
     def _load_background(self) -> pygame.Surface:
         """Load background with gradient fallback""" 
@@ -139,6 +153,11 @@ class MainMenuRenderer:
         # Background layers
         screen.blit(self.background_image, (0, 0))
         screen.blit(self.surfaces['dim'], (0, 0))
+        
+        # Visual Rendering
+        for circle in self.circles:
+            circle.update()
+            circle.draw(screen)
         
         # Particles and lighting
         self._render_particles(screen, particles)

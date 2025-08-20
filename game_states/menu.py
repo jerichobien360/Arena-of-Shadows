@@ -96,7 +96,7 @@ class MainMenuState(GameState):
             return None
             
         if pygame.key.get_pressed()[pygame.K_RETURN]:
-            self.start_transition("class_selection") # PREVIOUS: loading_screen_gameplay
+            self.start_transition("class_selection") # Next Class State
         
         return None
 

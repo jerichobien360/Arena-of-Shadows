@@ -7,6 +7,7 @@ from settings import *
 
 # Module Packages
 from game_function.game_function import *
+from game_function.debugging import *
 from systems.manager.sound_manager import *
 from systems.manager.game_state_manager import *
 
@@ -77,7 +78,7 @@ class ArenaOfShadows:
         for name, state in states.items():
             self.state_manager.add_state(name, state)
         
-        self.state_manager.change_state("loading_screen_menu") # ORIGINAL CODE: "main_menu"
+        self.state_manager.change_state("loading_screen_menu")
     
     # -------------------- HANDLE EVENTS ----------------------------------
     def _handle_events(self):
@@ -136,8 +137,10 @@ class ArenaOfShadows:
         """Update game logic."""
         next_state = self.state_manager.update(delta_time)
         
+        # Safety net for exiting the game within a game state loop
         if next_state == "quit":
             self.running = False
+        
         elif next_state:
             self.state_manager.change_state(next_state)
     

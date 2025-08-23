@@ -2,6 +2,7 @@ Bug to Fix:
 1. Combat System: The enemy were glitching when they make a formation, other code classes were possibly not used there correctly.
 2. Clean code: Through rearranging and refactoring the large code into a simple one
 3. Unknown Starting Position of Player: After choosing a class, an unknown bug occur, before and after restarting the game.
+4. Minimap: The size of the viewport is not correspond to the actual view of the player there.
 
 
 For Improvement:

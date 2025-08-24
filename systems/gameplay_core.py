@@ -1,20 +1,28 @@
 """Core gameplay logic with clean architecture and optimized combat systems."""
 
-import math
-import pygame
-from typing import List, Tuple, Optional, Dict, Any
 
+# Configuration Modules
 from settings import *
+
+# Entity Modules
 from entities.player import *
 from entities.enemies import *
+
+# System Modules
 from systems.manager.wave_manager import *
 from systems.game_feature.camera import *
 from systems.game_feature.background_system import *
 from systems.game_feature.battle_formation_system import FormationSystem
 from systems.manager.input_manager import InputHandler
+
+# UI Modules
 from systems.manager.ui_manager import UniversalPanel, PanelTemplates
 from game_function.ui import *
 from ui.components.gameplay_renderer import GameplayRenderer
+
+import math
+import pygame
+from typing import List, Tuple, Optional, Dict, Any
 
 
 class GameplayCore:

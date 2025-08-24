@@ -1,11 +1,7 @@
 """Arena of Shadows - Main Game Application"""
 
-import pygame
-import sys
-import traceback
-from settings import *
-
 # Module Packages
+from settings import *
 from game_function.game_function import *
 from game_function.debugging import *
 from systems.manager.sound_manager import *
@@ -20,6 +16,10 @@ from game_states.menu import MainMenuState
 from game_states.game_over import GameOverState
 from game_states.loading import LoadingScreenState
 from game_states.game_class.class_selection import ClassSelectionState
+
+import pygame
+import sys
+import traceback
 
 
 class ArenaOfShadows:

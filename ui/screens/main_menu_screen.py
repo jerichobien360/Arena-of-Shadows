@@ -1,12 +1,12 @@
-import pygame
-import math
-
 from settings import *
-from contextlib import suppress
-from typing import Dict, List, Any
-from dataclasses import dataclass
 from systems.manager.asset_manager import *
 from ui.visuals.circle import Circle
+
+from typing import Dict, List, Any
+from dataclasses import dataclass
+
+import pygame
+import math
 
 
 class MainMenuRenderer:

@@ -1,8 +1,10 @@
 from settings import *
 from game_function.game_function import *
-import pygame
+
 from game_states.gameplay import GameState
 from ui.screens.game_over_screen import GameOverVisuals
+
+import pygame
 
 
 class GameOverState(GameState):

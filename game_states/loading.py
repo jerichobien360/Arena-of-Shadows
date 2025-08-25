@@ -1,9 +1,9 @@
-import pygame
-import math
-
 from settings import *
 from systems.manager.asset_manager import *
 from game_function.game_function import *
+
+import pygame
+import math
 
 
 class LoadingScreenState:

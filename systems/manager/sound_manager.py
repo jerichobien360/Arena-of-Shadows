@@ -1,7 +1,11 @@
-import math, pygame, os
-import numpy as np
 from settings import *
 from game_function.game_function import *
+
+
+import os
+import pygame
+import math
+import numpy as np
 
 
 class SoundManager:

@@ -7,11 +7,9 @@ class MiniMap:
     
     def __init__(self, world_width, world_height, background_system=None, 
                  width=180, height=120, margin=16):
-        # World dimensions (actual world spans 3x the provided dimensions)
+        # World dimensions
         self.world_width = world_width
         self.world_height = world_height
-        self.actual_world_width = world_width * 3
-        self.actual_world_height = world_height * 3
         
         # Minimap display properties
         self.width = width

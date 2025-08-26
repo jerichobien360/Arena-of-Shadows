@@ -125,46 +125,8 @@ class LoadingScreenState:
         title_surface = self.title_font.render(self.title_text, True, self.text_color)
         title_rect = title_surface.get_rect(center=(center_x, center_y - 100))
         screen.blit(title_surface, title_rect)
-        
-        # Render animated loading text with dots
-        # dots = ""
-        # for i in range(self.dots_count):
-        #     # Make dots flash in sequence
-        #     flash_time = (self.loading_time - i * 0.2) % (self.dots_count * self.dot_flash_speed)
-        #     if flash_time < self.dot_flash_speed:
-        #         dots += "."
-        #     else:
-        #         dots += " "
-        
-        # loading_display = f"{self.loading_text}{dots}"
-        # loading_surface = self.font.render(loading_display, True, self.text_color)
-        # loading_rect = loading_surface.get_rect(center=(center_x, center_y + 50))
-        # screen.blit(loading_surface, loading_rect)
-        
-        # # Render loading progress bar
-        # bar_width = 300
-        # bar_height = 20
-        # bar_x = center_x - bar_width // 2
-        # bar_y = center_y + 100
-        
-        # # Background bar
-        # pygame.draw.rect(screen, (50, 50, 60), (bar_x, bar_y, bar_width, bar_height))
-        
-        # # Progress bar
-        # progress_width = int(bar_width * self.progress)
-        # if progress_width > 0:
-        #     pygame.draw.rect(screen, self.accent_color, (bar_x, bar_y, progress_width, bar_height))
-        
-        # # Progress percentage
-        # percentage = int(self.progress * 100)
-        # percent_text = f"{percentage}%"
-        # percent_surface = self.font.render(percent_text, True, self.text_color)
-        # percent_rect = percent_surface.get_rect(center=(center_x, bar_y + bar_height + 30))
-        # screen.blit(percent_surface, percent_rect)
-        
-        # # Render spinning loading indicator
-        # self._draw_spinner(screen, center_x, center_y - 20, 30)
 
+        # Loading Icon
         if self.sound_manager:
             loading_info = f"Loading Assets: {self.sound_manager.loaded_assets}/{self.sound_manager.total_assets}"
         else:
@@ -256,12 +218,16 @@ class LoadingScreenState:
             event: Pygame event to handle
         """
         # You can add event handling here if needed
-        # For example, skip loading on key press:
+        # For example, skip loading on key press
+        
+        '''
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 # Skip loading
                 self.progress = 1.0
                 self.loading_complete = True
+        '''
+        pass    
     
     def set_loading_text(self, text):
         """Set custom loading text.

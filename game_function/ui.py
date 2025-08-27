@@ -2,7 +2,7 @@ import pygame
 from settings import *
 
 
-# --- Input helpers (stateless, module-level) ---
+# --- Input Helpers (in a stateless, module-level) ---
 def activate_input(panel, element, mouse_pos):
     # Deactivate all other inputs
     for e in panel.elements:
@@ -27,7 +27,7 @@ def activate_input(panel, element, mouse_pos):
     element.selection_start = element.selection_end = element.cursor_pos
 
 def handle_input_key(panel, element, event):
-    # CTRL, SHIFT, CURSORS
+    # Keys: Ctrl, Shift, Cursors
     ctrl_held = pygame.K_LCTRL in panel.keys_held or pygame.K_RCTRL in panel.keys_held
     shift_held = pygame.K_LSHIFT in panel.keys_held or pygame.K_RSHIFT in panel.keys_held
     cursor_moved = False
@@ -141,7 +141,7 @@ def handle_input_key(panel, element, event):
     return True
 
 
-# --- Drawing helpers (stateless, module-level) ---
+# --- Drawing helpers (in a stateless, module-level) ---
 def draw_button(surface, font, el, colors, button_pressed=None, button_hovered=None):
     color = colors['button']
     if el == button_pressed:

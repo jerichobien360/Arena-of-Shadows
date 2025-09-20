@@ -7,7 +7,7 @@ from game_function.debugging import *
 from systems.manager.sound_manager import *
 from systems.manager.game_state_manager import *
 
-# Global Component
+# Global Entities
 from entities.player import Player
 
 # Game States
@@ -22,21 +22,35 @@ import sys
 import traceback
 
 
+"""
+This is the class for the main game application, and it shall START HERE
+as a main model of this code structuure.
+
+For complexities, it helds with the main system:
+    > State Manager (Main Hierarchy of the Game Flows)
+    > Debugging Tool
+    > Handling Events (Sequences that deals on the game application)
+    > Rendering (CPU-Based)
+
+As of now, working on separating all of pygame renderer to the renderer class
+and switch from CPU to GPU. Also, for documenting all of these game project for fun.
+"""
+
+
 class ArenaOfShadows:
     """Main Game Class of Arena of Shadows."""
     def __init__(self):
         self.running = True
         self.debug_mode = False
         
+        # Initialize Game Packages
         self._initialize_pygame()
-        self._setup_display()
-        self._initialize_managers()
-        self._global_component()
-        self._setup_game_states()
-    
+        self._initialize_components()
+        
     # -------------------- INITIALIZE -------------------------------------
     def _initialize_pygame(self):
-        """Initialize pygame and mixer."""
+        """Initialize game packages."""
+        # Pygame and Mixer
         pygame.init()
         pygame.mixer.init(
             frequency=22050, 
@@ -45,6 +59,14 @@ class ArenaOfShadows:
             buffer=512
         )
     
+    def _initialize_components(self):
+        """Main Components"""
+        self._setup_display()
+        self._setup_managers()
+        self._setup_entity()
+        self._setup_game_states()
+    
+    # -------------------- COMPONENTS -------------------------------------
     def _setup_display(self):
         """Setup game display and window properties."""
         self.screen = SCREEN(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -56,12 +78,12 @@ class ArenaOfShadows:
         
         self.input_handler = InputHandler()
     
-    def _initialize_managers(self):
+    def _setup_managers(self):
         """Initialize game managers."""
         self.sound_manager = SoundManager()
         self.state_manager = GameStateManager()
     
-    def _global_component(self):
+    def _setup_entity(self):
         self.player = Player()
     
     def _setup_game_states(self):
@@ -75,9 +97,11 @@ class ArenaOfShadows:
             "loading_screen_gameplay": LoadingScreenState("gameplay", self.sound_manager)
         }
         
+        # Adding to the state manager's main data
         for name, state in states.items():
             self.state_manager.add_state(name, state)
         
+        # Default
         self.state_manager.change_state("loading_screen_menu")
     
     # -------------------- HANDLE EVENTS ----------------------------------

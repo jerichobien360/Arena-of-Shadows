@@ -10,7 +10,9 @@
   <img src="https://img.icons8.com/color/48/000000/linux.png" alt="Linux Logo" height="32"/>
 </p>
 
-<img width="1280" height="720" alt="Work In Progress" src="https://github.com/user-attachments/assets/2e407da4-15ed-4f80-85bb-ec8b62990f2a" />
+<p align='left'>
+<img width="520" height="225" alt="banner" src="https://github.com/user-attachments/assets/35b59d16-a6eb-4b5d-826a-a37b6658d4b7" />
+</p>
 
 ## Game Overview
 A 2D pixel RPG fighting game where you battle waves of shadowy enemies in an ancient arena. Choose your class, upgrade your stats, and master light, heavy, block, and dodge mechanics to survive. Fight, level up, and conquer this arena.
@@ -38,10 +40,11 @@ It can transform into a tool that expands scalability from small to medium proje
 > [!WARNING]
 > Make sure to read on the [**LICENSE.md**](LICENSE.md) before to use this project for a various reasons.
 
+
 ## Game Menu
 <table>
 <tr>
-<td><img src="https://github.com/user-attachments/assets/e83f3b14-a1fe-48d8-853d-26af6f9f8f3c" width="400"></td>
+<td><img width="515" height="387" alt="menu" src="https://github.com/user-attachments/assets/4f816449-be23-49c4-a994-50b60d76250b" width="400"/></td>
 <td>
 
 **Features:**
@@ -55,10 +58,31 @@ The main menu welcomes players into this mystical world of shadows and ancient c
 </tr>
 </table>
 
+## Class Selection
+<table>
+<tr>
+<td><img width="515" height="387" alt="class_selection" src="https://github.com/user-attachments/assets/b09eab2a-9f9a-480f-96ca-77a807883ace" width="400"/></td>
+<td>
+
+**Features:**
+- Warrior 
+- Mage
+- Fireshooter
+
+Around these features, a unique class selection to be chosen will take on the shadowy battlefield.
+<br>
+<br>
+_(Work in Progress)_
+
+</td>
+</tr>
+</table>
+
+
 ## Gameplay
 <table>
 <tr>
-<td><img src="https://github.com/user-attachments/assets/ea5bfb26-d053-4861-a2e2-3e4f682a8fa4" width="400"></td>
+<td><img alt="gameplay" src="https://github.com/user-attachments/assets/ea5bfb26-d053-4861-a2e2-3e4f682a8fa4" width="400"></td>
 <td>
 
 **Combat System Features:**

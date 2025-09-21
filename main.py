@@ -131,15 +131,15 @@ class ArenaOfShadows:
         if event.type != pygame.KEYDOWN:
             return True
         
-        # Alt+F4 to quit
+        # Alt+F4: Quit the game
         if event.key == pygame.K_F4 and (event.mod & pygame.KMOD_ALT):
             return False
         
-        # F11 for fullscreen toggle
+        # F11: Toggle Fullscreen Mode
         if event.key == pygame.K_F11:
             pass #self._toggle_fullscreen()
         
-        # F3 for debug mode toggle
+        # F3: Toggle Debug Mode
         if event.key == pygame.K_F3:
             self.debug_mode = not self.debug_mode
         
@@ -192,6 +192,14 @@ class ArenaOfShadows:
         self.screen.blit(state_text, (10, 10))
     
     # -------------------- CLEANUP ----------------------------------------
+    def _cleanup(self):
+        """Clean up resources and exit gracefully."""
+        DEBUGGING('MENU_CLEANUP', DEBUGGING_ENABLE)
+        pygame.quit()
+        DEBUGGING('GAME_CLOSED', DEBUGGING_ENABLE)
+        sys.exit()
+
+    # -------------------- CLEANUP ----------------------------------------
     def run(self):
         """Main game loop."""
         DEBUGGING('GAME_STARTUP', DEBUGGING_ENABLE)
@@ -204,20 +212,15 @@ class ArenaOfShadows:
             if not self._handle_events():
                 break
             
+            # Game Update
             self._update_game(delta_time)
             self._render_game()
         
+        # Cleanup before to exit the game
         self._cleanup()
-    
-    def _cleanup(self):
-        """Clean up resources and exit gracefully."""
-        DEBUGGING('MENU_CLEANUP', DEBUGGING_ENABLE)
-        pygame.quit()
-        DEBUGGING('GAME_CLOSED', DEBUGGING_ENABLE)
-
 
 def main():
-    """Entry point for this game."""
+    """Game Application Entry point"""
     try:
         game = ArenaOfShadows()
         game.run()

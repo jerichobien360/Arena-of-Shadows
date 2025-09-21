@@ -1,11 +1,13 @@
 from settings import *
 from game_function.game_function import *
+from systems.game_feature.particle_system import *
+from systems.manager.game_state_manager import *
+
+from typing import Optional, Tuple, List
 import pygame
 import math
 import random
-from typing import Optional, Tuple, List
 
-from systems.game_feature.particle_system import *
 
 
 class Player:
@@ -17,6 +19,14 @@ class Player:
         self.camera = camera
         self.radius = 15
         self.world_bounds: Optional[Tuple[float, float, float, float]] = None
+        self.status_effect = {
+            "stunned": None,
+            "slow down": None,
+            "burning": None,
+            "hyponotized": None,
+            "freezed": None,
+            "healing": None
+        } # TODO: Create a class that handles on these status effect, and make a simple design for this
 
         # Setup the player's position
         if start_x is None:
@@ -24,7 +34,10 @@ class Player:
         if start_y is None:
             start_y = WORLD_HEIGHT // 2
 
+        # Position
         self.position = {'x': start_x, 'y': start_y}
+        
+        # Initial Position
         self.x = start_x
         self.y = start_y
 

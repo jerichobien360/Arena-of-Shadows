@@ -7,16 +7,33 @@ import pygame
 
 
 # ======================= Game Configuration ================================
-# Game Configuration
+# ============ Window Settings ============
 TITLE = "Arena of Shadows"
 DEBUGGING_ENABLE = True
 DEBUGGING_ENABLE_DETAILS = True
 
-# Window Manager - CONSTANTS
+# Other Properties
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 525
 FPS = 60
 
+
+# ============ Input Settings =============
+# Input Handler
+MOVE_LEFT = pygame.K_LEFT
+MOVE_RIGHT = pygame.K_RIGHT
+MOVE_DOWN = pygame.K_DOWN
+MOVE_UP = pygame.K_UP
+JUMP = pygame.K_SPACE
+ESCAPE = pygame.K_ESCAPE
+DASH_KEY = pygame.K_e
+
+# Audio Configuration
+MUSIC_VOLUME = 0.8  # Range: 0.0 ~ 1.0
+SFX_VOLUME = 0.7    # Range: 0.0 ~ 1.0
+
+
+# ============ Colors =====================
 # Colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -30,7 +47,7 @@ CYAN = (0, 255, 255)
 DARK_RED = (139, 0, 0)
 DARK_BLUE = (0, 0, 139)
 
-# Game Color Theme
+# Main Theme Color
 COLOR_THEME = {
     1: (251,245,239), # White: Bianca
     2: (242,211,171), # Light Brown: Wheat
@@ -40,31 +57,21 @@ COLOR_THEME = {
     6: (39,39,68) # Dark Blue: Ebony Clay
 }
 
-
 # Custom Color
 FIRESHOOTER_INNER_COLOR = (255, 200, 0)
 
-# CAMERA
+
+# ============ Camera Settings ============
+# PROPERTIES
 CAMERA_SMOOTHING = 0.12 # Default: 0.10
 MAX_ZOOM = 500
 MIN_ZOOM = 0
 
+
+# ============ Map Settings ===============
 # WORLD SETTINGS
 WORLD_WIDTH = 3000
 WORLD_HEIGHT = 3000
-
-# Input Handler
-MOVE_LEFT = pygame.K_LEFT
-MOVE_RIGHT = pygame.K_RIGHT
-MOVE_DOWN = pygame.K_DOWN
-MOVE_UP = pygame.K_UP
-JUMP = pygame.K_SPACE
-ESCAPE = pygame.K_ESCAPE
-DASH_KEY = pygame.K_e
-
-# Audio Configuration
-MUSIC_VOLUME = 0.8  # Range: 0.0 ~ 1.0
-SFX_VOLUME = 0.7    # Range: 0.0 ~ 1.0
 
 
 # ======================= Asset Filepath Configuration ======================
@@ -117,6 +124,7 @@ MENU_BACKGROUND_TILE_PATH = "assets/background/background_2.jpg"
 
 # BACKGROUND GAME TILING
 BACKGROUND_TILE_PATH = "assets\\background\\background_tile.jpg"
+
 
 # ======================= UI Configuration ==================================
 # UI Manager Enums and Classes

@@ -11,7 +11,7 @@
 </p>
 
 <p align='left'>
-<img width="520" height="225" alt="banner" src="https://github.com/user-attachments/src/assets/35b59d16-a6eb-4b5d-826a-a37b6658d4b7" />
+<img width="520" height="225" alt="banner" src="https://github.com/user-attachments/assets/35b59d16-a6eb-4b5d-826a-a37b6658d4b7" />
 </p>
 
 ## Game Overview
@@ -44,7 +44,7 @@ It can transform into a tool that expands scalability from small to medium proje
 ## Game Menu
 <table>
 <tr>
-<td><img width="515" height="387" alt="menu" src="https://github.com/user-attachments/src/assets/4f816449-be23-49c4-a994-50b60d76250b" width="400"/></td>
+<td><img width="515" height="387" alt="menu" src="https://github.com/user-attachments/assets/4f816449-be23-49c4-a994-50b60d76250b" width="400"/></td>
 <td>
 
 **Features:**
@@ -61,7 +61,7 @@ The main menu welcomes players into this mystical world of shadows and ancient c
 ## Class Selection
 <table>
 <tr>
-<td><img width="515" height="387" alt="class_selection" src="https://github.com/user-attachments/src/assets/b09eab2a-9f9a-480f-96ca-77a807883ace" width="400"/></td>
+<td><img width="515" height="387" alt="class_selection" src="https://github.com/user-attachments/assets/b09eab2a-9f9a-480f-96ca-77a807883ace" width="400"/></td>
 <td>
 
 **Features:**
@@ -82,7 +82,7 @@ _(Work in Progress)_
 ## Gameplay
 <table>
 <tr>
-<td><img alt="gameplay" src="https://github.com/user-attachments/src/assets/ea5bfb26-d053-4861-a2e2-3e4f682a8fa4" width="400"></td>
+<td><img alt="gameplay" src="https://github.com/user-attachments/assets/ea5bfb26-d053-4861-a2e2-3e4f682a8fa4" width="400"></td>
 <td>
 
 **Combat System Features:**

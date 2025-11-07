@@ -8,10 +8,10 @@ from settings import *
 from game_function.game_function import *
 from game_function.ui import *
 from game_states.gameplay import GameState
-from ui.effects.particles import ParticleSystem
-from ui.screens.main_menu_screen import MainMenuRenderer
-from ui.effects.animations import AnimationState
-from ui.effects.lighting import LightingConfig
+from src.ui.effects.particles import ParticleSystem
+from src.ui.screens.main_menu_screen import MainMenuRenderer
+from src.ui.effects.animations import AnimationState
+from src.ui.effects.lighting import LightingConfig
 
 
 class MainMenuState(GameState):

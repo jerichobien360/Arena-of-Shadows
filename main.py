@@ -8,7 +8,7 @@ from systems.manager.sound_manager import *
 from systems.manager.game_state_manager import *
 
 # Global Entities
-from entities.player import Player
+from src.entities.player import Player
 
 # Game States
 from game_states.gameplay import GameplayState

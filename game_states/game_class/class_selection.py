@@ -1,7 +1,7 @@
 from settings import *
 from game_function.game_function import *
-from entities.character_classes import CHARACTER_CLASSES
-from ui.effects.particles import ParticleSystem 
+from src.entities.character_classes import CHARACTER_CLASSES
+from src.ui.effects.particles import ParticleSystem 
 
 import pygame
 import math
@@ -160,7 +160,7 @@ class ClassSelectionState:
     def _create_selection_particles(self, x, y, class_obj):
         """Create magical particles around selected class"""
         import random
-        from ui.effects.particles import Firefly
+        from src.ui.effects.particles import Firefly
         
         # Clear existing selection particles
         self.selection_particles.clear()
@@ -220,7 +220,7 @@ class ClassSelectionState:
             
             # Create subtle ambient particles for each class
             if len(self.class_aura_particles[class_name]) < 3:
-                from ui.effects.particles import Firefly
+                from src.ui.effects.particles import Firefly
                 import random
                 
                 for _ in range(3 - len(self.class_aura_particles[class_name])):

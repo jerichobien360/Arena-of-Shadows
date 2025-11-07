@@ -5,8 +5,8 @@
 from settings import *
 
 # Entity Modules
-from entities.player import *
-from entities.enemies import *
+from src.entities.player import *
+from src.entities.enemies import *
 
 # System Modules
 from systems.manager.wave_manager import *
@@ -18,7 +18,7 @@ from systems.manager.input_manager import InputHandler
 # UI Modules
 from systems.manager.ui_manager import UniversalPanel, PanelTemplates
 from game_function.ui import *
-from ui.components.gameplay_renderer import GameplayRenderer
+from src.ui.components.gameplay_renderer import GameplayRenderer
 
 import math
 import pygame

@@ -1,6 +1,6 @@
 from settings import *
-from entities.enemies import *
-from entities.player import *
+from src.entities.enemies import *
+from src.entities.player import *
 import pygame, math, random
 
 class WaveManager:

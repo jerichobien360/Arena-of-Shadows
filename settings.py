@@ -78,52 +78,52 @@ WORLD_HEIGHT = 3000
 # SOUND FILES DICTIONARY
 SOUND_FILES = {
     # Game sounds
-    'attack': 'assets/audio/sounds/attack.wav',
-    'enemy_hit': 'assets/audio/sounds/enemy_hit.wav',
-    'enemy_death': 'assets/audio/sounds/enemy_death.wav',
-    'player_damage': 'assets/audio/sounds/player_damage.wav',
-    'level_up': 'assets/audio/sounds/level_up.wav',
-    'wave_complete': 'assets/audio/sounds/wave_complete.wav',
-    'dash': 'assets/audio/sounds/dash.wav',
+    'attack': 'src/assets/audio/sounds/attack.wav',
+    'enemy_hit': 'src/assets/audio/sounds/enemy_hit.wav',
+    'enemy_death': 'src/assets/audio/sounds/enemy_death.wav',
+    'player_damage': 'src/assets/audio/sounds/player_damage.wav',
+    'level_up': 'src/assets/audio/sounds/level_up.wav',
+    'wave_complete': 'src/assets/audio/sounds/wave_complete.wav',
+    'dash': 'src/assets/audio/sounds/dash.wav',
     
     # UI sounds
-    'ui_click': 'assets/audio/sounds/ui_click.wav',
-    'ui_hover': 'assets/audio/sounds/ui_hover.wav',
-    'ui_slider': 'assets/audio/sounds/ui_slider.wav',
-    'ui_toggle': 'assets/audio/sounds/ui_toggle.wav',
-    'ui_dropdown': 'assets/audio/sounds/ui_dropdown.wav',
-    'ui_focus': 'assets/audio/sounds/ui_focus.wav',
-    'ui_panel': 'assets/audio/sounds/ui_panel.wav',
-    'ui_error': 'assets/audio/sounds/ui_error.wav',
-    'ui_success': 'assets/audio/sounds/ui_success.wav',
+    'ui_click': 'src/assets/audio/sounds/ui_click.wav',
+    'ui_hover': 'src/assets/audio/sounds/ui_hover.wav',
+    'ui_slider': 'src/assets/audio/sounds/ui_slider.wav',
+    'ui_toggle': 'src/assets/audio/sounds/ui_toggle.wav',
+    'ui_dropdown': 'src/assets/audio/sounds/ui_dropdown.wav',
+    'ui_focus': 'src/assets/audio/sounds/ui_focus.wav',
+    'ui_panel': 'src/assets/audio/sounds/ui_panel.wav',
+    'ui_error': 'src/assets/audio/sounds/ui_error.wav',
+    'ui_success': 'src/assets/audio/sounds/ui_success.wav',
     
     # Ambient/feedback sounds
-    'notification': 'assets/audio/sounds/notification.wav',
-    'coin_collect': 'assets/audio/sounds/coin_collect.wav',
-    'item_pickup': 'assets/audio/sounds/item_pickup.wav',
-    'magic_cast': 'assets/audio/sounds/magic_cast.wav'
+    'notification': 'src/assets/audio/sounds/notification.wav',
+    'coin_collect': 'src/assets/audio/sounds/coin_collect.wav',
+    'item_pickup': 'src/assets/audio/sounds/item_pickup.wav',
+    'magic_cast': 'src/assets/audio/sounds/magic_cast.wav'
 }
 
 # BACKGROUND MUSIC PATH
-MENU_MUSIC_PATH = "assets/audio/background_music/main_menu.mp3"
-CLASS_SELECTION_MUSIC_PATH = "assets/audio/background_music/class_selection.mp3"
-GAMEPLAY_MUSIC_PATH = "assets/audio/background_music/gameplay.mp3"
-CLASS_SELECTION_MUSIC_PATH = "assets/audio/background_music/class_selection.mp3"
+MENU_MUSIC_PATH = "src/assets/audio/background_music/main_menu.mp3"
+CLASS_SELECTION_MUSIC_PATH = "src/assets/audio/background_music/class_selection.mp3"
+GAMEPLAY_MUSIC_PATH = "src/assets/audio/background_music/gameplay.mp3"
+CLASS_SELECTION_MUSIC_PATH = "src/assets/audio/background_music/class_selection.mp3"
 
 # WINDOW_MANAGER FILEPATH
-GAME_ICON = "assets\\icon.png"
-CUSTOM_FONT = "assets\\font\\Pixelify_Sans\\static\\PixelifySans-Medium.ttf"
-CUSTOM_FONT_UI = "assets\\font\\Exo\\static\\Exo-Light.ttf"
-CUSTOM_FONT_UI_BOLD = "assets\\font\\Exo\\static\\Exo-Medium.ttf"
+GAME_ICON = "src\\assets\\icon.png"
+CUSTOM_FONT = "src\\assets\\font\\Pixelify_Sans\\static\\PixelifySans-Medium.ttf"
+CUSTOM_FONT_UI = "src\\assets\\font\\Exo\\static\\Exo-Light.ttf"
+CUSTOM_FONT_UI_BOLD = "src\\assets\\font\\Exo\\static\\Exo-Medium.ttf"
 
 # DATABASE FILEPATH
 DATABASE_FILE = "data\\AOS_player_data.db"
 
 # IMAGE IMPORT
-MENU_BACKGROUND_TILE_PATH = "assets/background/background_2.jpg"
+MENU_BACKGROUND_TILE_PATH = "src/assets/background/background_2.jpg"
 
 # BACKGROUND GAME TILING
-BACKGROUND_TILE_PATH = "assets\\background\\background_tile.jpg"
+BACKGROUND_TILE_PATH = "src\\assets\\background\\background_tile.jpg"
 
 
 # ======================= UI Configuration ==================================

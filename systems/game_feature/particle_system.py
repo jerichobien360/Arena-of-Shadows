@@ -2,7 +2,7 @@ import pygame
 import math
 import random
 from typing import List, Tuple, Optional
-from ui.components.particle import *
+from src.ui.components.particle import *
 
 
 # TODO: Simplify the code and follow on the DRY and KISS Principle

@@ -2,7 +2,7 @@ from settings import *
 from game_function.game_function import *
 
 from game_states.gameplay import GameState
-from ui.screens.game_over_screen import GameOverVisuals
+from src.ui.screens.game_over_screen import GameOverVisuals
 
 import pygame
 

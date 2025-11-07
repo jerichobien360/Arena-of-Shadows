@@ -22,14 +22,14 @@ A 2D pixel RPG fighting game where you battle waves of shadowy enemies in an anc
 <summary>Show more...</summary>
 
 <h3>🎯Project Vision</h3>
-<p>This game is built to be more than entertainment, whereas it is primarily focused on the <b>open-source game project</b>, particularly for Python developers who want to get started into game development, and use this project as a reference.
+<p>This game is designed to serve more than just entertainment; it is primarily focused on the <b>open-source game project</b>, particularly for Python developers who want to get started in game development and use this project as a reference.
 
 With a feature tool of:
 - Modular level system
 - Adaptive AI
 - And a Custom Level Editor
 
-It can transform into a tool that expands scalability from small to medium projects, as you may allow to use this project's tool for your reference towards the development with Pygame.</p>
+It can transform into a tool that expands scalability from small to medium projects, as you can use this project's tool for reference during development with Pygame.</p>
 
 ![Genre](https://img.shields.io/badge/genre-rpg-blue)
 ![Game](https://img.shields.io/badge/project-Arena--of--Shadows-brown)
@@ -38,7 +38,7 @@ It can transform into a tool that expands scalability from small to medium proje
 </details>
 
 > [!WARNING]
-> Make sure to read on the [**LICENSE.md**](LICENSE.md) before to use this project for a various reasons.
+> Make sure to read the [**LICENSE.md**](LICENSE.md) before using this project for various reasons.
 
 
 ## Game Menu
